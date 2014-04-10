@@ -15,9 +15,9 @@ Run
 ---
 
 Prepare a local directory that can be FUSE-mounted by your user. 
-For instance, _/circuit_ is a good choice.
+For instance, `/circuit` is a good choice.
 
-To run the circuit tool on local port _11022_, use
+To run the circuit tool on local port `11022`, use
 
 	circuit -a :11022 -m /circuit
 
