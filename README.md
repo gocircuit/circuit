@@ -21,3 +21,11 @@ To run the circuit tool on local port `11022`, use
 
 	circuit -a :11022 -m /circuit
 
+Among a few other things, the circuit tool will printout its own circuit URL.
+It should look like this:
+
+	…
+	circuit://[::]:11022/78139/R21b66be46e9ba3e8
+	…
+
+Copy it. We will need it to instruct the next circuit tool to join this one.
