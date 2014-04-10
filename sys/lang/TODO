@@ -1,0 +1,19 @@
+* optimize handling of passing X that points to a local object
+	* also receiving X that points to a local object
+
+* write doc
+
+* monitor size of imp/exp tables and frequency of all runtime op types
+	# exp perm handles
+	# exp perm values
+	# exp nonperm handles
+	# exp nonperm values
+	# exp importers
+	# imp perm
+	# imp nonperm
+	# imp nonperm exporters
+	# calls per ?
+
+* expose all the pprof stuff
+
+* add passing channels

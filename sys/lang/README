@@ -1,0 +1,38 @@
+
+SUMMARY
+The language runtime converts linguistic operations
+(calling a remote value's method or forking a go
+routine remotely) into request-response interactions
+with remote runtimes.
+
+I/O:
+The ResponseWriter interfaces abstracts away an asynchronous 
+request-response architecture with other opaquely 
+addressable entities.
+
+ResponseWriter exposes communication over Go runtime interface{}s
+to the user. These values passed for these interfaces must
+be gob encodable. This design enables an implementation
+that allows for maintaining one encoder/decoder per remote
+runtime, thereby benefitting from better data compression
+over time.
+
+TIMEOUTS:
+The I/O infrastructure is responsible for timeing out request/response
+interactions if the destination is suspected dead.
+
+If a req/resp pair to a given destination timesout, the destination
+is considered ... dead for good?
+
+TYPES AND GOB:
+To ensure argument and return values are gob encodable,
+their types are registered with gob at the point where their
+receiver objects are registered with the circuit
+type system.
+
+FLATTENING AND UNFLATTENING
+Gob flattens values that are given as input to Encode or that are assigned to
+interface variables inside composite types.  For functional arguments and
+return values, we can correct for the flattening since we keep the original
+type information.  However we cannot do this for interface variables inside
+composite types passed as in or out of a function call.

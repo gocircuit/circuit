@@ -1,0 +1,25 @@
+RELEASE
+=======
+
+* document directory removal rules
+* move to github
+* make go gettable/installable?
+* website
+
+OPTIMIZATIONS
+=============
+
+When verified permanently broken, conn should not linger, but close right away
+2013/10/15 12:10:18 /Users/petar/code.google.com/p/cir-kernel/src/circuit/kit/tele/chain/dial.go:71: (0xc2100ec008) (tele·chain·127.0.0.1:5500) permanently unreachable
+
+Capture user interrupts on focus-side, so network delays don't block ctrl-c
+Garbage-collection of elements
+
+PROJECTS
+========
+
+add docker element
+Circuit Apps infrastructure (mention in talk)
+/tty element; interactive shell: Fix ^D/^C/exit issue of RSX's interactive shell
+/anchor file system (synchronized tree, sorta like zookeeper)
+/broadcast, /reduce, /allreduce file systems
