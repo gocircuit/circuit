@@ -1,0 +1,63 @@
+
+▒ Compiling without optimizations and inlining:
+	-gcflags "-N -l"
+
+▒ Very slow memory leaks, not reflected in the memory profile, are goroutine leaks!
+
+▒ Iterator variables are overwritten. Not correct:
+	for i := 0; i < N; i++ {
+		go func() {
+			println(i)
+		}()
+	}
+
+▒ Never use sync.Cond
+
+▒ defer recover() does not have any effect. Use
+	defer func() {
+		recover()
+	}()
+
+READABILITY
+===========
+
+▒ Use anonymous structs to group together fields protected by the same lock, e.g.
+	type tx struct {
+		r struct {
+			sync.Mutex
+			ch   <-chan UnlockFunc
+			unlk UnlockFunc
+		}
+		s struct {
+			sync.Mutex
+			s chan<- UnlockFunc
+		}
+	}
+
+
+BUG BLINDNESS
+=============
+
+Sometimes you run into a bug the source of which you cannot recover, specifically
+because your 
+
+▒ Receiver is a value by mistake
+
+	func (...) Close() error {
+		x.Lock()
+		defer x.Unlock()
+		if x.closed {
+			return io.ErrUnexpectedEOF
+		}
+		close(x.channel) // PANIC: closing a closed channel
+		x.closed = true
+		return nil
+	}
+
+	This panic seems implausible, staring at the code.
+	The bug is gleaned by looking at the receiver and checking
+	whether you have (x Type) or (x *Type).
+
+	CRUX: It is hard to catch because the natural line of reasoning, which
+	follows the stack trace does not prompt you to look at the receiver.
+	
