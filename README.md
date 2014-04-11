@@ -10,9 +10,9 @@ The circuit's CSP model provides three simple _elements_ that suffice for
 unconstrained general-purpose programmability and orchestration of cloud
 applications across clusters of any size. These elements are:
 
-* _Channel_: An ordered, message-oriented communication primitive
-* _Selection_: A synchronization mechanism for waiting on multiple event sources.
-* _Process_: A primitive for executing, monitoring and synchronizing with UNIX processes.
+* _Channel:_ An ordered, message-oriented communication primitive
+* _Selection:_ A synchronization mechanism for waiting on multiple event sources
+* _Process:_ A primitive for executing, monitoring and synchronizing with UNIX processes
 
 Build
 -----
