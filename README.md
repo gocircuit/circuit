@@ -1,8 +1,18 @@
 
 
-The Circuit is a tool for executing and synchronizing OS processes across entire clusters
-by means of a file-system interface.
+The circuit is a tool for executing and synchronizing UNIX processes across entire clusters
+by means of a file-system interface. 
 
+The circuit represents any cluster of UNIX machines in Hoare's _Communicating
+Sequential Processes_ model, hereafter CSP for short.
+
+The circuit's CSP model provides three simple _elements_ that suffice for
+unconstrained general-purpose programmability and orchestration of cloud
+applications across clusters of any size. These elements are:
+
+	* Channel: An ordered, message-oriented communication primitive
+	* Selection: A synchronization mechanism for waiting on multiple event sources.
+	* Process: A primitive for executing, monitoring and synchronizing with UNIX processes.
 
 Build
 -----
