@@ -1,5 +1,7 @@
 
-The Circuit is a simple language-agnostic tool for programming process-level concurrency across a cluster
+
+The Circuit is a tool for executing and synchronizing OS processes across entire clusters
+by means of a file-system interface.
 
 
 Build

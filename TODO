@@ -10,6 +10,7 @@ Garbage-collection of elements
 PROJECTS
 ========
 
+add waitjoin
 add docker element
 Circuit Apps infrastructure (mention in talk)
 /tty element; interactive shell: Fix ^D/^C/exit issue of RSX's interactive shell
