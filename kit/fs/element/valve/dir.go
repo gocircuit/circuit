@@ -43,6 +43,9 @@ func NewDir(name string, rmv func()) *ValveDir {
 	d.dir.AddChild("send", file.NewFileFID(NewSendFile(d.v)))
 	d.dir.AddChild("recv", file.NewFileFID(NewRecvFile(d.v)))
 	//
+	d.dir.AddChild("trysend", file.NewFileFID(NewTrySendFile(d.v)))
+	d.dir.AddChild("tryrecv", file.NewFileFID(NewTryRecvFile(d.v)))
+	//
 	d.dir.AddChild("waitsend", file.NewFileFID(NewWaitSendFile(d.v)))
 	d.dir.AddChild("waitrecv", file.NewFileFID(NewWaitRecvFile(d.v)))
 	//
@@ -70,9 +73,6 @@ func (s *ValveDir) Walk(wname []string) (rh.FID, error) {
 func (d *ValveDir) Remove() error {
 	d.rmv.Lock()
 	defer d.rmv.Unlock()
-	if !d.v.IsClosed() {
-		return rh.ErrBusy
-	}
 	if d.rmv.rmv != nil {
 		d.rmv.rmv()
 	}
@@ -106,7 +106,7 @@ SEND
 	Then, the matched open copies of "send" and "receive" become an
 	unbuffered pipe.
 
-		echo "¡hello, world!" > send
+		echo "¡hello, world!" >> send
 
 CLOSE
 

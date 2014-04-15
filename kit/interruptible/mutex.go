@@ -15,36 +15,48 @@ import (
 
 // Mutex is analgous to sync.Mutex, but the lock operation can be interrupted by the locking user.
 type Mutex struct {
-	lk   sync.Mutex
-	wait <-chan struct{}
+	initlk sync.Mutex
+	lock   <-chan struct{}
+	unlock chan<- struct{}
+}
+
+func (m *Mutex) init() {
+	m.initlk.Lock()
+	defer m.initlk.Unlock()
+	if m.lock != nil {
+		return
+	}
+	ch := make(chan struct{}, 1)
+	ch <- struct{}{} // first lock lease
+	m.lock, m.unlock = ch, ch
 }
 
 func (m *Mutex) Lock(intr rh.Intr) *Unlocker {
-	//
-	m.lk.Lock()
-	if m.wait == nil { // initial condition
-		u := make(chan struct{})
-		m.wait = u
-		close(u)
-	}
-	wait := m.wait
-	turn := make(chan struct{})
-	m.wait = turn
-	m.lk.Unlock()
-	//
+	m.init()
 	select {
-	case <-wait:
-		return &Unlocker{turn}
+	case <-m.lock:
+		return &Unlocker{m}
 	case <-intr:
-		close(turn)
+		return nil
+	}
+}
+
+func (m *Mutex) TryLock() *Unlocker {
+	m.init()
+	select {
+	case <-m.lock:
+		return &Unlocker{m}
+	default:
 		return nil
 	}
 }
 
 type Unlocker struct {
-	turn chan<- struct{}
+	mutex *Mutex
 }
 
 func (u *Unlocker) Unlock() {
-	close(u.turn)
+	select {
+	case u.mutex.unlock <- struct{}{}:
+	}
 }

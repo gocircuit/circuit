@@ -13,24 +13,24 @@ import (
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
-type SendFile struct {
+type TrySendFile struct {
 	v *Valve
 }
 
-func NewSendFile(v *Valve) file.File {
-	return &SendFile{v: v}
+func NewTrySendFile(v *Valve) file.File {
+	return &TrySendFile{v: v}
 }
 
-func (f *SendFile) Perm() rh.Perm {
+func (f *TrySendFile) Perm() rh.Perm {
 	return 0222 // -w--w--w-
 }
 
-func (f *SendFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+func (f *TrySendFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	if flag.Attr != rh.WriteOnly {
 		return nil, rh.ErrPerm
 	}
-	r, w := interruptible.BufferPipe(MessageCap) // Send –> Recv
-	if err := f.v.Send(r, intr); err != nil {
+	r, w := interruptible.BufferPipe(MessageCap) // TrySend –> TryRecv
+	if err := f.v.TrySend(r); err != nil {
 		w.Close()
 		r.Close()
 		return nil, err
@@ -38,6 +38,6 @@ func (f *SendFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	return file.NewOpenInterruptibleWriterFile(w), nil
 }
 
-func (f *SendFile) Remove() error {
+func (f *TrySendFile) Remove() error {
 	return rh.ErrPerm
 }

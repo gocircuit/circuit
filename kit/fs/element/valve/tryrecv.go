@@ -13,29 +13,29 @@ import (
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
-type RecvFile struct {
+type TryRecvFile struct {
 	v *Valve
 }
 
-func NewRecvFile(v *Valve) file.File {
-	return &RecvFile{v: v}
+func NewTryRecvFile(v *Valve) file.File {
+	return &TryRecvFile{v: v}
 }
 
-func (f *RecvFile) Perm() rh.Perm {
+func (f *TryRecvFile) Perm() rh.Perm {
 	return 0444 // r--r--r--
 }
 
-func (f *RecvFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+func (f *TryRecvFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
-	r, err := f.v.Recv(intr)
+	r, err := f.v.TryRecv()
 	if err != nil {
 		return nil, err
 	}
 	return file.NewOpenInterruptibleReaderFile(r.(interruptible.Reader)), nil
 }
 
-func (f *RecvFile) Remove() error {
+func (f *TryRecvFile) Remove() error {
 	return rh.ErrPerm
 }
