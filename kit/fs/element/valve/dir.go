@@ -87,72 +87,70 @@ func (d *ValveDir) Help() string {
 const dirHelpFormat = `
 	This is the control directory for a circuit channel named: %s
 
-	A circuit channel matches concurring write-session to "send"
-	with read-sessions from "recv", while no more than "cap"
-	copies of "send" can be open at any one time.
+	A circuit channel analogous to a “chan []byte” in Go.
+
+INIT
+
+	Initialize the channel by writing its desired buffer capacity
+	to the "cap" file.
+
+		echo 5 > cap
+
+	This corresponds to “ch := make(chan []byte, 5)” in Go.
 
 SEND
 
-	When the user tries to open "send" for writing, the file open
-	operation will block until fewer than capacity-many copies of "send"
-	are still open.
-
-	When opening "send" succeeds, the "send" file session is still 
-	not matched with a receiver: it is now in the "channel's buffer".
-	The buffer accommodates at most capacity-many unmatched send sessions.
-
-	Attempting to write to "send" will usually block write after open,
-	until the send session is matched up with a reader of "recv".
-	Then, the matched open copies of "send" and "receive" become an
-	unbuffered pipe.
+	To send a binary message through the channel, write the
+	message to the "send" file.
 
 		echo "¡hello, world!" >> send
+
+	The open-file operation will block until the channel can
+	accept the message.
+
+	This is equivalent to “ch <- []byte("¡hello, world!")” in Go.
 
 CLOSE
 
 	Writing the text "close" to file "close" will close the channel permanently
-	for writing. Pending send sessions will still be receivable.
+	for writing. Buffered messages will still be receivable.
 
-		echo close > close
+		echo "close" > close
 
 RECV
 
-	When the user tries to open "recv" for reading, the file open
-	operation will block until it can be matched to an available
-	open copy of send in the channel buffer.
-
-	When a match occurs, reading from "recv" unblocks.
+	To receive the next channel message, read from the "recv" file.
 
 		cat recv
 
-	CAP
+	The open-file operation will block until a message is available.
 
-	The capacity of the channel buffer can be set dynamically by
-	writing a non-negative integral capacity to "cap".
+	This is equivalent to “<-ch” in Go.
 
-		echo 5 > cap
+TRYING
 
-	Shrinking the buffer will not neglect pending/buffered send sessions.
-	The current capacity can be retrieved by reading from "cap".
+	To send or receive a message without blocking, if possible,
+	use the files "trysend" and "tryrecv" analogously to "send"
+	and "recv".
 
-		cat cap
+	Opening a try-file will never block, but if the underlying
+	channel operation is not available at the moment, the
+	file-open operation will return with an error.
 
 WAITING
 
-	Trying to open "waitrecv" for reading will block until send sessions
-	are available for receiving. 
+	To wait until a message can be sent without blocking or received
+	without blocking, read from the files "waitsend" and "waitrecv",
+	respectively.
 
 		cat waitrecv
 
-	Analogously, trying to open "waitsend" for reading will block until
-	there is enough space in the channel buffer to accommodate the next
-	"send" open operation immediately without blocking.
-
-		cat waitsend
+	The open-file operation will block until the desired channel
+	operation is available. Both wait-files contain the empty string.
 
 STAT
 
-	Reading "stat" asynchronously retrieves channel dynamic statistics.
+	Reading "stat" asynchronously retrieves channel runtime information.
 
 		cat stat
 
