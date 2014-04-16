@@ -40,7 +40,30 @@
 <h3>
 <a name="run" class="anchor" href="#run"><span class="octicon octicon-link"></span></a>Run</h3>
 
+<p>To run the first circuit agent, pick a network address and a local mount-directory, then run</p>
+
 <pre><code>circuit -a 10.20.30.7:11022 -m /circuit
+</code></pre>
+
+<p>The circuit agent will respond by printing out its “circuit URL”, something like</p>
+
+<pre><code>…
+circuit://10.20.30.7:77/78517/R56e7a2a0d47a7b5d
+…
+</code></pre>
+
+<p>Copy the circuit URL, so you can point the next circuit agent to it</p>
+
+<pre><code>circuit -a 10.20.30.5:77 -m /circuit -j circuit://10.20.30.7:77/78517/R56e7a2a0d47a7b5d
+</code></pre>
+
+<h3>
+<a name="explore" class="anchor" href="#explore"><span class="octicon octicon-link"></span></a>Explore</h3>
+
+<p>Go the local circuit mount-point and look around. All directories include readable help files.</p>
+
+<pre><code>cd /circuit
+ls
 </code></pre>
 
 <h3>
