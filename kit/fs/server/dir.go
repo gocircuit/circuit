@@ -39,7 +39,7 @@ func NewDir(kinXID kinfolk.KinXID, shared ...Resource) (*ServerDir, error) {
 	// Add builtin resources
 	d.FID = d.dir.FID()
 	d.dir.AddChild("help", newFile(d.Help))
-	d.dir.AddChild("dash", dash.NonRemovableDashDir{dash.NewDir(fmt.Sprintf("%s/dash", kinstr))})
+	d.dir.AddChild("namespace", dash.NonRemovableDashDir{dash.NewDir(fmt.Sprintf("%s/namespace", kinstr))})
 	d.dir.AddChild("sys", NewDebugDir())
 	// Add shared resources
 	for _, rsc := range shared {

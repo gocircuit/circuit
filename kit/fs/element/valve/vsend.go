@@ -55,7 +55,7 @@ func (c *senderValve) Send(v interface{}, intr rh.Intr) error {
 	t := make(chan interface{}, 1)
 	t <- v
 	select {
-	case c.send.send <- t:
+	case c.send.send <- onceReceiver(t):
 		return nil
 	case <-intr:
 		c.ErrorFile.Set("send interrupted")
@@ -114,7 +114,7 @@ func (c *senderValve) WaitSend(intr rh.Intr) error {
 	//
 	t := make(chan interface{}, 1)
 	select {
-	case c.send.send <- t:
+	case c.send.send <- onceReceiver(t):
 		c.carrier.ch = onceSender(t)
 		return nil
 	case <-intr:
