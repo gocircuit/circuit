@@ -15,27 +15,24 @@ import (
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 )
 
-type WaitFile struct {
+type TryWaitFile struct {
 	s *Select
 }
 
-func NewWaitFile(s *Select) file.File {
-	return &WaitFile{s: s}
+func NewTryWaitFile(s *Select) file.File {
+	return &TryWaitFile{s: s}
 }
 
-func (f *WaitFile) Perm() rh.Perm {
+func (f *TryWaitFile) Perm() rh.Perm {
 	return 0444 // r--r--r--
 }
 
-func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+func (f *TryWaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	f.s.ErrorFile.Set("") // clear error file
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
-	branch, waitfile, err := f.s.Wait(intr)
-	if err == rh.ErrIntr {
-		return nil, err
-	}
+	branch, waitfile, err := f.s.TryWait()
 	if err != nil {
 		return nil, rh.ErrIO // how does ErrIO manifest on the POSIX end?
 	}
@@ -46,11 +43,6 @@ func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(result)))), nil
 }
 
-func (f *WaitFile) Remove() error {
+func (f *TryWaitFile) Remove() error {
 	return rh.ErrPerm
-}
-
-type Result struct {
-	Clause int     `json:"clause"`
-	Name   string  `json:"name"`
 }

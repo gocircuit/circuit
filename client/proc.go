@@ -51,7 +51,12 @@ func (p *proc) Start(cmd Command) error {
 	return ioutil.WriteFile(path.Join(p.Path(), "start"), b, 0222)
 }
 
-func (p *proc) Wait() error {
+// TryExit returns nil if the processes has exited with zero exit code.
+func (p *proc) TryExit() error {
+	??
+}
+
+func (p *proc) WaitExit() error {
 	b, err := ioutil.ReadFile(path.Join(p.Path(), "waitexit"))
 	if err != nil {
 		return err

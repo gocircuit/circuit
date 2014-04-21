@@ -61,6 +61,38 @@ func (c *channel) Recv() io.ReadCloser {
 	return f
 }
 
+func (c *channel) WaitSend() {
+	f, err := os.OpenFile(path.Join(c.Path(), "waitsend"), os.O_RDONLY, 0444)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+}
+
+func (c *channel) WaitRecv() {
+	f, err := os.OpenFile(path.Join(c.Path(), "waitrecv"), os.O_RDONLY, 0444)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+}
+
+func (c *channel) TrySend() io.WriteCloser {
+	f, err := os.OpenFile(path.Join(c.Path(), "trysend"), os.O_WRONLY, 0222)
+	if err != nil {
+		return nil
+	}
+	return f
+}
+
+func (c *channel) TryRecv() io.ReadCloser {
+	f, err := os.OpenFile(path.Join(c.Path(), "tryrecv"), os.O_RDONLY, 0444)
+	if err != nil {
+		return nil
+	}
+	return f
+}
+
 func (c *channel) Close() {
 	if err := ioutil.WriteFile(path.Join(c.Path(), "close"), []byte("close"), 0222); err != nil {
 		panic(err)

@@ -37,6 +37,7 @@ func (n *Namespace) Walk(walk []string) (*Namespace, error) {
 	return newNamespace(n.worker, append(n.walk, walk...))
 }
 
+// MakeNamespace
 func (n *Namespace) MakeNamespace(walk []string) (ns *Namespace, err error) {
 	if err = os.MkdirAll(path.Join(append([]string{n.Path()}, walk...)...), 0755); err != nil {
 		return nil, err

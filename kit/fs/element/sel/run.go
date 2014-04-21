@@ -58,7 +58,7 @@ type runWriteFile struct {
 }
 
 func (w *runWriteFile) Close() (err error) {
-	w.s.ErrorFile.Set("") // clear error file
+	w.s.ErrorFile.Clear()
 	var waitfiles []string
 	if err = json.Unmarshal(w.Buffer.Bytes(), &waitfiles); err != nil {
 		w.s.ErrorFile.Set("data written is not JSON")

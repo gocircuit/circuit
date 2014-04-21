@@ -33,9 +33,6 @@ func newReceiverValve(errfile *file.ErrorFile, recv <-chan onceReceiver) *receiv
 }
 
 func (c *receiverValve) Recv(intr rh.Intr) (interface{}, error) {
-	println("recv begin")
-	defer println("recv end")
-
 	c.ErrorFile.Clear()
 	if t, ok := c.quickRecv(); ok {
 		select {
@@ -136,7 +133,6 @@ func (c *receiverValve) WaitRecv(intr rh.Intr) error {
 			return rh.ErrGone
 		}
 		c.carrier.ch = t
-		println("plant carrier")
 		return nil
 	case <-intr:
 		c.ErrorFile.Set("send interrupted")

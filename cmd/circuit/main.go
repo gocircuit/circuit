@@ -29,15 +29,15 @@ import (
 
 var (
 	// System-related
-	flagAddr     = flag.String("a", "", "External network address for the worker; required non-empty")
-	flagDir      = flag.String("d", "", "Directory to lock; use a new temporary directory, if empty")
-	flagWorkerID = flag.String("i", "", "ID of the worker; choose randomly, if empty")
-	flagJoin     = flag.String("j", "", "Join a worker URL. Start a genus worker, if empty")
-	flagMount    = flag.String("m", "/"+n.Scheme, "Mount directory within local file system; required non-empty")
+	flagAddr      = flag.String("a", "", "External network address for the worker; required non-empty")
+	flagDir       = flag.String("d", "", "Directory to lock; use a new temporary directory, if empty")
+	flagWorkerID  = flag.String("i", "", "ID of the worker; choose randomly, if empty")
+	flagJoin      = flag.String("j", "", "Join a worker URL. Start a genus worker, if empty")
+	flagMount     = flag.String("m", "/"+n.Scheme, "Mount directory within local file system; required non-empty")
 	// Resource-related
-	flagXDir = flag.String("xfs", "", "Local FS directory to share with others; none, if empty")
-	// Container parent/child-related
-	flagParent = flag.String("parent", "", "If non-empty, this is a child worker")
+	flagFS        = flag.String("fs", "", "Local FS directory to share with others; none, if empty")
+	// Internal helper roles of the circuit executable
+	flagSysOpen   = flag.String("sysopen", "", "(Helper) Open the named file and exit with 0 iff opened successfully.")
 )
 
 const (
@@ -46,10 +46,15 @@ const (
 )
 
 func main() {
+	flag.Parse()
+	if *flagSysOpen != "" {
+		mainSysOpen(*flagSysOpen)
+		panic(0)
+	}
+
 	println("CIRCUIT 2014 gocircuit.org")
 
 	// Parse and verify arguments
-	flag.Parse()
 	if *flagAddr == "" {
 		log.Fatal("network address flag -a not given")
 	}
@@ -86,10 +91,10 @@ func main() {
 
 	// Share local file system?
 	var xfs rh.Server
-	if *flagXDir != "" {
-		*flagXDir = path.Clean(*flagXDir)
-		log.Println("sharing local file system", *flagXDir)
-		if xfs, err = rhunix.New(fmt.Sprintf("%s.xfs·%s", circuit.WorkerAddr().WorkerID(), *flagXDir), *flagXDir); err != nil {
+	if *flagFS != "" {
+		*flagFS = path.Clean(*flagFS)
+		log.Println("sharing local file system", *flagFS)
+		if xfs, err = rhunix.New(fmt.Sprintf("%s.xfs·%s", circuit.WorkerAddr().WorkerID(), *flagFS), *flagFS); err != nil {
 			log.Fatalf("local file system server start (%s)", err)
 		}
 	}
@@ -139,4 +144,21 @@ func dontPanic(call func(), ifPanic string) {
 		}
 	}()
 	call()
+}
+
+func mainSysOpen(file string) {
+	_, err := os.Open(file)
+	if os.IsNotExist(err) {
+		fmt.Printf("not exist")
+		os.Exit(1)
+	}
+	if os.IsPermission(err) {
+		fmt.Printf("permission")
+		os.Exit(1)
+	}
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+		os.Exit(1)
+	}
+	os.Exit(0)
 }

@@ -42,6 +42,7 @@ func NewDir(name string, rmv func()) *SelectDir {
 	))
 	d.dir.AddChild("select", file.NewFileFID(NewSelectFile(d.s)))
 	d.dir.AddChild("wait", file.NewFileFID(NewWaitFile(d.s)))
+	d.dir.AddChild("trywait", file.NewFileFID(NewTryWaitFile(d.s)))
 	d.dir.AddChild("error", file.NewFileFID(d.s.ErrorFile))
 	return d
 }
@@ -56,7 +57,7 @@ func (d *SelectDir) Walk(wname []string) (rh.FID, error) {
 func (d *SelectDir) Remove() error {
 	d.rmv.Lock()
 	defer d.rmv.Unlock()
-	if err := d.s.ClunkIfNotBusy(); err != nil {
+	if err := d.s.Clunk(); err != nil {
 		return rh.ErrBusy
 	}
 	if d.rmv.rmv != nil {
@@ -100,6 +101,9 @@ SELECT
 	Writing to "select" will return instantaneously, while 
 	in the background the circuit will start waiting on opening
 	all of the given files.
+
+	(Note that some "echo" and/or shell implementations open a
+	file twice, which would break the above example.)
 
 WAITING
 

@@ -5,19 +5,12 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
+// Package client is development in progress. Do not use, but you can look.
 package client
 
 import (
 	"io"
 )
-
-// Channel
-
-type Chan interface {
-	Send() io.WriteCloser
-	Close()
-	Recv() io.ReadCloser
-}
 
 // Process
 
@@ -27,33 +20,22 @@ type Command struct {
 	Args []string `json:"args"`
 }
 
-type Proc interface {
-	Start(Command) error
-	Wait() error
-}
-
 // Select
 
-type Clause interface{}
+type Clause interface{
+}
 
-type ClauseDefault struct{}
+type ClauseDefault struct{
+}
 
 type ClauseSend struct {
-	Chan
+	*Chan
 }
 
 type ClauseRecv struct {
-	Chan
+	*Chan
 }
 
 type ClauseExit struct {
-	Proc
-}
-
-type Select interface {
-
-	// Wait blocks until one of the select branches unblocks.
-	// branch indicates the index of the clause that unblocked.
-	// 
-	Wait() (branch int, value interface{}) // io.WriteCloser, io.ReadCloser, error
+	*Proc
 }
