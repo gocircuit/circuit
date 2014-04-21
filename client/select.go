@@ -23,8 +23,11 @@ type sel struct {
 	namespace *Namespace
 	name      string
 	dir       *Dir
-	clause    []Clause
-	result    <-chan *unblock
+	sel struct {
+		??
+		clause    []Clause
+		result    <-chan *unblock
+	}
 }
 
 type unblock struct {
@@ -33,25 +36,22 @@ type unblock struct {
 	Error  error
 }
 
-func makeSel(namespace *Namespace, name string, clause []Clause) (s *sel, err error) {
+func makeSel(namespace *Namespace, name string) (s *sel, err error) {
 	s = &sel{
 		namespace: namespace,
 		name:      name,
-		clause:    clause,
 	}
 	if err = os.Mkdir(s.Path(), 0777); err != nil {
 		return nil, err
 	}
-	if err = ioutil.WriteFile(path.Join(s.Path(), "select"), marshalClauses(clause), 0222); err != nil {
-		os.Remove(s.Path())
-		return nil, err
-	}
 	if s.dir, err = OpenDir(s.Path()); err != nil {
+		os.Remove(s.Path())
 		return nil, err
 	}
 	return c, nil
 }
 
+// Path returns the path of this select element in the local circuit file system.
 func (s *sel) Path() string {
 	return path.Join(s.namespace.Path(), selDir, s.name)
 }
@@ -73,7 +73,14 @@ func (s *sel) Wait() (branch int, value interface{}) {
 	return r.Branch, r.Value
 }
 
-// start initiates the selection
+func (s *sel) Start(clause []Clause) error {
+	??
+	if err = ioutil.WriteFile(path.Join(s.Path(), "select"), marshalClauses(clause), 0222); err != nil {
+		os.Remove(s.Path())
+		return nil, err
+	}
+}
+
 func (s *sel) start(clause []Clause) {
 	if hasDefault(clause) {
 		s.startNonBlocking(clause)

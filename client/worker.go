@@ -11,7 +11,7 @@ import (
 	"path"
 )
 
-// Worker represents a circuit daemon instance.
+// Worker is a client for a specific circuit worker's distributed control facilities.
 type Worker struct {
 	client *Client
 	worker WorkerID
@@ -36,6 +36,7 @@ func newWorker(client *Client, worker WorkerID) (w *Worker, err error) {
 	return w, nil
 }
 
+// Path returns the path of this worker in the local circuit file system.
 func (w *Worker) Path() string {
 	return path.Join(w.client.Path(), string(w.worker))
 }

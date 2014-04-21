@@ -88,7 +88,7 @@ const mkdirHelp = `
 		cd charlie
 		cat help
 
-RMDIR
+REMOVAL
 
 	Circuit channel directories can be removed with "rmdir" only 
 	after the channel has been closed.

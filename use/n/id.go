@@ -32,11 +32,11 @@ func ChooseWorkerID() WorkerID {
 }
 
 func Int64WorkerID(src int64) WorkerID {
-	return WorkerID(fmt.Sprintf("R%016x", src))
+	return WorkerID(fmt.Sprintf("Q%016x", src))
 }
 
 func UInt64WorkerID(src uint64) WorkerID {
-	return WorkerID(fmt.Sprintf("R%016x", src))
+	return WorkerID(fmt.Sprintf("Q%016x", src))
 }
 
 // ParseOrHashWorkerID tries to parse the string s as a canonical worker ID representation.
@@ -53,7 +53,7 @@ func ParseOrHashWorkerID(s string) WorkerID {
 // ParseWorkerID parses the string s for a canonical representation of a worker
 // ID and returns a corresponding WorkerID value.
 func ParseWorkerID(s string) (WorkerID, error) {
-	if len(s) != 17 || s[0] != 'R' {
+	if len(s) != 17 || s[0] != 'Q' {
 		return "", ErrParse
 	}
 	ui64, err := strconv.ParseUint(s[1:], 16, 64)

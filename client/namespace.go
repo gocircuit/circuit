@@ -12,6 +12,7 @@ import (
 	"path"
 )
 
+// ??
 type Namespace struct {
 	worker *Worker
 	walk   []string
@@ -29,10 +30,12 @@ func newNamespace(worker *Worker, walk []string) (n *Namespace, err error) {
 	return n, nil
 }
 
+// Path returns the path of this namespace in the local circuit file system.
 func (n *Namespace) Path() string {
 	return path.Join(append([]string{n.worker.Path(), namespaceDir}, n.walk...)...)
 }
 
+// ??
 func (n *Namespace) Walk(walk []string) (*Namespace, error) {
 	return newNamespace(n.worker, append(n.walk, walk...))
 }

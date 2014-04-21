@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package client is development in progress. Do not use, but you can look.
+// Package client is development in progress. Do not use, but feel free to look.
 package client
 
 import (
@@ -22,20 +22,23 @@ type Command struct {
 
 // Select
 
-type Clause interface{
-}
+// Clause stands for any of the Clause* types.
+type Clause interface{}
 
-type ClauseDefault struct{
-}
+// ClauseDefault represnts a default case in a selection.
+type ClauseDefault struct{}
 
+// ??
 type ClauseSend struct {
 	*Chan
 }
 
+// ??
 type ClauseRecv struct {
 	*Chan
 }
 
+// ??
 type ClauseExit struct {
 	*Proc
 }

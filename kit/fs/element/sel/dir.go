@@ -74,19 +74,24 @@ func (d *SelectDir) Help() string {
 const dirHelpFormat = `
 	This is the control directory for a select element named: %s
 
-	Select elements are a mechanism for waiting on multiple
-	files to open.
+	Select elements are a mechanism for waiting until one
+	of multiple named files is ready to be opened.
 
-	All files in the circuit file system, which are named 
-	"wait*" have the same behavior: They block on opening
-	until some target event takes place. Select elements 
-	were designed to wait for the first of a set of given
-	wait-files to open.
+	Select elements are inteded to be used in conjunction
+	with other files in the circuit file system whose
+	names follow the pattern "wait*". (For instance,
+	in a channel element directory, one can find a "waitrecv"
+	file, which would block on open until a message is
+	available within the channel for receiving.)
+
+	These "wait*" files share a common behavior:
+	They block on opening until some underlying event takes place
+	or some underlying resource is available to use.
 
 SELECT
 
-	To start a selection, write a JSON-encoded array of
-	file names to the "select" file:
+	To start a selection, write a JSON-encoded array of file names
+	to the "select" file:
 
 		echo << EOF > select
 		[
@@ -95,12 +100,16 @@ SELECT
 		]
 		EOF
 
-	File names should be absolute: They refer the local file system
-	at the circuit worker, where the select is being created.
+	File names should be absolute paths: They refer the local
+	file system at the circuit worker, where the select element
+	is being created.
 
 	Writing to "select" will return instantaneously, while 
 	in the background the circuit will start waiting on opening
-	all of the given files.
+	all of the given files. In the event of any error that
+	prevents the selection from being performed, closing the 
+	"select", after writing to it, will return an error.
+	Human-readbale error messages can be read from the "error" file.
 
 	(Note that some "echo" and/or shell implementations open a
 	file twice, which would break the above example.)
@@ -109,13 +118,28 @@ WAITING
 
 	Once a selection has been started, trying to open the "wait"
 	file will block until the first of the files being selected upon
-	open successfully. The name of the latter file will then become
-	readable as the contents of the "wait" file.
+	opens successfully. Then the readable contents of "wait" will
+	be a JSON structure, describing the unblocked file:
 
-REUSE
+		cat wait
+		{
+			"clause": 0,
+			"name":   "/circuit/X130fc59d7291f8cf/dash/proc/paul/waitexit"
+		}
 
-	Select directories are reusable. After a selection has returned 
-	from waiting, a new selection can be started, as in SELECT.
+	Where "clause" is the index of the file which unblocked on open,
+	whereas "name" is its name.
+
+TRYING
+
+	The file "trywait" is similar to "wait" in purpose, except that opening it
+	is guaranteed not to block. If no selection event is ready, opening
+	"trywait" will return an error.
+
+REMOVAL
+
+	Select element directories can be removed with "rmdir" as long as 
+	the none of the "select", "wait" or "trywait" files are currently open.
 
 ERRORS
 

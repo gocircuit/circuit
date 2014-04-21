@@ -17,6 +17,7 @@ import (
 
 const procDir = "proc"
 
+// ErrExit represents any non-zero process exit code.
 var ErrExit = errors.New("circuit process exit error")
 
 type proc struct {
@@ -39,10 +40,12 @@ func makeProc(namespace *Namespace, name string) (p *proc, err error) {
 	return p, nil
 }
 
+// Path returns the path of this process element in the local circuit file system.
 func (p *proc) Path() string {
 	return path.Join(p.namespace.Path(), procDir, p.name)
 }
 
+// ??
 func (p *proc) Start(cmd Command) error {
 	b, err := json.Marshal(cmd)
 	if err != nil {
@@ -51,18 +54,22 @@ func (p *proc) Start(cmd Command) error {
 	return ioutil.WriteFile(path.Join(p.Path(), "start"), b, 0222)
 }
 
-// TryExit returns nil if the processes has exited with zero exit code.
-func (p *proc) TryExit() error {
-	??
-}
-
+// ??
 func (p *proc) WaitExit() error {
 	b, err := ioutil.ReadFile(path.Join(p.Path(), "waitexit"))
-	if err != nil {
+	if os.IsNotExist(err) { // a missing file indicates a dead circuit worker; we panic for those by convention
+		panic(err)
+	}
+	if err != nil { // other errors are process element specific; we report them traditionally
 		return err
 	}
 	if len(b) == 0 {
 		return nil
 	}
 	return ErrExit
+}
+
+// XXX: "stat" and "waitexit" should have same return format
+func (p *proc) tryWaitExit() error {
+	?? 
 }

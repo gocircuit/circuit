@@ -41,10 +41,12 @@ func makeChan(namespace *Namespace, name string, cap_ int) (c *channel, err erro
 	return c, nil
 }
 
+// Path returns the path of this channel in the local circuit file system.
 func (c *channel) Path() string {
 	return path.Join(c.namespace.Path(), channelDir, c.name)
 }
 
+// ??
 func (c *channel) Send() io.WriteCloser {
 	f, err := os.OpenFile(path.Join(c.Path(), "send"), os.O_WRONLY, 0222)
 	if err != nil {
@@ -53,6 +55,7 @@ func (c *channel) Send() io.WriteCloser {
 	return f
 }
 
+// ??
 func (c *channel) Recv() io.ReadCloser {
 	f, err := os.OpenFile(path.Join(c.Path(), "recv"), os.O_RDONLY, 0444)
 	if err != nil {
@@ -61,23 +64,7 @@ func (c *channel) Recv() io.ReadCloser {
 	return f
 }
 
-func (c *channel) WaitSend() {
-	f, err := os.OpenFile(path.Join(c.Path(), "waitsend"), os.O_RDONLY, 0444)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-}
-
-func (c *channel) WaitRecv() {
-	f, err := os.OpenFile(path.Join(c.Path(), "waitrecv"), os.O_RDONLY, 0444)
-	if err != nil {
-		return nil
-	}
-	defer f.Close()
-}
-
-func (c *channel) TrySend() io.WriteCloser {
+func (c *channel) trySend() io.WriteCloser {
 	f, err := os.OpenFile(path.Join(c.Path(), "trysend"), os.O_WRONLY, 0222)
 	if err != nil {
 		return nil
@@ -85,7 +72,7 @@ func (c *channel) TrySend() io.WriteCloser {
 	return f
 }
 
-func (c *channel) TryRecv() io.ReadCloser {
+func (c *channel) tryRecv() io.ReadCloser {
 	f, err := os.OpenFile(path.Join(c.Path(), "tryrecv"), os.O_RDONLY, 0444)
 	if err != nil {
 		return nil
@@ -93,7 +80,15 @@ func (c *channel) TryRecv() io.ReadCloser {
 	return f
 }
 
+// ??
 func (c *channel) Close() {
+	if err := ioutil.WriteFile(path.Join(c.Path(), "close"), []byte("close"), 0222); err != nil {
+		panic(err)
+	}
+}
+
+// Scrub removes the channel elements from the circuit environment (and local file system).
+func (c *channel) Scrub() error {
 	if err := ioutil.WriteFile(path.Join(c.Path(), "close"), []byte("close"), 0222); err != nil {
 		panic(err)
 	}

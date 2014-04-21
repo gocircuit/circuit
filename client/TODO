@@ -2,4 +2,4 @@
 distinguish between dead-worker and regular errors
 add attach version of CSP elements
 
-primitives that were created within the programming environment should delete themselves on gc
+primitives that were created within the programming environment should delete themselves on gc?

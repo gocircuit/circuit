@@ -22,6 +22,9 @@ type Client struct {
 	mount *Dir
 }
 
+// NewClient creates a new client for the circuit environment.  It opens the
+// circuit mount point and keeps it open (preventing it from being unmounted)
+// for the life of the return Client object.
 func NewClient(mount string) (c *Client, err error) {
 	c = &Client{}
 	if c.mount, err = OpenDir(path.Clean(mount)); err != nil {
