@@ -29,15 +29,16 @@ import (
 
 var (
 	// System-related
-	flagAddr      = flag.String("a", "", "External network address for the worker; required non-empty")
-	flagDir       = flag.String("d", "", "Directory to lock; use a new temporary directory, if empty")
-	flagWorkerID  = flag.String("i", "", "ID of the worker; choose randomly, if empty")
-	flagJoin      = flag.String("j", "", "Join a worker URL. Start a genus worker, if empty")
-	flagMount     = flag.String("m", "/"+n.Scheme, "Mount directory within local file system; required non-empty")
+	flagAddr         = flag.String("a", "", "External network address for the worker; required non-empty")
+	flagDir          = flag.String("d", "", "Directory to lock; use a new temporary directory, if empty")
+	flagWorkerID     = flag.String("i", "", "ID of the worker; choose randomly, if empty")
+	flagJoin         = flag.String("j", "", "Join a worker URL. Start a genus worker, if empty")
+	flagMount        = flag.String("m", "/"+n.Scheme, "Mount directory within local file system; required non-empty")
 	// Resource-related
-	flagFS        = flag.String("fs", "", "Local FS directory to share with others; none, if empty")
+	flagFS           = flag.String("fs", "", "Local FS directory to share with others; none, if empty")
 	// Internal helper roles of the circuit executable
-	flagSysOpen   = flag.String("sysopen", "", "(Helper) Open the named file and exit with 0 iff opened successfully.")
+	flagSysOpenRead  = flag.String("sysread", "", "(sys) Open a file for reading.")
+	flagSysOpenWrite = flag.String("syswrite", "", "(sys) Open a file for writing.")
 )
 
 const (
@@ -47,8 +48,12 @@ const (
 
 func main() {
 	flag.Parse()
-	if *flagSysOpen != "" {
-		mainSysOpen(*flagSysOpen)
+	if *flagSysOpenRead != "" {
+		mainSysOpenRead(*flagSysOpenRead)
+		panic(0)
+	}
+	if *flagSysOpenWrite != "" {
+		mainSysOpenWrite(*flagSysOpenWrite)
 		panic(0)
 	}
 
@@ -144,21 +149,4 @@ func dontPanic(call func(), ifPanic string) {
 		}
 	}()
 	call()
-}
-
-func mainSysOpen(file string) {
-	_, err := os.Open(file)
-	if os.IsNotExist(err) {
-		fmt.Printf("not exist")
-		os.Exit(1)
-	}
-	if os.IsPermission(err) {
-		fmt.Printf("permission")
-		os.Exit(1)
-	}
-	if err != nil {
-		fmt.Printf("%s", err.Error())
-		os.Exit(1)
-	}
-	os.Exit(0)
 }
