@@ -27,30 +27,27 @@ func (f *WaitFile) Perm() rh.Perm {
 	return 0444 // r--r--r--
 }
 
-func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (_ rh.FID, err error) {
 	f.s.ErrorFile.Set("") // clear error file
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
-	branch, waitfile, err := f.s.Wait(intr)
+	var u Unblock
+	u.Clause, u.Commit, err = f.s.Wait(intr)
 	if err == rh.ErrIntr {
 		return nil, err
 	}
 	if err != nil {
-		return nil, rh.ErrIO // how does ErrIO manifest on the POSIX end?
+		return nil, rh.ErrIO
 	}
-	result := &Result{
-		Clause: branch,
-		Name:   waitfile,
-	}
-	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(result)))), nil
+	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(u)))), nil
 }
 
 func (f *WaitFile) Remove() error {
 	return rh.ErrPerm
 }
 
-type Result struct {
+type Unblock struct {
 	Clause int     `json:"clause"`
-	Name   string  `json:"name"`
+	Commit string  `json:"commit"` // name of “commit” file where actual reading/writing can be performed
 }

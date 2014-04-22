@@ -8,35 +8,34 @@
 package sel
 
 import (
-	"fmt"
 	"bufio"
-	"bytes"
-	"os"
+	"io"
 	"os/exec"
 	"path"
+	"runtime"
 	"sync"
 
+	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
 // FileReader is an interruptible.Reader
 type FileReader struct {
-	cmd    *exec.Command
+	cmd    *exec.Cmd
 	stdin  io.WriteCloser
 	ir     interruptible.Reader
 	prompt sync.Once
 	kill   sync.Once
-	clunk  func()
+	Clunk  func() // Non-nil Clunk will be invoked if and when the FileReader is closed.
 }
 
 const bufferCap = 8*1024
 
-// clunk will be invoked if and when the FileReader is closed.
-func OpenFileReader(name string, intr rh.Intr, clunk func()) (r *FileReader, err error) {
+// OpenFileReader tries to open the named file for reading, potentially blocking for a while.
+func OpenFileReader(name string, intr rh.Intr) (r *FileReader, err error) {
 	r = &FileReader{
-		cmd:   exec.Command(getCircuitBinary(), "-sysread", path.Clean(file)),
-		clunk: clunk,
+		cmd: exec.Command(getCircuitBinary(), "-sysread", path.Clean(name)),
 	}
 	// stderr and stdin are a backward and forward control channels
 	stderr, err := r.cmd.StderrPipe()
@@ -48,7 +47,7 @@ func OpenFileReader(name string, intr rh.Intr, clunk func()) (r *FileReader, err
 		panic(err) // system error
 	}
 	// stdout is the reading channel
-	r.ir, r.Command.Stdout = interruptible.BufferPipe(bufferCap)
+	r.ir, r.cmd.Stdout = interruptible.BufferPipe(bufferCap)
 	//
 	if err = r.cmd.Start(); err != nil {
 		panic(err) // system errors are reported as panics to distinguish them
@@ -81,19 +80,29 @@ func OpenFileReader(name string, intr rh.Intr, clunk func()) (r *FileReader, err
 			r.cmd.Process.Kill()
 			return nil, err
 		}
+		// Kill helper process on garbage collection
+		runtime.SetFinalizer(r, 
+			func(r2 *FileReader) { 
+				r2.Close()
+			},
+		)
 		return r, nil
 	}
 }
 
-func (r *FileReader) prompt() {
-	defer func() {
-		if r := recover(); r != nil {
-			r.Close()
-		}
-	}()
-	if n, _ := r.Write([]byte("\n")); n != 1 {
-		panic(1)
-	}
+func (r *FileReader) commit() {
+	r.prompt.Do(
+		func() {
+			defer func() {
+				if p := recover(); p != nil {
+					r.Close()
+				}
+			}()
+			if n, _ := r.stdin.Write([]byte("\n")); n != 1 {
+				panic(1)
+			}
+		},
+	)
 }
 
 func (r *FileReader) ReadIntr(p []byte, intr rh.Intr) (_ int, err error) {
@@ -102,17 +111,17 @@ func (r *FileReader) ReadIntr(p []byte, intr rh.Intr) (_ int, err error) {
 			r.Close()
 		}
 	}()
-	r.prompt.Do(r.prompt)
+	r.commit()
 	return r.ir.ReadIntr(p, intr)
 }
 
-func (r *FileReader) Read(p []byte) (int, error) {
+func (r *FileReader) Read(p []byte) (_ int, err error) {
 	defer func() {
 		if err != nil {
 			r.Close()
 		}
 	}()
-	r.prompt.Do(r.prompt)
+	r.commit()
 	return r.ir.Read(p)
 }
 
@@ -123,9 +132,9 @@ func (r *FileReader) Close() error {
 		}()
 		r.kill.Do(func() {
 			r.cmd.Process.Kill()
-			if r.clunk != nil {
-				r.clunk()
-				r.clunk = nil
+			if r.Clunk != nil {
+				r.Clunk()
+				r.Clunk = nil
 			}
 		})
 	}()

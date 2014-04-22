@@ -11,7 +11,8 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -21,31 +22,35 @@ import (
 )
 
 type Select struct {
+	dir *SelectDir
 	*file.ErrorFile
 	clauses struct {
 		sync.Mutex
-		waitfiles []string
+		clauses []Clause
 	}
 	back struct {
-		interruptible.Mutex    // Both Select and Wait operations synchronize on this lock
-		report  <-chan *result // waitOpenFile goroutines report open results to this channel
-		abort   rh.Abandon     // closing intr interrupts all blocked waitOpenFile goroutines
-		result  *result
+		interruptible.Mutex    // Select and Wait synchronize on this lock
+		unblock <-chan *unblock // file-open goroutines report results to this channel
+		abort   rh.Abandon      // closing intr interrupts all blocked file-open goroutines
+		result  *unblock
 	}
 }
 
-func MakeSelect() *Select {
-	return &Select{ErrorFile: file.NewErrorFile()}
+func MakeSelect(dir *SelectDir) *Select {
+	return &Select{
+		dir:  dir,
+		ErrorFile: file.NewErrorFile(),
+	}
 }
 
-func (s *Select) WaitFiles() []string {
+func (s *Select) GetClauses() []Clause {
 	s.clauses.Lock()
 	defer s.clauses.Unlock()
-	return s.clauses.waitfiles
+	return s.clauses.clauses
 }
 
 // Select initiates a selection process.
-func (s *Select) Select(waitfiles []string) (err error) {
+func (s *Select) Select(clauses []Clause) (err error) {
 	s.ErrorFile.Clear()
 	// obtain operation lock
 	u := s.back.TryLock()
@@ -57,53 +62,104 @@ func (s *Select) Select(waitfiles []string) (err error) {
 	//
 	s.clauses.Lock()
 	defer s.clauses.Unlock()
-	if s.clauses.waitfiles != nil {
+	if s.clauses.clauses != nil {
 		s.ErrorFile.Set("selection already in progress")
-		return fmt.Errorf("select already running")
+		return fmt.Errorf("selection already in progress")
 	}
-	if waitfiles, err = verifyFiles(waitfiles); err != nil {
+	if clauses, err = verifyFiles(clauses); err != nil {
 		s.ErrorFile.Set(err.Error())
 		return err
 	}
-	s.clauses.waitfiles = waitfiles
-	s.start(waitfiles)
+	s.clauses.clauses = clauses
+	s.start(clauses)
 	return nil
 }
 
 // verifyFiles runs some basic sanity checks on the wait file names
-func verifyFiles(waitfiles []string) ([]string, error) {
-	if len(waitfiles) == 0 {
-		return nil, fmt.Errorf("no wait files")
+func verifyFiles(clauses []Clause) ([]Clause, error) {
+	if len(clauses) == 0 {
+		return nil, fmt.Errorf("no clauses")
 	}
-	for i, file := range waitfiles {
-		file = path.Clean(file)
-		_, filename := filepath.Split(file)
-		if !strings.HasPrefix(filename, "wait") {
-			return nil, fmt.Errorf("file %s is not a wait file", file)
+	for i, clause := range clauses {
+		clause.Op = strings.ToLower(strings.TrimSpace(clause.Op))
+		switch clause.Op {
+		case "r", "w":
+		default:
+			return nil, fmt.Errorf("unknown operation")
 		}
-		waitfiles[i] = file
-		// Make sure the files exist
-		if _, err := os.Stat(file); err != nil {
-			return nil, fmt.Errorf("cannot stat file %s: %s", file, err.Error())
+		clause.File = path.Clean(clause.File)
+		clauses[i] = clause
+		if _, err := os.Stat(clause.File); err != nil { // Make sure the files exist
+			return nil, fmt.Errorf("cannot stat file %s: %s", clause.File, err.Error())
 		}
 	}
-	return waitfiles, nil
+	return clauses, nil
 }
 
-func (s *Select) start(waitfiles []string) {
-	ch := make(chan *result, len(waitfiles))
-	s.back.report = ch
+func (s *Select) start(clauses []Clause) {
+	ch := make(chan *unblock, len(clauses))
+	s.back.unblock = ch
 	var intr rh.Intr
 	intr, s.back.abort = rh.NewIntr()
-	for i, file := range waitfiles {
-		go waitOpenFile(i, file, intr, ch)
+	for i_, clause_ := range clauses {
+		i, clause := i_, clause_
+		switch clause.Op {
+		case "r":
+			go func() {
+				u := &unblock{Clause: i}
+				defer func() { // catch panics from disappearing clause files
+					if r := recover(); r != nil {
+						u.Error = rh.ErrNotExist
+						ch <- u
+					}
+				}()
+				u.File, u.Error = OpenFileReader(clause.File, intr)
+				ch <- u
+			}()
+		case "w":
+			go func() {
+				u := &unblock{Clause: i}
+				defer func() { // catch panics from disappearing clause files
+					if r := recover(); r != nil {
+						u.Error = rh.ErrNotExist
+						ch <- u
+					}
+				}()
+				u.File, u.Error = OpenFileWriter(clause.File, intr)
+				ch <- u
+			}()
+		}
 	}
+}
+
+//s.dir.dir.AddChild(name, file.NewFileFID(NewDelayedReadFile(f)))
+
+type unblock struct {
+	Clause int
+	File   interface{} // *FileReader or *FileWriter
+	Error  error
+}
+
+func (u *unblock) CommitName() string {
+	if u.File == nil {
+		return ""
+	}
+	switch u.File.(type) {
+	case *FileReader:
+		return "read." + strconv.Itoa(u.Clause)
+	case *FileWriter:
+		return "write." + strconv.Itoa(u.Clause)
+	}
+	panic(0)
+}
+
+func (u *unblock) Return() (clause int, commit string, err error) {
+	return u.Clause, u.CommitName(), u.Error
 }
 
 // Wait returns when one of the wait files opens (with or without a POSIX open error).
-// The POSIX file open error is not reflected in the final return value of Wait;
 // The error returned by Wait is non-nil only in the case of an interruption or another system error.
-func (s *Select) Wait(intr rh.Intr) (branch int, file string, err error) {
+func (s *Select) Wait(intr rh.Intr) (clause int, commit string, err error) {
 	s.ErrorFile.Clear()
 	// obtain operation lock
 	u := s.back.Lock(intr)
@@ -114,27 +170,37 @@ func (s *Select) Wait(intr rh.Intr) (branch int, file string, err error) {
 	defer u.Unlock()
 	//
 	if s.back.result != nil { // wait already unblocked
-		return s.back.result.Branch, s.back.result.Name, nil
+		return s.back.result.Return()
 	}
-	if s.back.report == nil {
+	if s.back.unblock == nil {
 		s.ErrorFile.Set("no selection in progress")
 		return -1, "", rh.ErrClash
 	}
+	//
 	select {
-	case s.back.result = <-s.back.report:
-		s.back.report = nil // make sure no other results are consumed
-		close(s.back.abort)  // kill all remaining waiters
-		s.back.abort = nil
-		return s.back.result.Branch, s.back.result.Name, nil
+	case s.back.result = <-s.back.unblock:
+		s.abort() // stop all other waiters
+		return s.back.result.Return()
 	case <-intr:
 		s.ErrorFile.Set("wait interrupted")
 		return -1, "", rh.ErrIntr
 	}
 }
 
-// Clunk will abort the selection and terminate any waiting goroutines,
+func (s *Select) abort() error {
+	if s.back.abort == nil {
+		return rh.ErrGone
+	}
+	s.back.unblock = nil // make sure no other unblock results are consumed
+	close(s.back.abort)  // kill all remaining waiters
+	runtime.GC()         // rush the collection of *FileReaders and *FileWriters
+	s.back.abort = nil
+	return nil
+}
+
+// Abort will abort the selection and terminate any waiting goroutines,
 // as long as no Wait or Select operation is currently underway.
-func (s *Select) Clunk() error {
+func (s *Select) Abort() (err error) {
 	// obtain operation lock
 	u := s.back.TryLock()
 	if u == nil {
@@ -142,16 +208,28 @@ func (s *Select) Clunk() error {
 	}
 	defer u.Unlock()
 	//
-	if s.back.abort == nil {
-		return nil // either already done or not initialized yet
-	}
-	close(s.back.abort) // kill any outstanding file-open waiter processes
-	s.back.abort = nil
-	s.back.report = nil
-	return nil
+	return s.abort()
 }
 
-func (s *Select) TryWait() (branch int, file string, err error) {
+// Scrub is like abort, but it will fail with rh.ErrBusy if Wait or Select is pending.
+func (s *Select) Scrub() (err error) {
+	// obtain operation lock
+	u := s.back.TryLock()
+	if u == nil {
+		return rh.ErrBusy
+	}
+	defer u.Unlock()
+	//
+	err = s.abort()
+	switch err {
+	case rh.ErrGone, nil:
+		return nil
+	default:
+		return err
+	}
+}
+
+func (s *Select) TryWait() (clause int, commit string, err error) {
 	s.ErrorFile.Clear()
 	u := s.back.TryLock()
 	if u == nil {
@@ -161,20 +239,19 @@ func (s *Select) TryWait() (branch int, file string, err error) {
 	defer u.Unlock()
 	//
 	if s.back.result != nil { // wait already unblocked
-		return s.back.result.Branch, s.back.result.Name, nil
+		return s.back.result.Return()
 	}
-	if s.back.report == nil {
+	if s.back.unblock == nil {
 		s.ErrorFile.Set("no selection in progress")
 		return -1, "", rh.ErrClash
 	}
+	//
 	select {
-	case s.back.result = <-s.back.report:
-		s.back.report = nil // make sure no other results are consumed
-		close(s.back.abort)  // kill all remaining waiters
-		s.back.abort = nil
-		return s.back.result.Branch, s.back.result.Name, nil
+	case s.back.result = <-s.back.unblock:
+		s.abort() // stop all other waiters
+		return s.back.result.Return()
 	default:
-		s.ErrorFile.Set("no cases ready")
+		s.ErrorFile.Set("no clauses ready")
 		return -1, "", rh.ErrBusy
 	}
 }

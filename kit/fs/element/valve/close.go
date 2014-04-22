@@ -50,6 +50,6 @@ func (f *closeFile) Close() error {
 		f.v.Close()
 		return nil
 	}
-	f.v.ErrorFile.Set("data written to the close file is not \"close\"")
+	f.v.ErrorFile.Set("data written to the close file is not “close”")
 	return rh.ErrClash
 }

@@ -27,20 +27,17 @@ func (f *TryWaitFile) Perm() rh.Perm {
 	return 0444 // r--r--r--
 }
 
-func (f *TryWaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+func (f *TryWaitFile) Open(flag rh.Flag, _ rh.Intr) (_ rh.FID, err error) {
 	f.s.ErrorFile.Set("") // clear error file
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
-	branch, waitfile, err := f.s.TryWait()
+	var u Unblock
+	u.Clause, u.Commit, err = f.s.TryWait()
 	if err != nil {
-		return nil, rh.ErrIO // how does ErrIO manifest on the POSIX end?
+		return nil, rh.ErrIO
 	}
-	result := &Result{
-		Clause: branch,
-		Name:   waitfile,
-	}
-	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(result)))), nil
+	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(u)))), nil
 }
 
 func (f *TryWaitFile) Remove() error {

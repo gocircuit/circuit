@@ -36,11 +36,16 @@ func marshal(v interface{}) string {
 	return string(b)
 }
 
+type Clause struct {
+	Op   string `json:"op"`
+	File string `json:"file"`
+}
+
 func (f *SelectFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	switch flag.Attr {
 	case rh.ReadOnly:
 		return file.NewOpenReaderFile(
-			iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(f.s.WaitFiles()))),
+			iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(f.s.GetClauses()))),
 		), nil
 	case rh.WriteOnly:
 		return file.NewOpenWriterFile(&runWriteFile{s: f.s}), nil
@@ -59,12 +64,12 @@ type runWriteFile struct {
 
 func (w *runWriteFile) Close() (err error) {
 	w.s.ErrorFile.Clear()
-	var waitfiles []string
-	if err = json.Unmarshal(w.Buffer.Bytes(), &waitfiles); err != nil {
-		w.s.ErrorFile.Set("data written is not JSON")
+	var clauses []Clause
+	if err = json.Unmarshal(w.Buffer.Bytes(), &clauses); err != nil {
+		w.s.ErrorFile.Set("cannot recognize JSON clauses structure")
 		return rh.ErrClash
 	}
-	if err = w.s.Select(waitfiles); err != nil {
+	if err = w.s.Select(clauses); err != nil {
 		return rh.ErrClash
 	}
 	return nil

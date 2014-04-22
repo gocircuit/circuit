@@ -8,14 +8,14 @@
 package sel
 
 import (
-	"fmt"
 	"bufio"
-	"bytes"
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"sync"
 
+	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
@@ -29,27 +29,25 @@ func getCircuitBinary() string {
 
 // FileWriter is an interruptible.Writer
 type FileWriter struct {
-	cmd   *exec.Command
+	cmd   *exec.Cmd
 	iw    interruptible.Writer
 	kill  sync.Once
-	clunk func()
+	Clunk func() // Clunk will be invoked if and when the FileWriter is closed.
 }
 
-// clunk will be invoked if and when the FileWriter is closed.
-func OpenFileWriter(name string, intr rh.Intr, clunk func()) (r *FileWriter, err error) {
-	r = &FileWriter{
-		cmd:   exec.Command(getCircuitBinary(), "-syswrite", path.Clean(file)),
-		clunk: clunk,
+func OpenFileWriter(name string, intr rh.Intr) (w *FileWriter, err error) {
+	w = &FileWriter{
+		cmd:   exec.Command(getCircuitBinary(), "-syswrite", path.Clean(name)),
 	}
-	// stderr is a control channel
-	stderr, err := r.cmd.StderrPipe()
+	// stderr is a control back-channel
+	stderr, err := w.cmd.StderrPipe()
 	if err != nil {
 		panic(err) // system error
 	}
 	// stdin is the writing channel
-	r.Command.Stdout, r.iw = interruptible.BufferPipe(bufferCap)
+	w.cmd.Stdin, w.iw = interruptible.BufferPipe(bufferCap)
 	//
-	if err = r.cmd.Start(); err != nil {
+	if err = w.cmd.Start(); err != nil {
 		panic(err) // system errors are reported as panics to distinguish them
 	}
 	waitopen := make(chan error, 1)
@@ -69,18 +67,24 @@ func OpenFileWriter(name string, intr rh.Intr, clunk func()) (r *FileWriter, err
 			}
 			break
 		}
-		r.cmd.Wait()
+		w.cmd.Wait()
 	}()
 	select {
 	case <-intr:
-		r.cmd.Process.Kill()
+		w.cmd.Process.Kill()
 		return nil, rh.ErrIntr
 	case err := <-waitopen:
 		if err != nil {
-			r.cmd.Process.Kill()
+			w.cmd.Process.Kill()
 			return nil, err
 		}
-		return r, nil
+		// Kill helper process on garbage collection
+		runtime.SetFinalizer(w, 
+			func(w2 *FileWriter) { 
+				w2.Close()
+			},
+		)
+		return w, nil
 	}
 }
 
@@ -93,7 +97,7 @@ func (w *FileWriter) WriteIntr(p []byte, intr rh.Intr) (_ int, err error) {
 	return w.iw.WriteIntr(p, intr)
 }
 
-func (w *FileWriter) Write(p []byte) (int, error) {
+func (w *FileWriter) Write(p []byte) (_ int, err error) {
 	defer func() {
 		if err != nil {
 			w.Close()
@@ -109,9 +113,9 @@ func (w *FileWriter) Close() error {
 		}()
 		w.kill.Do(func() {
 			w.cmd.Process.Kill()
-			if w.clunk != nil {
-				w.clunk()
-				w.clunk = nil
+			if w.Clunk != nil {
+				w.Clunk()
+				w.Clunk = nil
 			}
 		})
 	}()

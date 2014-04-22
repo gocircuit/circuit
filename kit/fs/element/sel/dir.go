@@ -31,8 +31,8 @@ type SelectDir struct {
 func NewDir(name string, rmv func()) *SelectDir {
 	d := &SelectDir{
 		dir: dir.NewDir(),
-		s:   MakeSelect(),
 	}
+	d.s = MakeSelect(d)
 	d.rmv.rmv = rmv
 	d.FID = d.dir.FID()
 	d.dir.AddChild("help", file.NewFileFID(file.NewByteReaderFile(
@@ -43,6 +43,7 @@ func NewDir(name string, rmv func()) *SelectDir {
 	d.dir.AddChild("select", file.NewFileFID(NewSelectFile(d.s)))
 	d.dir.AddChild("wait", file.NewFileFID(NewWaitFile(d.s)))
 	d.dir.AddChild("trywait", file.NewFileFID(NewTryWaitFile(d.s)))
+	d.dir.AddChild("abort", file.NewFileFID(NewAbortFile(d.s)))
 	d.dir.AddChild("error", file.NewFileFID(d.s.ErrorFile))
 	return d
 }
@@ -57,7 +58,7 @@ func (d *SelectDir) Walk(wname []string) (rh.FID, error) {
 func (d *SelectDir) Remove() error {
 	d.rmv.Lock()
 	defer d.rmv.Unlock()
-	if err := d.s.Clunk(); err != nil {
+	if err := d.s.Scrub(); err != nil {
 		return rh.ErrBusy
 	}
 	if d.rmv.rmv != nil {

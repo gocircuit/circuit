@@ -51,7 +51,12 @@ circuit of the first one:
 	circuit -a 10.20.30.5:11088 -m /circuit -j circuit://10.20.30.7:11022/78517/R56e7a2a0d47a7b5d
 
 You now have two mutually-aware circuit agents, running on two different hosts in your cluster.
-You can join any number of additional hosts to the circuit environment in a similar fashion.
+You can join any number of additional hosts to the circuit environment in a similar fashion,
+even billions:
+
+	> The circuit uses a modern [expander graph](http://en.wikipedia.org/wiki/Expander_graph)-based
+	> algorithm for presence awareness and ordered communication, which is genuinely distributed;
+	> It uses communication and connectivity sparingly, hardly leaving a footprint when idle.
 
 Explore
 -------
@@ -64,3 +69,9 @@ On any host with a running circuit agent, go to the local circuit mount director
 Each of its subdirectories corresponds to a live circuit agent. Navigate into
 any one of them and explore the file system. Each directory is equipped with a
 `help` file to guide you.
+
+Learn more
+----------
+
+To stay up to date with new developments, documentation and articles, follow
+The Go Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit).
