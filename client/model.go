@@ -12,7 +12,7 @@ import (
 	"io"
 )
 
-// Process
+// Process-related
 
 type Command struct {
 	Env  []string `json:"env"`
@@ -20,13 +20,10 @@ type Command struct {
 	Args []string `json:"args"`
 }
 
-// Select
+// Select-related
 
 // Clause stands for any of the Clause* types.
 type Clause interface{}
-
-// ClauseDefault represnts a default case in a selection.
-type ClauseDefault struct{}
 
 // ??
 type ClauseSend struct {

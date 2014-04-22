@@ -87,9 +87,7 @@ func (c *channel) Close() {
 	}
 }
 
-// Scrub removes the channel elements from the circuit environment (and local file system).
-func (c *channel) Scrub() error {
-	if err := ioutil.WriteFile(path.Join(c.Path(), "close"), []byte("close"), 0222); err != nil {
-		panic(err)
-	}
+// Remove removes the channel element from the circuit environment (and local file system).
+func (c *channel) Remove() error {
+	return os.Remove(c.Path())
 }

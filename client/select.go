@@ -9,12 +9,13 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"os"
 	"path"
-	"strconv"
+
+	"github.com/gocircuit/circuit/kit/fs/element/sel"
 )
 
 const selDir = "select"
@@ -23,11 +24,8 @@ type sel struct {
 	namespace *Namespace
 	name      string
 	dir       *Dir
-	sel struct {
-		??
-		clause    []Clause
-		result    <-chan *unblock
-	}
+	sync.Mutex
+	clause    []Clause
 }
 
 type unblock struct {
@@ -56,37 +54,36 @@ func (s *sel) Path() string {
 	return path.Join(s.namespace.Path(), selDir, s.name)
 }
 
-// Wait blocks until one of the select branches unblocks.
-// branch indicates the index of the clause that unblocked.
-// value is an io.WriteCloser if the unblocking clause is a channel send;
-// value is an io.ReadCloser if unblocking clause is a channel receive and the channel is still open;
-// value equals nil if the unblocking clause is a channel receive and the channel is closed;
-// value is nil if the unblocking clause is a successful process exit, otherwise it is a non-nil error.
-func (s *sel) Wait() (branch int, value interface{}) {
-	r, ok := <-s.result
-	if !ok {
-		return -1, nil // all clauses blocked and selection has default clause
-	}
-	if r.Error != nil { // the worker directory hosting this selection is gone (worker is dead)
-		panic(r.Error)
-	}
-	return r.Branch, r.Value
-}
-
+// ??
 func (s *sel) Start(clause []Clause) error {
-	??
-	if err = ioutil.WriteFile(path.Join(s.Path(), "select"), marshalClauses(clause), 0222); err != nil {
-		os.Remove(s.Path())
-		return nil, err
+	if err = ioutil.WriteFile(path.Join(s.Path(), "select"), encodeClauses(clause), 0222); err != nil {
+		return err
 	}
+	s.Lock()
+	defer s.Unlock()
+	if s.clause != nil {
+		panic("selection already started")
+	}
+	s.clause = clause
 }
 
-func (s *sel) start(clause []Clause) {
-	if hasDefault(clause) {
-		s.startNonBlocking(clause)
-	} else {
-		s.startBlocking(clause)
+func encodeClauses(clauses []Clause) []byte {
+	var waitfiles []string
+	for i, c := range clauses {
+		switch t := c.(type) {
+		case ClauseSend:
+			waitfiles = append(waitfiles, path.Join(t.Chan.Path(), "waitsend")
+		case ClauseReceive:
+			waitfiles = append(waitfiles, path.Join(t.Chan.Path(), "waitrecv")
+		case ClauseExit:
+			waitfiles = append(waitfiles, path.Join(t.Proc.Path(), "waitexit")
+		}
 	}
+	buf, err := json.Marshal(waitfiles)
+	if err != nil {
+		panic(0)
+	}
+	return buf
 }
 
 // hasDefault returns true if one of clause is ClauseDefault.
@@ -99,114 +96,48 @@ func hasDefault(clause []Clause) bool {
 	return false
 }
 
-func (s *sel) startNonBlocking(clause []Clause) {
-	var i int
-	perm := rand.Perm(len(clause))
-	//
-	defer close(s.result)
-	defer func() {
-		if r := recover(); r != nil {
-			s.result <- &unblock{
-				Branch: perm[i],
-				Error:  r,
-			}
-		}
-	}()
-	//
-	for i, _ = range clause {
-		c := clause[perm[i]]
-		switch t := c.(type) {
-		case ClauseDefault:
-			// skip
+var ExitOK = errors.New("process exit ok")
+var ExitError = errors.New("process exit error")
+var Closed = errors.New("channel closed")
 
-		case ClauseSend:
-			s.result <- &unblock{
-				Branch: perm[i],
-				Value:  t.Chan.TrySend(),
-			}
-			return
-
-		case ClauseReceive:
-			result <- &unblock{
-				Branch: perm[i],
-				Value:  t.Chan.TryRecv(),
-			}
-			return
-
-		case ClauseExit:
-			result <- &unblock{
-				Branch: perm[i],
-				Value:  t.Proc.Stat(),
-			}
-			return
-
-		}
+// Wait blocks until one of the select branches unblocks.
+// branch indicates the index of the clause that unblocked.
+// value is an io.WriteCloser if the unblocking clause is a channel send;
+// value is an io.ReadCloser if unblocking clause is a channel receive and the channel is still open;
+// value equals Closed if the unblocking clause is a channel receive and the channel is closed;
+// value equals ExitOK or ExitError if the unblocking clause is a successful or erroneous process exit.
+// value can be nil in the case of channel receive and channel send, if a racing select or channel operation
+// snatches the unblocked channel operation first; 
+// TODO(petar): the latter condition could be wrapped inside a spin loop
+func (s *sel) Wait() (branch int, value interface{}) {
+	b, err := ioutil.ReadFile(path.Join(s.Path(), "wait"))
+	if os.IsNotExist(err) { // a missing file indicates a dead circuit worker; we panic for those by convention
+		panic(err)
 	}
-	// If all clauses are blocking, just close s.result within the defer above.
-}
-
-func (s *sel) startBlocking(clause []Clause) {
-	perm := rand.Perm(len(clause))
-	backchan := make(chan *unblock, len(clause))
-	for i, _ = range clause { // fire off waiters
-		b := perm[i]
-		c := clause[b]
-		switch t := c.(type) {
-		case ClauseDefault:
-			panic(0)
-		case ClauseSend:
-			go waitSend(backchan, b, t.Chan)
-		case ClauseReceive:
-			go waitRecv(backchan, b, t.Chan)
-		case ClauseExit:
-			go waitExit(backchan, b, t.Proc)
-		}
+	var r sel.Result
+	if err = json.Unmarshal(b, &r); err != nil {
+		panic(err)
 	}
-	for { // spin after wait until operation completes
+	if r.Branch < 0 { // happens if select is interrupted by removal
+		return -1, nil
+	}
+	//
+	s.Lock()
+	defer s.Unlock()
+	//
+	clause := r.clause[r.Branch]
+	switch t := clause.(type) {
+	case ClauseSend:
+		??
+	case ClauseReceive:
+		??
+	case ClauseExit:
 		??
 	}
+	panic(0)
 }
 
-func waitSend(report chan<- *unblock, branch int, ch Chan) {
-	defer func() {
-		if r := recover(); r != nil {
-			select {
-			case s.result <- &unblock{
-					Branch: branch,
-					Error:  r,
-				}
-			}
-		}
-	}()
-	ch.WaitSend()
-	select {
-	case ch <- &unblock{Branch: branch}
-	}
-}
-
-func waitRecv(report chan<- *unblock, branch int, ch Chan) {
-	defer func() {
-		if r := recover(); r != nil {
-			select {
-			case s.result <- &unblock{
-					Branch: branch,
-					Error:  r,
-				}
-			}
-		}
-	}()
-	ch.WaitRecv()
-	select {
-	case ch <- &unblock{Branch: branch}
-	}
-}
-
-func marshalClauses(clauses []Clause) []byte {
-	??
-	var w bytes.Buffer
-	for i, c := range clauses {
-		switch t := c.(type) {
-		}
-	}
-	return w.Bytes()
+// Remove removes the select element from the circuit environment (and local file system).
+func (s *sel) Remove() error {
+	return os.Remove(s.Path())
 }
