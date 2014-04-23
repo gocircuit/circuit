@@ -74,4 +74,4 @@ Learn more
 ----------
 
 To stay up to date with new developments, documentation and articles, follow
-The Go Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit).
+The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit).
