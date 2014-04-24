@@ -1,4 +1,8 @@
+The Circuit
+===========
 
+For a visual introduction to The Circuit, dive into the 
+[GopherCon 2014 Slides](https://docs.google.com/presentation/d/1ooedstHs8_ow-eHY7z8MCV_1m65gSaiB6Q1ruz3j7Hk/edit#slide=id.g26f183bd0_00).
 
 The circuit is a tool for executing and synchronizing UNIX processes across entire clusters
 by means of a file-system interface. 
@@ -54,9 +58,9 @@ You now have two mutually-aware circuit agents, running on two different hosts i
 You can join any number of additional hosts to the circuit environment in a similar fashion,
 even billions:
 
-	> The circuit uses a modern [expander graph](http://en.wikipedia.org/wiki/Expander_graph)-based
-	> algorithm for presence awareness and ordered communication, which is genuinely distributed;
-	> It uses communication and connectivity sparingly, hardly leaving a footprint when idle.
+The circuit uses a modern [expander graph](http://en.wikipedia.org/wiki/Expander_graph)-based
+algorithm for presence awareness and ordered communication, which is genuinely distributed;
+It uses communication and connectivity sparingly, hardly leaving a footprint when idle.
 
 Explore
 -------
