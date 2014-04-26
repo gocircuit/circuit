@@ -10,7 +10,6 @@ package valve
 import (
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
-	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
 type TryRecvFile struct {
@@ -33,7 +32,7 @@ func (f *TryRecvFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return file.NewOpenInterruptibleReaderFile(r.(interruptible.Reader)), nil
+	return file.NewOpenInterruptibleReaderFile(r), nil
 }
 
 func (f *TryRecvFile) Remove() error {

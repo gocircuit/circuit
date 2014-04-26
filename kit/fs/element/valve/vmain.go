@@ -13,161 +13,39 @@ import (
 
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
+	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
 func MakeValve() *Valve {
-	return &Valve{ErrorFile: file.NewErrorFile()}
+	return &Valve{
+		ErrorFile: file.NewErrorFile(),
+	}
 }
 
+// Sender-receiver pipe capacity (once matched)
 const MessageCap = 32e3 // 32K
 
+// Valve
 type Valve struct {
-	*file.ErrorFile
-	sync.Mutex
-	stat  Stat
-	send  *senderValve
-	recv  *receiverValve
-}
-
-type onceSender chan<- interface{}
-type onceReceiver <-chan interface{}
-
-// ctrl
-
-func (c *Valve) SetCap(n int) error {
-	c.ErrorFile.Clear()
-	c.Lock()
-	defer c.Unlock()
-	if c.send != nil {
-		c.ErrorFile.Set("capacity already set")
-		return rh.ErrClash
+	send struct {
+		abr <-chan struct{} // abort when closed
+		interruptible.Mutex
+		tun chan<- chan interruptible.Reader
+		gate chan<- interruptible.Reader
 	}
-	if n < 0 {
-		c.ErrorFile.Set("negative capacity")
-		return rh.ErrPerm
+	recv struct {
+		abr <-chan struct{} // abort when closed
+		interruptible.Mutex
+		tun <-chan chan interruptible.Reader
+		gate <-chan interruptible.Reader
 	}
-	c.stat.Cap = n
-	c.stat.Opened = true
-	ch := make(chan onceReceiver, n)
-	c.send, c.recv = newSenderValve(c.ErrorFile, ch), newReceiverValve(c.ErrorFile, ch)
-	return nil
-}
-
-func (c *Valve) GetCap() int {
-	c.Lock()
-	defer c.Unlock()
-	return c.stat.Cap
-}
-
-// send-side
-
-func (c *Valve) sendvalve() (*senderValve, error) {
-	c.ErrorFile.Clear()
-	c.Lock()
-	defer c.Unlock()
-	if c.send == nil {
-		c.ErrorFile.Set("capacity not set")
-		return nil, rh.ErrClash
+	ErrorFile *file.ErrorFile
+	ctrl struct {
+		sync.Mutex
+		abr  chan<- struct{}
+		stat Stat
 	}
-	return c.send, nil
 }
-
-func (c *Valve) Close() error {
-	x, err := c.sendvalve()
-	if err != nil {
-		return err
-	}
-	c.Lock()
-	c.stat.Closed = true
-	c.Unlock()
-	go func() {
-		x.Close()
-	}()
-	return nil
-}
-
-func (c *Valve) incSend(err error) error {
-	if err != nil {
-		return err
-	}
-	c.Lock()
-	defer c.Unlock()
-	c.stat.NumSend++
-	return nil
-}
-
-func (c *Valve) Send(v interface{}, intr rh.Intr) error {
-	x, err := c.sendvalve()
-	if err != nil {
-		return err
-	}
-	return c.incSend(x.Send(v, intr))
-}
-
-func (c *Valve) TrySend(v interface{}) error {
-	x, err := c.sendvalve()
-	if err != nil {
-		return err
-	}
-	return c.incSend(x.TrySend(v))
-}
-
-func (c *Valve) WaitSend(intr rh.Intr) error {
-	x, err := c.sendvalve()
-	if err != nil {
-		return err
-	}
-	return x.WaitSend(intr)
-}
-
-// recv-side
-
-func (c *Valve) recvvalve() (*receiverValve, error) {
-	c.ErrorFile.Clear()
-	c.Lock()
-	defer c.Unlock()
-	if c.recv == nil {
-		c.ErrorFile.Set("capacity not set")
-		return nil, rh.ErrClash
-	}
-	return c.recv, nil
-}
-
-func (c *Valve) incRecv(v interface{}, err error) (interface{}, error) {
-	if err != nil {
-		return nil, err
-	}
-	c.Lock()
-	defer c.Unlock()
-	c.stat.NumRecv++
-	return v, nil
-}
-
-func (c *Valve) Recv(intr rh.Intr) (interface{}, error) {
-	x, err := c.recvvalve()
-	if err != nil {
-		return nil, err
-	}
-	return c.incRecv(x.Recv(intr))
-}
-
-func (c *Valve) TryRecv() (interface{}, error) {
-	x, err := c.recvvalve()
-	if err != nil {
-		return nil, err
-	}
-	return c.incRecv(x.TryRecv())
-}
-
-func (c *Valve) WaitRecv(intr rh.Intr) error {
-	x, err := c.recvvalve()
-	if err != nil {
-		return err
-	}
-	return x.WaitRecv(intr)
-}
-
-// stat
 
 type Stat struct {
 	Cap     int  `json:"cap"`
@@ -185,9 +63,61 @@ func (s *Stat) String() string {
 	return string(b)
 }
 
-func (c *Valve) GetStat() *Stat {
-	c.Lock()
-	defer c.Unlock()
-	var s Stat = c.stat
+// SetCap initializes the valve and sets its buffer capacity to n.
+func (v *Valve) SetCap(n int) error {
+	// Lock the send system
+	su := v.send.TryLock()
+	if su == nil {
+		v.ErrorFile.Set("concurring send attempt")
+		return rh.ErrPerm
+	}
+	defer su.Unlock()
+
+	// Lock the receive system
+	ru := v.recv.TryLock()
+	if ru == nil {
+		v.ErrorFile.Set("concurring receive attempt")
+		return rh.ErrPerm
+	}
+	defer ru.Unlock()
+
+	// Lock the control system
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+
+	// Validate argument and check we are not opening twice
+	if v.ctrl.stat.Opened {
+		v.ErrorFile.Set("capacity already set")
+		return rh.ErrClash
+	}
+	if n < 0 {
+		v.ErrorFile.Set("negative capacity")
+		return rh.ErrPerm
+	}
+
+	// Initialize valve
+	tun, abr := make(chan chan interruptible.Reader, n), make(chan struct{})
+	v.send.tun, v.recv.tun = tun, tun                  // setup main channel
+	v.ctrl.abr, v.send.abr, v.recv.abr = abr, abr, abr // setup abort channel
+	v.ctrl.stat.Opened, v.ctrl.stat.Cap = true, n                // update state
+
+	return nil
+}
+
+// GetCap returns the capacity of the valve and whether it was set.
+func (v *Valve) GetCap() int {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	if v.ctrl.stat.Opened {
+		return v.ctrl.stat.Cap
+	}
+	return -1
+}
+
+// GetStat …
+func (v *Valve) GetStat() *Stat {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	var s Stat = v.ctrl.stat
 	return &s
 }

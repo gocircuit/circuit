@@ -47,8 +47,7 @@ type closeFile struct {
 func (f *closeFile) Close() error {
 	f.v.ErrorFile.Clear()
 	if strings.TrimSpace(f.Buffer.String()) == "close" {
-		f.v.Close()
-		return nil
+		return f.v.Close()
 	}
 	f.v.ErrorFile.Set("data written to the close file is not “close”")
 	return rh.ErrClash

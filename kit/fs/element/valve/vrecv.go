@@ -10,132 +10,140 @@ package valve
 import (
 	"sync"
 
-	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
-type receiverValve struct {
-	recv <-chan onceReceiver
-	carrier struct {
-		lk1 interruptible.Mutex
-		lk2 sync.Mutex
-		ch  onceReceiver
+func (v *Valve) Recv(intr rh.Intr) (ir interruptible.Reader, err error) {
+	// Lock send system
+	u := v.recv.Lock(intr)
+	if u == nil {
+		return nil, rh.ErrIntr
 	}
-	*file.ErrorFile
-}
 
-func newReceiverValve(errfile *file.ErrorFile, recv <-chan onceReceiver) *receiverValve {
-	return &receiverValve{
-		recv:      recv,
-		ErrorFile: errfile,
+	// Is there an abandoned gate from the sender?
+	if v.recv.gate != nil {
+		g := v.recv.gate
+		v.recv.gate = nil
+		return newValveReader(v, u, g), nil
 	}
-}
 
-func (c *receiverValve) Recv(intr rh.Intr) (interface{}, error) {
-	c.ErrorFile.Clear()
-	if t, ok := c.quickRecv(); ok {
-		select {
-		case v := <-t:
-			return v, nil
-		case <-intr:
-			c.ErrorFile.Set("receive interrupted")
-			return nil, rh.ErrIntr
-		}
-	}
-	//
+	// Otherwise, pull a gate from the sender
 	select {
-	case t, ok := <-c.recv:
-		if !ok {
-			return nil, rh.ErrGone
-		}
-		select {
-		case v := <-t:
-			return v, nil
-		case <-intr:
-			c.ErrorFile.Set("receive interrupted")
-			return nil, rh.ErrIntr
-		}
+	case g := <-v.recv.tun:
+		return newValveReader(v, u, g), nil
+	case <-v.recv.abr:
+		u.Unlock()
+		return nil, rh.ErrGone
 	case <-intr:
-		c.ErrorFile.Set("receive interrupted")
+		u.Unlock()
 		return nil, rh.ErrIntr
 	}
 }
 
-func (c *receiverValve) TryRecv() (interface{}, error) {
-	c.ErrorFile.Clear()
-	if t, ok := c.quickRecv(); ok {
-		select {
-		case v := <-t:
-			return v, nil
-		default:
-			// lose the message;
-			// happens only when TrySend and TryRecv match each other;
-			// this is a user programming mistake.
-			c.ErrorFile.Set("try send matched try recv (user programming error); message lost")
-			return nil, rh.ErrClash
-		}
+func (v *Valve) TryRecv() (ir interruptible.Reader, err error) {
+	// Lock send system
+	u := v.recv.TryLock()
+	if u == nil {
+		return nil, rh.ErrBusy
 	}
-	//
+
+	// Is there an abandoned gate from the sender?
+	if v.recv.gate != nil {
+		g := v.recv.gate
+		v.recv.gate = nil
+		return newValveReader(v, u, g), nil
+	}
+
+	// Otherwise, pull a gate from the sender
 	select {
-	case t, ok := <-c.recv:
+	case g, ok := <-v.recv.tun:
 		if !ok {
-			return nil, rh.ErrGone
+			u.Unlock()
+			return nil, rh.ErrEOF
 		}
-		select {
-		case v := <-t:
-			return v, nil
-		default:
-			// lose the message;
-			// happens only when TrySend and TryRecv match each other;
-			// this is a user programming mistake.
-			c.ErrorFile.Set("try send matched try recv (user programming error); message lost")
-			return nil, rh.ErrClash
-		}
+		return newValveReader(v, u, g), nil
+	case <-v.recv.abr:
+		u.Unlock()
+		return nil, rh.ErrGone
 	default:
-		c.ErrorFile.Set("receive would block")
+		u.Unlock()
 		return nil, rh.ErrBusy
 	}
 }
 
-func (c *receiverValve) quickRecv() (onceReceiver, bool) {
-	c.carrier.lk2.Lock()
-	defer c.carrier.lk2.Unlock()
-	if c.carrier.ch == nil {
-		return nil, false
-	}
-	defer func() {
-		c.carrier.ch = nil
-	}()
-	return c.carrier.ch, true
+// valveReader is an interruptible.Reader.
+type valveReader struct {
+	valve *Valve
+	u *interruptible.Unlocker
+	s *Snatcher
+	sync.Mutex
+	g <-chan interruptible.Reader
+	r interruptible.Reader
 }
 
-func (c *receiverValve) canQuickRecv() bool {
-	c.carrier.lk2.Lock()
-	defer c.carrier.lk2.Unlock()
-	return c.carrier.ch != nil
+// ValveReader …
+// gate is the channel where the valve writer will send the reading end, if it commits to the session.
+func newValveReader(
+	valve *Valve, 
+	unlocker *interruptible.Unlocker,
+	gate <-chan interruptible.Reader,
+) (vr interruptible.Reader) {
+	return &valveReader{
+		valve: valve,
+		u: unlocker,
+		s: NewSnatcher(),
+		g: gate,
+		r: brokenReader{rh.ErrGone},
+	}
 }
 
-func (c *receiverValve) WaitRecv(intr rh.Intr) error {
-	u := c.carrier.lk1.Lock(intr)
-	if u == nil {
-		return rh.ErrIntr
+func (vr *valveReader) commit() interruptible.Reader {
+	vr.Lock()
+	defer vr.Unlock()
+	if vr.s.Snatch(committing) == FirstSnatch {
+		defer vr.u.Unlock()
+		vr.r = <-vr.g
+		vr.g = nil
 	}
-	defer u.Unlock()
-	//
-	c.ErrorFile.Clear()
-	if c.canQuickRecv() {
-		return nil
+	return vr.r
+}
+
+func (vr *valveReader) Read(p []byte) (int, error) {
+	return vr.commit().Read(p)
+}
+
+func (vr *valveReader) ReadIntr(p []byte, intr rh.Intr) (n int, err error) {
+	return vr.commit().ReadIntr(p, intr)
+}
+
+func (vr *valveReader) abandon() {
+	vr.Lock()
+	defer vr.Unlock()
+	if vr.s.Snatch(abandoning) == FirstSnatch {
+		defer vr.u.Unlock()
+		vr.valve.recv.gate, vr.g = vr.g, nil
 	}
-	select {
-	case t, ok := <-c.recv:
-		if !ok {
-			return rh.ErrGone
-		}
-		c.carrier.ch = t
-		return nil
-	case <-intr:
-		c.ErrorFile.Set("send interrupted")
-		return rh.ErrIntr
-	}
+}
+
+func (vr *valveReader) Close() error {
+	vr.abandon()
+	return vr.commit().Close()
+}
+
+// brokenReader is an interruptible.Reader which always fails in error.
+type brokenReader struct {
+	error
+}
+
+func (broken brokenReader) Read([]byte) (int, error) {
+	return 0, broken.error
+}
+
+func (broken brokenReader) ReadIntr(p []byte, intr rh.Intr) (n int, err error) {
+	return 0, broken.error
+}
+
+func (broken brokenReader) Close() error {
+	return broken.error
 }

@@ -48,6 +48,6 @@ func (f *WaitFile) Remove() error {
 }
 
 type Unblock struct {
-	Clause int     `json:"clause"`
-	Commit string  `json:"commit"` // name of “commit” file where actual reading/writing can be performed
+	Clause int     `json:"case"`
+	Commit string  `json:"file"` // name of “commit” file where actual reading/writing can be performed
 }

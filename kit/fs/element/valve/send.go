@@ -10,7 +10,6 @@ package valve
 import (
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
-	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
 type SendFile struct {
@@ -30,10 +29,8 @@ func (f *SendFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	if flag.Attr != rh.WriteOnly {
 		return nil, rh.ErrPerm
 	}
-	r, w := interruptible.BufferPipe(MessageCap) // Send –> Recv
-	if err := f.v.Send(r, intr); err != nil {
-		w.Close()
-		r.Close()
+	w, err := f.v.Send(intr)
+	if err != nil {
 		return nil, err
 	}
 	return file.NewOpenInterruptibleWriterFile(w), nil

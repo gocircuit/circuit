@@ -61,6 +61,5 @@ func (c *capWriteFile) Close() error {
 		c.v.ErrorFile.Set("capacity not a non-negative integer")
 		return rh.ErrClash
 	}
-	c.v.SetCap(n)
-	return nil
+	return c.v.SetCap(n)
 }

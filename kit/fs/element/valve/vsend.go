@@ -10,145 +10,161 @@ package valve
 import (
 	"sync"
 
-	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
-type senderValve struct {
-	send struct {
-		interruptible.Mutex
-		send chan<- onceReceiver
-	}
-	carrier struct {
-		lk1 interruptible.Mutex
-		lk2 sync.Mutex
-		ch  onceSender
-	}
-	*file.ErrorFile
-}
-
-func newSenderValve(errfile *file.ErrorFile, send chan<- onceReceiver) *senderValve {
-	r := &senderValve{
-		ErrorFile: errfile,
-	}
-	r.send.send = send
-	return r
-}
-
-func (c *senderValve) Send(v interface{}, intr rh.Intr) error {
-	c.ErrorFile.Clear()
-	if c.quickSend(v) {
-		return nil
-	}
-	//
-	u := c.send.Lock(intr)
-	if u == nil {
-		return rh.ErrIntr
-	}
-	defer u.Unlock()
-	//
-	if c.send.send == nil {
+// Close closes the channel
+func (v *Valve) Close() error {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	if v.ctrl.stat.Closed {
 		return rh.ErrGone
 	}
-	//
-	t := make(chan interface{}, 1)
-	t <- v
-	select {
-	case c.send.send <- onceReceiver(t):
-		return nil
-	case <-intr:
-		c.ErrorFile.Set("send interrupted")
-		return rh.ErrIntr
-	}
-}
-
-func (c *senderValve) TrySend(v interface{}) error {
-	c.ErrorFile.Clear()
-	if c.quickSend(v) {
-		return nil
-	}
-	//
-	u := c.send.TryLock()
-	if u == nil {
-		return rh.ErrIntr
-	}
-	defer u.Unlock()
-	//
-	if c.send.send == nil {
-		return rh.ErrGone
-	}
-	//
-	t := make(chan interface{}, 1)
-	t <- v
-	select {
-	case c.send.send <- t:
-		return nil
-	default:
-		c.ErrorFile.Set("send would block")
-		return rh.ErrBusy
-	}
-}
-
-func (c *senderValve) WaitSend(intr rh.Intr) error {
-	u1 := c.carrier.lk1.Lock(intr)
-	if u1 == nil {
-		return rh.ErrIntr
-	}
-	defer u1.Unlock()
-	//
-	c.ErrorFile.Clear()
-	if c.canQuickSend() {
-		return nil
-	}
-	//
-	u2 := c.send.Lock(intr)
-	if u2 == nil {
-		return rh.ErrIntr
-	}
-	defer u2.Unlock()
-	//
-	if c.send.send == nil {
-		return rh.ErrGone
-	}
-	//
-	t := make(chan interface{}, 1)
-	select {
-	case c.send.send <- onceReceiver(t):
-		c.carrier.ch = onceSender(t)
-		return nil
-	case <-intr:
-		c.ErrorFile.Set("send interrupted")
-		return rh.ErrIntr
-	}
-}
-
-func (c *senderValve) Close() error {
-	u := c.send.Lock(nil)
-	defer u.Unlock()
-	//
-	if c.send.send == nil {
-		return rh.ErrGone
-	}
-	//
-	close(c.send.send)
-	c.send.send = nil
+	v.ctrl.stat.Closed = true
+	close(v.ctrl.abr)
+	go func() {
+		v.send.Lock(nil) // Lock send system
+		close(v.send.tun)
+	}()
 	return nil
 }
 
-func (c *senderValve) quickSend(v interface{}) bool {
-	c.carrier.lk2.Lock()
-	defer c.carrier.lk2.Unlock()
-	if c.carrier.ch == nil {
-		return false
+func (v *Valve) Send(intr rh.Intr) (iw interruptible.Writer, err error) {
+	// Lock send system
+	u := v.send.Lock(intr)
+	if u == nil {
+		return nil, rh.ErrIntr
 	}
-	c.carrier.ch <- v
-	c.carrier.ch = nil
-	return true
+
+	// Is there an abandoned gate to the receiver?
+	if v.send.gate != nil {
+		g := v.send.gate
+		v.send.gate = nil
+		return newValveWriter(v, u, g), nil
+	}
+
+	// Otherwise, make a new gate and push it to the receiver
+	g := make(chan interruptible.Reader, 1)
+	select {
+	case v.send.tun <- g:
+		return newValveWriter(v, u, g), nil
+	case <-v.send.abr:
+		u.Unlock()
+		return nil, rh.ErrGone
+	case <-intr:
+		u.Unlock()
+		return nil, rh.ErrIntr
+	}
 }
 
-func (c *senderValve) canQuickSend() bool {
-	c.carrier.lk2.Lock()
-	defer c.carrier.lk2.Unlock()
-	return c.carrier.ch != nil
+func (v *Valve) TrySend() (iw interruptible.Writer, err error) {
+	// Lock send system
+	u := v.send.TryLock()
+	if u == nil {
+		return nil, rh.ErrBusy
+	}
+
+	// Is there an abandoned gate to the receiver?
+	if v.send.gate != nil {
+		g := v.send.gate
+		v.send.gate = nil
+		return newValveWriter(v, u, g), nil
+	}
+
+	// Otherwise, make a new gate and push it to the receiver
+	g := make(chan interruptible.Reader, 1)
+	select {
+	case v.send.tun <- g:
+		return newValveWriter(v, u, g), nil
+	case <-v.send.abr:
+		u.Unlock()
+		return nil, rh.ErrGone
+	default:
+		u.Unlock()
+		return nil, rh.ErrBusy
+	}
+}
+
+// valveWriter is an interruptible.Writer.
+type valveWriter struct {
+	valve *Valve
+	u *interruptible.Unlocker
+	s *Snatcher
+	sync.Mutex
+	g chan<- interruptible.Reader
+	w interruptible.Writer
+}
+
+// ValveWriter …
+// gate is the channel where the valve writer will send the reading end, if it commits to the session.
+func newValveWriter(
+	valve *Valve, 
+	unlocker *interruptible.Unlocker,
+	gate chan<- interruptible.Reader,
+) (vw interruptible.Writer) {
+	return &valveWriter{
+		valve: valve,
+		u: unlocker,
+		s: NewSnatcher(),
+		g: gate,
+		w: brokenWriter{rh.ErrGone},
+	}
+}
+
+const (
+	committing = iota
+	abandoning
+)
+
+func (vw *valveWriter) commit() interruptible.Writer {
+	vw.Lock()
+	defer vw.Unlock()
+	if vw.s.Snatch(committing) == FirstSnatch {
+		defer vw.u.Unlock()
+		r, w := interruptible.Pipe()
+		vw.g <- r
+		vw.g = nil
+		vw.w = w
+	}
+	return vw.w
+}
+
+func (vw *valveWriter) Write(p []byte) (int, error) {
+	return vw.commit().Write(p)
+}
+
+func (vw *valveWriter) WriteIntr(p []byte, intr rh.Intr) (n int, err error) {
+	return vw.commit().WriteIntr(p, intr)
+}
+
+func (vw *valveWriter) abandon() {
+	vw.Lock()
+	defer vw.Unlock()
+	if vw.s.Snatch(abandoning) == FirstSnatch {
+		defer vw.u.Unlock()
+		vw.valve.send.gate, vw.g = vw.g, nil
+	}
+}
+
+func (vw *valveWriter) Close() error {
+	vw.abandon()
+	return vw.commit().Close()
+}
+
+// brokenWriter is an interruptible.Writer which always fails in error.
+type brokenWriter struct {
+	error
+}
+
+func (broken brokenWriter) Write([]byte) (int, error) {
+	return 0, broken.error
+}
+
+func (broken brokenWriter) WriteIntr(p []byte, intr rh.Intr) (n int, err error) {
+	return 0, broken.error
+}
+
+func (broken brokenWriter) Close() error {
+	return broken.error
 }

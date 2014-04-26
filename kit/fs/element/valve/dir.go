@@ -46,9 +46,6 @@ func NewDir(name string, rmv func()) *ValveDir {
 	d.dir.AddChild("trysend", file.NewFileFID(NewTrySendFile(d.v)))
 	d.dir.AddChild("tryrecv", file.NewFileFID(NewTryRecvFile(d.v)))
 	//
-	d.dir.AddChild("waitsend", file.NewFileFID(NewWaitSendFile(d.v)))
-	d.dir.AddChild("waitrecv", file.NewFileFID(NewWaitRecvFile(d.v)))
-	//
 	d.dir.AddChild("close", file.NewFileFID(NewCloseFile(d.v)))
 	d.dir.AddChild("cap", file.NewFileFID(NewCapFile(d.v)))
 	d.dir.AddChild("stat", file.NewFileFID(file.NewByteReaderFile(
@@ -87,7 +84,7 @@ func (d *ValveDir) Help() string {
 const dirHelpFormat = `
 	This is the control directory for a circuit channel named: %s
 
-	A circuit channel analogous to a “chan []byte” in Go.
+	A circuit channel is analogous to a “chan []byte” in Go.
 
 INIT
 
@@ -136,17 +133,6 @@ TRYING
 	Opening a try-file will never block, but if the underlying
 	channel operation is not available at the moment, the
 	file-open operation will return with an error.
-
-WAITING
-
-	To wait until a message can be sent without blocking or received
-	without blocking, read from the files "waitsend" and "waitrecv",
-	respectively.
-
-		cat waitrecv
-
-	The open-file operation will block until the desired channel
-	operation is available. Both wait-files contain the empty string.
 
 STAT
 
