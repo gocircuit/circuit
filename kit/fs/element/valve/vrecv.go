@@ -98,23 +98,28 @@ func newValveReader(
 	}
 }
 
-func (vr *valveReader) commit() interruptible.Reader {
+func (vr *valveReader) commit(intr rh.Intr) interruptible.Reader {
 	vr.Lock()
 	defer vr.Unlock()
 	if vr.s.Snatch(committing) == FirstSnatch {
-		defer vr.u.Unlock()
-		vr.r = <-vr.g
-		vr.g = nil
+		select {
+		case vr.r = <-vr.g:
+			vr.g = nil
+			vr.u.Unlock()
+		case <-intr:
+			vr.r = brokenReader{rh.ErrIntr}
+			vr.s = NewSnatcher()
+		}
 	}
 	return vr.r
 }
 
 func (vr *valveReader) Read(p []byte) (int, error) {
-	return vr.commit().Read(p)
+	panic("not used")
 }
 
 func (vr *valveReader) ReadIntr(p []byte, intr rh.Intr) (n int, err error) {
-	return vr.commit().ReadIntr(p, intr)
+	return vr.commit(intr).ReadIntr(p, intr)
 }
 
 func (vr *valveReader) abandon() {
@@ -128,7 +133,7 @@ func (vr *valveReader) abandon() {
 
 func (vr *valveReader) Close() error {
 	vr.abandon()
-	return vr.commit().Close()
+	return vr.commit(nil).Close()
 }
 
 // brokenReader is an interruptible.Reader which always fails in error.

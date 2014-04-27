@@ -131,7 +131,7 @@ func (vw *valveWriter) commit() interruptible.Writer {
 }
 
 func (vw *valveWriter) Write(p []byte) (int, error) {
-	return vw.commit().Write(p)
+	panic("not used")
 }
 
 func (vw *valveWriter) WriteIntr(p []byte, intr rh.Intr) (n int, err error) {

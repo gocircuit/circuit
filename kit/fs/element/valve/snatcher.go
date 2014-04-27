@@ -21,6 +21,7 @@ type Snatcher struct {
 func NewSnatcher() *Snatcher {
 	h := make(chan struct{}, 1)
 	h <- struct{}{}
+	close(h)
 	return &Snatcher{
 		h: h,
 	}
