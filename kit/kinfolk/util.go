@@ -14,9 +14,8 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
-// Init
 func init() {
-	circuit.RegisterValue(&Kin{}) // So that we can computer receiver ID
+	circuit.RegisterValue(&Kin{}) // So that we can compute receiver ID
 	circuit.RegisterValue(ExoKin{})
 }
 

@@ -36,11 +36,6 @@ func marshal(v interface{}) string {
 	return string(b)
 }
 
-type Clause struct {
-	Op   string `json:"op"`
-	File string `json:"file"`
-}
-
 func (f *SelectFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	switch flag.Attr {
 	case rh.ReadOnly:
@@ -64,6 +59,7 @@ type runWriteFile struct {
 
 func (w *runWriteFile) Close() (err error) {
 	w.s.ErrorFile.Clear()
+	println("parsing json", w.Buffer.String())
 	var clauses []Clause
 	if err = json.Unmarshal(w.Buffer.Bytes(), &clauses); err != nil {
 		w.s.ErrorFile.Set("cannot recognize JSON clauses structure")
@@ -73,4 +69,9 @@ func (w *runWriteFile) Close() (err error) {
 		return rh.ErrClash
 	}
 	return nil
+}
+
+type Clause struct {
+	Op   string `json:"op"`
+	File string `json:"file"`
 }

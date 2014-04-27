@@ -56,7 +56,7 @@ func NewKin(join XKin) (k *Kin, xkin ExoKin, add, rmv <-chan KinXID) {
 		}
 	}()
 	var w bytes.Buffer
-	for _, peer := range (YKin{KinXID{X: join}}).Join() {
+	for _, peer := range (YKin{ KinXID{ X: join }}).Join() {
 		k.open(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')

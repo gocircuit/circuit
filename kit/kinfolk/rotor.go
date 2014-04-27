@@ -23,6 +23,7 @@ type Rotor struct {
 	open []XID
 }
 
+// NewRotor creates a new rotor.
 func NewRotor() *Rotor {
 	return &Rotor{
 		open: make([]XID, 0, 6*Spread),

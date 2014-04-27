@@ -96,8 +96,8 @@ SELECT
 
 		echo << EOF > select
 		[
-			"/circuit/X130fc59d7291f8cf/dash/proc/paul/waitexit",
-			"/circuit/X8d9ae9be389cfea7/dash/project1/chan/charlie/waitsend"
+			{"op": "r", "file": "/circuit/X130fc59d7291f8cf/element/proc/paul/waitexit"},
+			{"op": "w", "file": "/circuit/X8d9ae9be389cfea7/element/project1/chan/charlie/send"}
 		]
 		EOF
 
@@ -125,7 +125,7 @@ WAITING
 		cat wait
 		{
 			"clause": 0,
-			"name":   "/circuit/X130fc59d7291f8cf/dash/proc/paul/waitexit"
+			"name":   "/circuit/X130fc59d7291f8cf/element/proc/paul/waitexit"
 		}
 
 	Where "clause" is the index of the file which unblocked on open,
