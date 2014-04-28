@@ -79,17 +79,13 @@ const dirHelpFormat = `
 	of multiple named files is ready to be opened.
 
 	Select elements are inteded to be used in conjunction
-	with other files in the circuit file system whose
-	names follow the pattern "wait*". (For instance,
-	in a channel element directory, one can find a "waitrecv"
-	file, which would block on open until a message is
-	available within the channel for receiving.)
+	with other files in the circuit file system. (For instance,
+	in a channel element directory, the "recv" file will block
+	on opening until a message is available to be received.)
 
-	These "wait*" files share a common behavior:
-	They block on opening until some underlying event takes place
-	or some underlying resource is available to use.
+	When select unblocks, …
 
-SELECT
+Initialization
 
 	To start a selection, write a JSON-encoded array of file names
 	to the "select" file:
@@ -115,7 +111,8 @@ SELECT
 	(Note that some "echo" and/or shell implementations open a
 	file twice, which would break the above example.)
 
-WAITING
+Blocking Interface
+	??
 
 	Once a selection has been started, trying to open the "wait"
 	file will block until the first of the files being selected upon
@@ -131,18 +128,18 @@ WAITING
 	Where "clause" is the index of the file which unblocked on open,
 	whereas "name" is its name.
 
-TRYING
+Non-blocking Interface
 
 	The file "trywait" is similar to "wait" in purpose, except that opening it
 	is guaranteed not to block. If no selection event is ready, opening
 	"trywait" will return an error.
 
-REMOVAL
+Removal
 
 	Select element directories can be removed with "rmdir" as long as 
 	the none of the "select", "wait" or "trywait" files are currently open.
 
-ERRORS
+Errors
 
 	Unsuccessful operations with the special in this directory will
 	return file system errors. These errors are standardized in POSIX

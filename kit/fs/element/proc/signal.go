@@ -28,6 +28,9 @@ func (f *SignalFile) Perm() rh.Perm {
 }
 
 func (f *SignalFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+	if flag.Truncate {
+		return rh.NopClunkerFID{}, nil
+	}
 	if flag.Attr != rh.WriteOnly {
 		return nil, rh.ErrPerm
 	}

@@ -37,6 +37,9 @@ func marshal(v interface{}) string {
 }
 
 func (f *SelectFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+	if flag.Truncate {
+		return rh.NopClunkerFID{}, nil
+	}
 	switch flag.Attr {
 	case rh.ReadOnly:
 		return file.NewOpenReaderFile(

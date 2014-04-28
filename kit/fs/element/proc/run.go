@@ -28,6 +28,9 @@ func (f *RunFile) Perm() rh.Perm {
 }
 
 func (f *RunFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+	if flag.Truncate {
+		return rh.NopClunkerFID{}, nil
+	}
 	switch flag.Attr {
 	case rh.ReadOnly:
 		return file.NewOpenReaderFile(

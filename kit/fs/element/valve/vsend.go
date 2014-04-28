@@ -32,6 +32,7 @@ func (v *Valve) Close() error {
 
 func (v *Valve) Send(intr rh.Intr) (iw interruptible.Writer, err error) {
 	// Lock send system
+	println("valve.Send")
 	u := v.send.Lock(intr)
 	if u == nil {
 		return nil, rh.ErrIntr

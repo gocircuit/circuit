@@ -37,7 +37,7 @@ func OpenFileReader(name string, intr rh.Intr) (r *FileReader, err error) {
 	r = &FileReader{
 		cmd: exec.Command(getCircuitBinary(), "-sysread", path.Clean(name)),
 	}
-	// stderr and stdin are a backward and forward control channels
+	// the helper process communicates control messages back to us on stderr
 	stderr, err := r.cmd.StderrPipe()
 	if err != nil {
 		panic(err) // system error
@@ -86,6 +86,7 @@ func OpenFileReader(name string, intr rh.Intr) (r *FileReader, err error) {
 				r2.Close()
 			},
 		)
+		println("opened file reader->")
 		return r, nil
 	}
 }

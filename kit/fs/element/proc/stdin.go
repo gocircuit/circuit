@@ -25,7 +25,10 @@ func (f *StdinFile) Perm() rh.Perm {
 }
 
 func (f *StdinFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
-	if flag.Attr != rh.WriteOnly /* && !flag.Truncate */ {
+	if flag.Truncate {
+		return rh.NopClunkerFID{}, nil
+	}
+	if flag.Attr != rh.WriteOnly {
 		return nil, rh.ErrPerm
 	}
 	return file.NewOpenInterruptibleWriterFile(f.p.Stdin), nil
