@@ -79,4 +79,4 @@ Learn more
 
 To stay up to date with new developments, documentation and articles, follow
 The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit) or
-mine [@maymounkov](https://twitter.com/maymounkov).
+me [@maymounkov](https://twitter.com/maymounkov).
