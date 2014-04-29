@@ -9,12 +9,14 @@ package sel
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os/exec"
 	"path"
 	"runtime"
 	"sync"
 
+	"github.com/gocircuit/circuit/kit/fs/helper"
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/interruptible"
@@ -35,7 +37,7 @@ const bufferCap = 8*1024
 // OpenFileReader tries to open the named file for reading, potentially blocking for a while.
 func OpenFileReader(name string, intr rh.Intr) (r *FileReader, err error) {
 	r = &FileReader{
-		cmd: exec.Command(getCircuitBinary(), "-sysread", path.Clean(name)),
+		cmd: exec.Command(helper.LookupExecutable(), "-sysread", path.Clean(name)),
 	}
 	// the helper process communicates control messages back to us on stderr
 	stderr, err := r.cmd.StderrPipe()
@@ -65,7 +67,7 @@ func OpenFileReader(name string, intr rh.Intr) (r *FileReader, err error) {
 			case "permission":
 				waitopen <- rh.ErrPerm
 			default:
-				waitopen <- rh.ErrClash
+				waitopen <- fmt.Errorf("helper says: %s", scanner.Text())
 			}
 			break
 		}
@@ -86,7 +88,6 @@ func OpenFileReader(name string, intr rh.Intr) (r *FileReader, err error) {
 				r2.Close()
 			},
 		)
-		println("opened file reader->")
 		return r, nil
 	}
 }

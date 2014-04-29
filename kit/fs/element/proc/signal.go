@@ -9,6 +9,7 @@ package proc
 
 import (
 	"bytes"
+	"encoding/json"
 	"strings"
 
 	"github.com/gocircuit/circuit/kit/fs/rh"
@@ -47,5 +48,11 @@ type signalFile struct {
 }
 
 func (f *signalFile) Close() error {
-	return f.p.Signal(strings.TrimSpace(f.Buffer.String()))
+	f.p.ErrorFile.Clear()
+	var cmd string
+	if err := json.Unmarshal(f.Buffer.Bytes(), &cmd); err != nil {
+		f.p.ErrorFile.Set("cannot recognize JSON")
+		return rh.ErrClash
+	}
+	return f.p.Signal(strings.TrimSpace(cmd))
 }

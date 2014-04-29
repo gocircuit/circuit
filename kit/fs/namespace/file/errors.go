@@ -9,6 +9,7 @@ package file
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -16,33 +17,39 @@ import (
 	"github.com/gocircuit/circuit/kit/fs/rh"
 )
 
+type Error struct {
+	Error string `json:"error"`
+}
+
 func NewErrorFile() *ErrorFile {
 	return &ErrorFile{}
 }
 
 type ErrorFile struct {
 	sync.Mutex
-	msg string
+	err interface{} // err can be any object that can JSON-marshal
 }
 
 func (f *ErrorFile) Clear() {
-	f.Set("")
+	f.Lock()
+	defer f.Unlock()
+	f.err = nil
 }
 
 func (f *ErrorFile) Set(msg string) {
 	f.Lock()
 	defer f.Unlock()
-	f.msg = msg
+	f.err = Error{msg}
 }
 
 func (f *ErrorFile) Setf(format string, arg ...interface{}) {
 	f.Set(fmt.Sprintf(format, arg...))
 }
 
-func (f *ErrorFile) Get() string {
+func (f *ErrorFile) Get() interface{} {
 	f.Lock()
 	defer f.Unlock()
-	return f.msg
+	return f.err
 }
 
 func (f *ErrorFile) Perm() rh.Perm {
@@ -50,9 +57,17 @@ func (f *ErrorFile) Perm() rh.Perm {
 }
 
 func (f *ErrorFile) Open(rh.Flag, rh.Intr) (rh.FID, error) {
-	return NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(f.Get()))), nil
+	return NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBuffer(marshal(f.Get())))), nil
 }
 
 func (f *ErrorFile) Remove() error {
 	return rh.ErrPerm
+}
+
+func marshal(v interface{}) []byte {
+	b, err := json.MarshalIndent(v, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	return b
 }

@@ -28,15 +28,12 @@ func (f *TryWaitFile) Perm() rh.Perm {
 }
 
 func (f *TryWaitFile) Open(flag rh.Flag, _ rh.Intr) (_ rh.FID, err error) {
-	f.s.ErrorFile.Set("") // clear error file
+	f.s.ErrorFile.Clear() // clear error file
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
 	var u Unblock
-	u.Clause, u.Commit, err = f.s.TryWait()
-	if err != nil {
-		return nil, rh.ErrIO
-	}
+	u.Clause, u.Commit, u.Error = f.s.TryWait()
 	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(u)))), nil
 }
 

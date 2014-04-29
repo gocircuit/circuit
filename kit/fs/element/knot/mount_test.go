@@ -5,7 +5,7 @@
 // Authors:
 //   2014 Petar Maymounkov <p@gocircuit.org>
 
-package dash
+package knot
 
 import (
 	"os"

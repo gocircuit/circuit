@@ -28,17 +28,14 @@ func (f *WaitFile) Perm() rh.Perm {
 }
 
 func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (_ rh.FID, err error) {
-	f.s.ErrorFile.Set("") // clear error file
+	f.s.ErrorFile.Clear() // clear error file
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
 	var u Unblock
-	u.Clause, u.Commit, err = f.s.Wait(intr)
-	if err == rh.ErrIntr {
+	u.Clause, u.Commit, u.Error = f.s.Wait(intr)
+	if u.Error == rh.ErrIntr {
 		return nil, err
-	}
-	if err != nil {
-		return nil, rh.ErrIO
 	}
 	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(marshal(u)))), nil
 }
@@ -50,4 +47,5 @@ func (f *WaitFile) Remove() error {
 type Unblock struct {
 	Clause int     `json:"case"`
 	Commit string  `json:"file"` // name of “commit” file where actual reading/writing can be performed
+	Error error `json:"error"`
 }

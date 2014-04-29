@@ -50,10 +50,7 @@ func NewDir(name string, rmv func()) *ValveDir {
 	d.dir.AddChild("cap", file.NewFileFID(NewCapFile(d.v)))
 	d.dir.AddChild("stat", file.NewFileFID(file.NewByteReaderFile(
 		func() []byte {
-			if stat := d.v.GetStat(); stat != nil {
-				return []byte(stat.String())
-			}
-			return []byte("closed\n")
+			return []byte(d.v.GetStat().String())
 		}),
 	))
 	d.dir.AddChild("error", file.NewFileFID(d.v.ErrorFile))

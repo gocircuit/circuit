@@ -62,7 +62,6 @@ type runWriteFile struct {
 
 func (w *runWriteFile) Close() (err error) {
 	w.s.ErrorFile.Clear()
-	println("parsing json", w.Buffer.String())
 	var clauses []Clause
 	if err = json.Unmarshal(w.Buffer.Bytes(), &clauses); err != nil {
 		w.s.ErrorFile.Set("cannot recognize JSON clauses structure")

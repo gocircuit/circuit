@@ -15,33 +15,25 @@ import (
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 )
 
-type WaitFile struct {
+type TryWaitFile struct {
 	p *Proc
 }
 
-func NewWaitFile(p *Proc) file.File {
-	return &WaitFile{p: p}
+func NewTryWaitFile(p *Proc) file.File {
+	return &TryWaitFile{p: p}
 }
 
-func (f *WaitFile) Perm() rh.Perm {
+func (f *TryWaitFile) Perm() rh.Perm {
 	return 0444 // r--r--r--
 }
 
-func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+func (f *TryWaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
-	err := f.p.Wait(intr)
-	if err == rh.ErrIntr {
-		return nil, err
-	}
-	var msg string
-	if err != nil {
-		msg = err.Error()
-	}
-	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(msg))), nil
+	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(f.p.TryWait().String()))), nil
 }
 
-func (f *WaitFile) Remove() error {
+func (f *TryWaitFile) Remove() error {
 	return rh.ErrPerm
 }

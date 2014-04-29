@@ -132,8 +132,6 @@ func (s *Select) start(clauses []Clause) {
 	}
 }
 
-//s.dir.dir.AddChild(name, file.NewFileFID(NewDelayedReadFile(f)))
-
 type unblock struct {
 	Clause int
 	File   interface{} // *FileReader or *FileWriter
@@ -180,11 +178,26 @@ func (s *Select) Wait(intr rh.Intr) (clause int, commit string, err error) {
 	select {
 	case s.back.result = <-s.back.unblock:
 		s.abort() // stop all other waiters
+		s.plant()
 		return s.back.result.Return()
 	case <-intr:
 		s.ErrorFile.Set("wait interrupted")
 		return -1, "", rh.ErrIntr
 	}
+}
+
+func (s *Select) plant() {
+	r := s.back.result
+	if r.Error != nil {
+		return // no file to plant if unblock was an error
+	}
+	switch t := r.File.(type) {
+	case *FileReader:
+		s.dir.dir.AddChild(r.CommitName(), file.NewFileFID(NewDelayedReadFile(t)))
+	case *FileWriter:
+		s.dir.dir.AddChild(r.CommitName(), file.NewFileFID(NewDelayedWriteFile(t)))
+	}
+	panic(0)
 }
 
 func (s *Select) abort() error {
@@ -249,6 +262,7 @@ func (s *Select) TryWait() (clause int, commit string, err error) {
 	select {
 	case s.back.result = <-s.back.unblock:
 		s.abort() // stop all other waiters
+		s.plant()
 		return s.back.result.Return()
 	default:
 		s.ErrorFile.Set("no clauses ready")

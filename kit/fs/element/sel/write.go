@@ -9,23 +9,16 @@ package sel
 
 import (
 	"bufio"
-	"os"
 	"os/exec"
 	"path"
 	"runtime"
 	"sync"
 
+	"github.com/gocircuit/circuit/kit/fs/helper"
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	"github.com/gocircuit/circuit/kit/interruptible"
 )
-
-func getCircuitBinary() string {
-	if os.Getenv("CIRCUIT_BIN") != "" {
-		return os.Getenv("CIRCUIT_BIN")
-	}
-	return os.Args[0]
-}
 
 // FileWriter is an interruptible.Writer
 type FileWriter struct {
@@ -37,7 +30,7 @@ type FileWriter struct {
 
 func OpenFileWriter(name string, intr rh.Intr) (w *FileWriter, err error) {
 	w = &FileWriter{
-		cmd:   exec.Command(getCircuitBinary(), "-syswrite", path.Clean(name)),
+		cmd:   exec.Command(helper.LookupExecutable(), "-syswrite", path.Clean(name)),
 	}
 	// stderr is a control back-channel
 	stderr, err := w.cmd.StderrPipe()
@@ -136,7 +129,10 @@ func (f *DelayedWriteFile) Perm() rh.Perm {
 }
 
 func (f *DelayedWriteFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
-	if flag.Attr != rh.WriteOnly && !flag.Truncate {
+	if flag.Truncate {
+		return rh.NopClunkerFID{}, nil
+	}
+	if flag.Attr != rh.WriteOnly {
 		return nil, rh.ErrPerm
 	}
 	return file.NewOpenInterruptibleWriterFile(f.w), nil

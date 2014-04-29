@@ -15,13 +15,16 @@ import (
 	"os"
 	"path"
 
-	"github.com/gocircuit/circuit/kit/fs/bridge/fuserh"
 	"github.com/gocircuit/circuit/kit/kinfolk"
 	"github.com/gocircuit/circuit/kit/kinfolk/locus"
+
+	"github.com/gocircuit/circuit/kit/fs/bridge/fuserh"
+	"github.com/gocircuit/circuit/kit/fs/helper"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 	nsrv "github.com/gocircuit/circuit/kit/fs/namespace/server"
 	"github.com/gocircuit/circuit/kit/fs/client"
 	"github.com/gocircuit/circuit/kit/fs/bridge/rhunix"
+
 	"github.com/gocircuit/circuit/kit/shell"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
@@ -36,9 +39,6 @@ var (
 	flagMount        = flag.String("m", "/"+n.Scheme, "Mount directory within local file system; required non-empty")
 	// Resource-related
 	flagFS           = flag.String("fs", "", "Local FS directory to share with others; none, if empty")
-	// Internal helper roles of the circuit executable
-	flagSysOpenRead  = flag.String("sysread", "", "(sys) Open a file for reading.")
-	flagSysOpenWrite = flag.String("syswrite", "", "(sys) Open a file for writing.")
 )
 
 const (
@@ -48,14 +48,7 @@ const (
 
 func main() {
 	flag.Parse()
-	if *flagSysOpenRead != "" {
-		mainSysOpenRead(*flagSysOpenRead)
-		panic(0)
-	}
-	if *flagSysOpenWrite != "" {
-		mainSysOpenWrite(*flagSysOpenWrite)
-		panic(0)
-	}
+	helper.Main()
 
 	println("CIRCUIT 2014 gocircuit.org")
 

@@ -9,6 +9,7 @@ package sel
 
 import (
 	"bytes"
+	"encoding/json"
 	"strings"
 
 	"github.com/gocircuit/circuit/kit/fs/rh"
@@ -46,9 +47,14 @@ type abortFile struct {
 
 func (f *abortFile) Close() error {
 	f.s.ErrorFile.Clear()
-	if strings.TrimSpace(f.Buffer.String()) == "abort" {
+	var cmd string
+	if err := json.Unmarshal(f.Buffer.Bytes(), &cmd); err != nil {
+		f.s.ErrorFile.Set("cannot recognize JSON")
+		return rh.ErrClash
+	}
+	if strings.TrimSpace(cmd) == "abort" {
 		return f.s.Abort()
 	}
-	f.s.ErrorFile.Set("data written to the abort file is not “abort”")
+	f.s.ErrorFile.Set("command given is not “abort”")
 	return rh.ErrClash
 }

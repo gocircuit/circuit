@@ -46,11 +46,11 @@ func NewDir(name string, rmv func()) *ProcDir {
 	d.dir.AddChild("stdout", file.NewFileFID(NewStdoutFile(d.p)))
 	d.dir.AddChild("stderr", file.NewFileFID(NewStderrFile(d.p)))
 	//
-	d.dir.AddChild("run", file.NewFileFID(NewRunFile(d.p)))
-	d.dir.AddChild("waitexit", file.NewFileFID(NewWaitFile(d.p)))
+	d.dir.AddChild("cmd", file.NewFileFID(NewCmdFile(d.p)))
+	d.dir.AddChild("wait", file.NewFileFID(NewWaitFile(d.p)))
+	d.dir.AddChild("trywait", file.NewFileFID(NewTryWaitFile(d.p)))
 	d.dir.AddChild("signal", file.NewFileFID(NewSignalFile(d.p)))
 	//
-	d.dir.AddChild("stat", file.NewFileFID(NewStatFile(d.p)))
 	d.dir.AddChild("error", file.NewFileFID(d.p.ErrorFile))
 
 	return d

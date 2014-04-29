@@ -8,8 +8,23 @@
 package proc
 
 import (
+	"encoding/json"
 	"syscall"
 )
+
+type Stat struct {
+	Cmd Cmd `json:"cmd"`
+	Exit error `json:"exit"`
+	State string `json:"state"`
+}
+
+func (s Stat) String() string {
+	b, err := json.MarshalIndent(s, "", "\t")
+	if err != nil {
+		panic(0)
+	}
+	return string(b)
+}
 
 type RunState int
 

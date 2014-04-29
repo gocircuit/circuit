@@ -5,13 +5,35 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package main
+package helper
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
 )
+
+func LookupExecutable() string {
+	return os.Args[0]
+}
+
+var (
+	flagSysOpenRead  = flag.String("sysread", "", "(sys) Open a file for reading.")
+	flagSysOpenWrite = flag.String("syswrite", "", "(sys) Open a file for writing.")
+)
+
+// Main can only be called after flag.Parse has been called.
+func Main() {
+	if *flagSysOpenRead != "" {
+		mainSysOpenRead(*flagSysOpenRead)
+		panic(0)
+	}
+	if *flagSysOpenWrite != "" {
+		mainSysOpenWrite(*flagSysOpenWrite)
+		panic(0)
+	}
+}
 
 func runAsMain(run func() error) {
 	if err := run(); err != nil {

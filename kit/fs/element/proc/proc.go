@@ -11,7 +11,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -28,12 +27,12 @@ type Proc struct {
 	wait struct {
 		interruptible.Mutex
 		wait <-chan error
-		exit error
 	}
 	cmd struct {
 		sync.Mutex
 		cmd exec.Cmd
 		wait chan<- error
+		exit error // exit set by waiter
 	}
 	*file.ErrorFile
 }
@@ -95,7 +94,7 @@ func (p *Proc) ClunkIfNotBusy() error {
 }
 
 func (p *Proc) Start() error {
-	p.ErrorFile.Set("") // clear error file
+	p.ErrorFile.Clear() // clear error file
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	//
@@ -111,12 +110,12 @@ func (p *Proc) Start() error {
 	return nil
 }
 
-func (p *Proc) Wait(intr rh.Intr) error {
+func (p *Proc) Wait(intr rh.Intr) (Stat, error) {
 	p.ErrorFile.Clear()
 	u := p.wait.Lock(intr)
 	if u == nil {
 		p.ErrorFile.Set("wait interrupted")
-		return rh.ErrIntr
+		return Stat{}, rh.ErrIntr
 	}
 	defer u.Unlock()
 	//
@@ -124,27 +123,26 @@ func (p *Proc) Wait(intr rh.Intr) error {
 	case err, ok := <-p.wait.wait:
 		if !ok {
 			p.ErrorFile.Set("process already exited")
-			return p.wait.exit
+			return p.TryWait(), nil
 		}
-		p.wait.exit = err
-		return err
+		p.cmd.Lock()
+		defer p.cmd.Unlock()
+		p.cmd.exit = err
+		return p.stat(), nil
 	case <-intr:
 		p.ErrorFile.Set("wait interrupted")
-		return rh.ErrIntr
+		return Stat{}, rh.ErrIntr
 	}
 }
 
 func (p *Proc) Signal(sig string) error {
-	p.ErrorFile.Set("") // clear error file
+	p.ErrorFile.Clear() // clear error file
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	//
 	if p.cmd.cmd.Process == nil {
 		p.ErrorFile.Set("no running process to signal")
 		return rh.ErrClash
-	}
-	if n, err := strconv.Atoi(sig); err == nil {
-		return p.cmd.cmd.Process.Signal(syscall.Signal(n))
 	}
 	if sig, ok := sigMap[strings.TrimSpace(strings.ToUpper(sig))]; ok {
 		return p.cmd.cmd.Process.Signal(sig)
@@ -157,7 +155,7 @@ func (p *Proc) GetEnv() []string {
 	return os.Environ()
 }
 
-func (p *Proc) SetInit(i *Init) {
+func (p *Proc) SetCmd(i *Cmd) {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	//
@@ -167,21 +165,33 @@ func (p *Proc) SetInit(i *Init) {
 	p.cmd.cmd.Args = append([]string{bin}, i.Args...)
 }
 
-func (p *Proc) GetInit() *Init {
+func (p *Proc) GetCmd() *Cmd {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	//
-	return &Init{
+	return &Cmd{
 		Env:  p.cmd.cmd.Env,
 		Path: p.cmd.cmd.Path,
 		Args: p.cmd.cmd.Args,
 	}
 }
 
-func (p *Proc) GetState() RunState {
+func (p *Proc) TryWait() Stat {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
-	return p.getState()
+	return p.stat()
+}
+
+func (p *Proc) stat() Stat {
+	return Stat{
+		Cmd: Cmd{
+			Env: p.cmd.cmd.Env,
+			Path: p.cmd.cmd.Path,
+			Args: p.cmd.cmd.Args,
+		},
+		Exit: p.cmd.exit,
+		State: p.getState().String(),
+	}
 }
 
 func (p *Proc) getState() RunState {

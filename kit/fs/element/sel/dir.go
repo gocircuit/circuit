@@ -43,7 +43,7 @@ func NewDir(name string, rmv func()) *SelectDir {
 	d.dir.AddChild("select", file.NewFileFID(NewSelectFile(d.s)))
 	d.dir.AddChild("wait", file.NewFileFID(NewWaitFile(d.s)))
 	d.dir.AddChild("trywait", file.NewFileFID(NewTryWaitFile(d.s)))
-	d.dir.AddChild("abort", file.NewFileFID(NewAbortFile(d.s)))
+	d.dir.AddChild("abort", file.NewFileFID(NewAbortFile(d.s))) // TODO: Maybe aborting should be embodied in “rmdir”
 	d.dir.AddChild("error", file.NewFileFID(d.s.ErrorFile))
 	return d
 }

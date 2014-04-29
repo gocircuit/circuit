@@ -5,7 +5,8 @@
 // Authors:
 //   2014 Petar Maymounkov <p@gocircuit.org>
 
-package dash
+// Package knot implements a knot directory: a namespace wherein circuit elements (chan, select, proc) can be created.
+package knot
 
 import (
 	"fmt"
@@ -19,16 +20,16 @@ import (
 	"github.com/gocircuit/circuit/kit/fs/rh"
 )
 
-type NonRemovableDashDir struct {
-	*DashDir
+type NonRemovableKnotDir struct {
+	*KnotDir
 }
 
-func (d NonRemovableDashDir) Remove() error {
+func (d NonRemovableKnotDir) Remove() error {
 	return rh.ErrPerm
 }
 
-// DashDir is a directory FID, constituting a dashboard (i.e. a workspace directory).
-type DashDir struct {
+// KnotDir is a directory FID, constituting a dashboard (i.e. a workspace directory).
+type KnotDir struct {
 	name string
 	dir *dir.Dir
 	rh.FID
@@ -40,8 +41,8 @@ type makerDir interface {
 	NumElements() int
 }
 
-func NewDir(name string) *DashDir {
-	s := &DashDir{
+func NewDir(name string) *KnotDir {
+	s := &KnotDir{
 		name: name,
 		dir:  dir.NewDir(),
 	}
@@ -67,21 +68,21 @@ func NewDir(name string) *DashDir {
 	return s
 }
 
-func (s *DashDir) Walk(wname []string) (rh.FID, error) {
+func (s *KnotDir) Walk(wname []string) (rh.FID, error) {
 	if len(wname) > 0 {
 		return s.FID.Walk(wname)
 	}
 	return s, nil
 }
 
-func (s *DashDir) Create(name string, flag rh.Flag, mode rh.Mode, perm rh.Perm) (rh.FID, error) {
+func (s *KnotDir) Create(name string, flag rh.Flag, mode rh.Mode, perm rh.Perm) (rh.FID, error) {
 	if mode.Attr != rh.ModeDir {
 		return nil, rh.ErrPerm
 	}
 	return s.dir.AddChild(name, NewDir(name))
 }
 
-func (s *DashDir) Remove() error {
+func (s *KnotDir) Remove() error {
 	s.dir.DisallowCreate()
 	// check for descendant elements
 	for _, d := range s.mkr {
@@ -99,7 +100,7 @@ func (s *DashDir) Remove() error {
 	return nil
 }
 
-func (s *DashDir) help() string {
+func (s *KnotDir) help() string {
 	return fmt.Sprintf(helpFormat, s.name)
 }
 
@@ -123,7 +124,7 @@ MKDIR
 
 		mkdir subdash
 
-	Dashboard directories are effectively namespaces within which
+	Knotboard directories are effectively namespaces within which
 	the user can create multiple circuit elements.
 
 RMDIR

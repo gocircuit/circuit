@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	"github.com/gocircuit/circuit/kit/kinfolk"
-	"github.com/gocircuit/circuit/kit/fs/element/dash"
+	"github.com/gocircuit/circuit/kit/fs/element/knot"
 	"github.com/gocircuit/circuit/kit/fs/namespace/dir"
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/rh"

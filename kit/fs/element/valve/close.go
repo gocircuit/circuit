@@ -9,6 +9,7 @@ package valve
 
 import (
 	"bytes"
+	"encoding/json"
 	"strings"
 
 	"github.com/gocircuit/circuit/kit/fs/rh"
@@ -46,9 +47,14 @@ type closeFile struct {
 
 func (f *closeFile) Close() error {
 	f.v.ErrorFile.Clear()
-	if strings.TrimSpace(f.Buffer.String()) == "close" {
+	var cmd string
+	if err := json.Unmarshal(f.Buffer.Bytes(), &cmd); err != nil {
+		f.v.ErrorFile.Set("cannot recognize JSON")
+		return rh.ErrClash
+	}
+	if strings.TrimSpace(cmd) == "close" {
 		return f.v.Close()
 	}
-	f.v.ErrorFile.Set("data written to the close file is not “close”")
+	f.v.ErrorFile.Set("command given is not “close”")
 	return rh.ErrClash
 }
