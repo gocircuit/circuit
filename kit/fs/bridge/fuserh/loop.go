@@ -25,7 +25,7 @@ import (
 
 	"github.com/gocircuit/circuit/kit/fs/fuse"
 	"github.com/gocircuit/circuit/kit/fs/rh"
-	"github.com/gocircuit/circuit/kit/sched/limiter"
+	//"github.com/gocircuit/circuit/kit/sched/limiter"
 )
 
 // RH is a FUSE file system server for a RH file system
@@ -93,8 +93,8 @@ func (r *RH) EOF() error {
 
 // loop listens for FUSE requests until the connection is closed.
 func (r *RH) loop() {
-	lmtr := limiter.New(r.qmax)
-	defer lmtr.Wait()
+	// lmtr := limiter.New(r.qmax)
+	// defer lmtr.Wait()
 	rr := newReadRequestChan(r.conn)
 	//
 	rootFID, err := r.ssn.Walk(nil)
@@ -111,9 +111,9 @@ func (r *RH) loop() {
 				r.eof.Close(err)
 				return
 			}
-			lmtr.Go(func() {
+			go func() {
 				r.serve(q.(fuse.Request))
-			})
+			}()
 		case err := <-r.fuseEOF.Chan():
 			r.eof.Close(err)
 			return
