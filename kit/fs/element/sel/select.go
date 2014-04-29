@@ -197,7 +197,6 @@ func (s *Select) plant() {
 	case *FileWriter:
 		s.dir.dir.AddChild(r.CommitName(), file.NewFileFID(NewDelayedWriteFile(t)))
 	}
-	panic(0)
 }
 
 func (s *Select) abort() error {

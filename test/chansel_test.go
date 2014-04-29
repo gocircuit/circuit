@@ -16,7 +16,7 @@ import (
 )
 
 func TestChanSel(t *testing.T) {
-	slash := os.Getenv("CN")
+	slash := os.Getenv("LOOPBACK")
 	//
 	println("make chan")
 	charlie := path.Join(slash, "chan", "charlie")
