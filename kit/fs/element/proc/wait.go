@@ -31,11 +31,15 @@ func (f *WaitFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}
-	stat, err := f.p.Wait(intr)
-	if err == rh.ErrIntr {
-		return nil, err
-	}
-	return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(stat.String()))), nil
+	return file.NewCommitFile(
+		func (intr rh.Intr) (rh.FID, error) {
+			stat, err := f.p.Wait(intr)
+			if err == rh.ErrIntr {
+				return nil, err
+			}
+			return file.NewOpenReaderFile(iomisc.ReaderNopCloser(bytes.NewBufferString(stat.String()))), nil
+		},
+	), nil
 }
 
 func (f *WaitFile) Remove() error {
