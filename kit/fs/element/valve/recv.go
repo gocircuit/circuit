@@ -25,6 +25,7 @@ func (f *RecvFile) Perm() rh.Perm {
 }
 
 func (f *RecvFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
+	println("recv open")
 	if flag.Attr != rh.ReadOnly {
 		return nil, rh.ErrPerm
 	}

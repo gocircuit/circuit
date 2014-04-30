@@ -30,7 +30,12 @@ func (v *Valve) Recv(intr rh.Intr) (ir interruptible.Reader, err error) {
 
 	// Otherwise, pull a gate from the sender
 	select {
-	case g := <-v.recv.tun:
+	case g, ok := <-v.recv.tun:
+		if !ok {
+			u.Unlock()
+			return nil, rh.ErrEOF
+		}
+		v.incRecv()
 		return newValveReader(v, u, g), nil
 	case <-v.recv.abr:
 		u.Unlock()
@@ -62,6 +67,7 @@ func (v *Valve) TryRecv() (ir interruptible.Reader, err error) {
 			u.Unlock()
 			return nil, rh.ErrEOF
 		}
+		v.incRecv()
 		return newValveReader(v, u, g), nil
 	case <-v.recv.abr:
 		u.Unlock()

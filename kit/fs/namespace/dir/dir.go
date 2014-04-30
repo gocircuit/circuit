@@ -8,9 +8,11 @@
 package dir
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 	"time"
+	"runtime/pprof"
 	"unsafe"
 
 	"github.com/gocircuit/circuit/kit/fs/rh"
@@ -140,6 +142,13 @@ func (fid *DirFID) Walk(wname []string) (rh.FID, error) {
 		return nil, rh.ErrNotExist
 	}
 	return f.Walk(wname[1:])
+}
+
+func stack() {
+	var w bytes.Buffer
+	p := pprof.Lookup("goroutine")
+	p.WriteTo(&w, 1)
+	println(w.String())
 }
 
 func (fid *DirFID) Read(offset int64, count int, _ rh.Intr) (rh.Chunk, error) {

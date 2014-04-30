@@ -63,6 +63,18 @@ func (s *Stat) String() string {
 	return string(b)
 }
 
+func (v *Valve) incSend() {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	v.ctrl.stat.NumSend++
+}
+
+func (v *Valve) incRecv() {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	v.ctrl.stat.NumRecv++
+}
+
 // SetCap initializes the valve and sets its buffer capacity to n.
 func (v *Valve) SetCap(n int) error {
 	// Lock the send system

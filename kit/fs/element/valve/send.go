@@ -25,7 +25,6 @@ func (f *SendFile) Perm() rh.Perm {
 }
 
 func (f *SendFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
-	//println("open/send", flag.String())
 	if flag.Truncate {
 		return rh.NopClunkerFID{}, nil
 	}

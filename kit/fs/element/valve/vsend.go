@@ -49,6 +49,7 @@ func (v *Valve) Send(intr rh.Intr) (iw interruptible.Writer, err error) {
 	g := make(chan interruptible.Reader, 1)
 	select {
 	case v.send.tun <- g:
+		v.incSend()
 		return newValveWriter(v, u, g), nil
 	case <-v.send.abr:
 		u.Unlock()
@@ -77,6 +78,7 @@ func (v *Valve) TrySend() (iw interruptible.Writer, err error) {
 	g := make(chan interruptible.Reader, 1)
 	select {
 	case v.send.tun <- g:
+		v.incSend()
 		return newValveWriter(v, u, g), nil
 	case <-v.send.abr:
 		u.Unlock()
