@@ -23,7 +23,6 @@ import (
 	"github.com/gocircuit/circuit/kit/lockfile"
 
 	// Sys
-	// anchorback "github.com/gocircuit/circuit/sys/anchor/load"
 	"github.com/gocircuit/circuit/sys/lang"
 	"github.com/gocircuit/circuit/sys/tele"
 
