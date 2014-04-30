@@ -51,14 +51,6 @@ type OpenWriterFile struct {
 	w interruptible.Writer
 }
 
-func (w *OpenWriterFile) Walk(wname []string) (rh.FID, error) {
-	if len(wname) > 0 {
-		return nil, rh.ErrClash
-	}
-	println("trying to clone open fid")
-	return nil, rh.ErrClash
-}
-
 func (w *OpenWriterFile) Clunk() (err error) {
 	if err = w.w.Close(); err != nil {
 		return rh.ErrClash

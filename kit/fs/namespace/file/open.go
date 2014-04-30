@@ -41,11 +41,19 @@ func (fid *openFile) Q() rh.Q {
 }
 
 func (fid *openFile) Walk(name []string) (rh.FID, error) {
-	panic("open FID does not walk")
+	return nil, rh.ErrClash //open FID does not walk or clone
 }
 
 func (fid *openFile) Open(rh.Flag, rh.Intr) error {
 	panic("FID already open")
+}
+
+func (r *openFile) Read(_ int64, count int, intr rh.Intr) (chunk rh.Chunk, err error) {
+	return nil, rh.ErrClash
+}
+
+func (w *openFile) Write(_ int64, data rh.Chunk, intr rh.Intr) (n int, err error) {
+	return 0, rh.ErrClash
 }
 
 func (fid *openFile) Clunk() error {
@@ -55,7 +63,7 @@ func (fid *openFile) Clunk() error {
 func (fid *openFile) Stat() (*rh.Dir, error) {
 	return &rh.Dir{
 		Q:      fid.q,
-		Mode:   rh.Mode{Attr: rh.ModeIO},
+		Mode:   rh.Mode{Attr: rh.ModeIO },
 		Atime:  fid.t,
 		Mtime:  fid.t,
 		Name:   "",

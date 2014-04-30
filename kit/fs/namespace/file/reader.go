@@ -54,14 +54,6 @@ type OpenReaderFile struct {
 	r interruptible.Reader
 }
 
-func (r *OpenReaderFile) Walk(wname []string) (rh.FID, error) {
-	if len(wname) > 0 {
-		return nil, rh.ErrClash
-	}
-	println("trying to clone open fid")
-	return nil, rh.ErrClash
-}
-
 func (r *OpenReaderFile) Clunk() (err error) {
 	if err = r.r.Close(); err != nil {
 		err = rh.ErrClash
