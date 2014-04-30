@@ -14,39 +14,39 @@ import (
 	"runtime"
 )
 
-// Dir represents a descendant directory within the local file system.
-type Dir struct {
+// dir represents a descendant directory within the local file system.
+type dir struct {
 	walk string  // absolute directory path
-	dir *os.File // open file for this local directory; prevents removing
+	f *os.File // open file for this local directory; prevents removing
 }
 
-func OpenDir(walk string) (*Dir, error) {
-	f, err := openDir(walk)
+func openDir(walk string) (*dir, error) {
+	f, err := osOpenDir(walk)
 	if err != nil {
 		return nil, err
 	}
-	d := &Dir{walk: walk, dir: f}
+	d := &dir{walk: walk, f: f}
 	runtime.SetFinalizer(d, 
-		func(d2 *Dir) {
-			d.dir.Close()
+		func(d2 *dir) {
+			d2.f.Close()
 		},
 	)
 	return d, nil
 }
 
 // Path returns the local absolute path of this directory
-func (d *Dir) Path() string {
+func (d *dir) Path() string {
 	return d.walk
 }
 
 // Walk returns the directory reachable from d via walk.
-func (d *Dir) Walk(walk ...string) (*Dir, error) {
-	return OpenDir(path.Join(append([]string{d.Path()}, walk...)...))
+func (d *dir) Walk(walk ...string) (*dir, error) {
+	return openDir(path.Join(append([]string{d.Path()}, walk...)...))
 }
 
-// openDir opens the local absolute path name, and returns an open file handle to it, 
+// osOpenDir opens the local absolute path name, and returns an open file handle to it, 
 // as long as it is an existing directory.
-func openDir(name string) (*os.File, error) {
+func osOpenDir(name string) (*os.File, error) {
 	f, err := os.Open(name)
 	if err != nil {
 		return nil, err

@@ -14,23 +14,24 @@ import (
 // Circuit is a client for a specific circuit worker's distributed control facilities.
 type Circuit struct {
 	client *Client
-	id CircuitID
-	dir *Dir
+	id string
+	dir *dir
 	anchor *Anchor
 }
 
-func openCircuit(client *Client, id CircuitID) (c *Circuit, err error) {
+func openCircuit(client *Client, id string) (c *Circuit) {
 	c = &Circuit{
 		client: client,
 		id: id,
 	}
-	if c.dir, err = OpenDir(c.Path()); err != nil {
-		return nil, err
+	var err error
+	if c.dir, err = openDir(c.Path()); err != nil {
+		panic(err)
 	}
 	if c.anchor, err = openAnchor(path.Join(c.Path(), anchorDir)); err != nil {
-		return nil, err
+		panic(err)
 	}
-	return c, nil
+	return c
 }
 
 // Path returns the path of this circuit in the local file system.
@@ -40,7 +41,7 @@ func (c *Circuit) Path() string {
 
 const anchorDir = "anchor"
 
-// UseAnchor
-func (c *Circuit) UseAnchor(walk []string) (_ *Anchor, err error) {
-	return c.anchor.UseAnchor(walk)
+// Anchor
+func (c *Circuit) Anchor(walk ...string) *Anchor {
+	return c.anchor.Anchor(walk...)
 }

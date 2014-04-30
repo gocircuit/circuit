@@ -20,13 +20,13 @@ const chanDir = "chan"
 // Chan is a handle for a circuit channel.
 type Chan struct {
 	local string
-	dir *Dir
+	dir *dir
 }
 
 func openChan(local string) (c *Chan) {
 	c = &Chan{local: local}
 	var err error
-	if c.dir, err = OpenDir(c.Path()); err != nil {
+	if c.dir, err = openDir(c.Path()); err != nil {
 		panic(err)
 	}
 	return c

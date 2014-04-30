@@ -28,13 +28,13 @@ var ErrExit = errors.New("circuit process exit error")
 
 type Proc struct {
 	local string
-	dir *Dir
+	dir *dir
 }
 
 func openProc(local string) (p *Proc) {
 	p = &Proc{local: local}
 	var err error
-	if p.dir, err = OpenDir(p.Path()); err != nil {
+	if p.dir, err = openDir(p.Path()); err != nil {
 		panic(err)
 	}
 	return p
@@ -54,7 +54,7 @@ func (p *Proc) Start(cmd Command) error {
 	return ioutil.WriteFile(path.Join(p.Path(), "start"), b, 0222)
 }
 
-type Stat struct {
+type stat struct {
 	Exit string `json:"exit"`
 	State string `json:"state"`
 }
@@ -68,7 +68,7 @@ func (p *Proc) Wait() error {
 	if err != nil { // other errors are element specific; we report them traditionally
 		return err
 	}
-	var stat Stat
+	var stat stat
 	if err = json.Unmarshal(b, &stat); err != nil {
 		panic(err)
 	}
