@@ -1,8 +1,3 @@
-
-√ add "default" clauses to fs/kit/element/select (just use "trywait")
-make process "waitexit" and "stat" output in the same format
-distinguish between dead-worker and regular errors
-
 add attach version of CSP elements
 add remove methods
 add element garbage-collection

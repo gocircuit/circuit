@@ -12,10 +12,10 @@ import (
 	"path"
 )
 
-// client -> worker -> namespace => chan,sync,proc
+// client -> circuit -> weave=knot -> chan, proc
 
-// WorkerID opaquely identifies a circuit worker
-type WorkerID string
+// CircuitID opaquely identifies a circuit worker
+type CircuitID string
 
 // Client is a live session with the circuit mount point on the local machine.
 type Client struct {
@@ -24,7 +24,7 @@ type Client struct {
 
 // NewClient creates a new client for the circuit environment.  It opens the
 // circuit mount point and keeps it open (preventing it from being unmounted)
-// for the life of the return Client object.
+// for the life of the returned Client object.
 func NewClient(mount string) (c *Client, err error) {
 	c = &Client{}
 	if c.mount, err = OpenDir(path.Clean(mount)); err != nil {
@@ -38,8 +38,8 @@ func (c *Client) Path() string {
 	return c.mount.Path()
 }
 
-// Workers asynchronously returns a list of known live workers.
-func (c *Client) Workers() ([]WorkerID, error) {
+// Circuits asynchronously returns a list of known live circuits.
+func (c *Client) Circuits() ([]CircuitID, error) {
 	d, err := os.Open(c.mount.Path())
 	if err != nil {
 		return nil, err
@@ -49,17 +49,17 @@ func (c *Client) Workers() ([]WorkerID, error) {
 	if err != nil {
 		return nil, err
 	}
-	var w []WorkerID
+	var w []CircuitID
 	for _, name := range children {
 		if name == "" || name[0] != 'X' {
 			continue
 		}
-		w = append(w, WorkerID(name))
+		w = append(w, CircuitID(name))
 	}
 	return w, nil
 }
 
-// Worker returns a controller for the requested circuit worker.
-func (c *Client) Worker(worker WorkerID) (*Worker, error) {
-	return newWorker(c, worker)
+// Circuit returns a controller for the circuit instance with the given id.
+func (c *Client) Circuit(id CircuitID) (*Circuit, error) {
+	return openCircuit(c, id)
 }

@@ -15,38 +15,37 @@ import (
 	"path"
 )
 
-const procDir = "proc"
+type Command struct {
+	Env  []string `json:"env"`
+	Path string   `json:"path"`
+	Args []string `json:"args"`
+}
+
+const procDir = "Proc"
 
 // ErrExit represents any non-zero process exit code.
 var ErrExit = errors.New("circuit process exit error")
 
-type proc struct {
-	namespace *Namespace
-	name      string
-	dir       *Dir
+type Proc struct {
+	local string
+	dir *Dir
 }
 
-func makeProc(namespace *Namespace, name string) (p *proc, err error) {
-	p = &proc{
-		namespace: namespace,
-		name:      name,
-	}
-	if err = os.Mkdir(p.Path(), 0777); err != nil {
-		return nil, err
-	}
+func openProc(local string) *Proc {
+	p = &Proc{local: local}
 	if p.dir, err = OpenDir(p.Path()); err != nil {
-		return nil, err
+		panic(err)
 	}
-	return p, nil
+	return p
 }
 
-// Path returns the path of this process element in the local circuit file system.
-func (p *proc) Path() string {
-	return path.Join(p.namespace.Path(), procDir, p.name)
+// Path returns the path of this Process element in the local circuit file system.
+func (p *Proc) Path() string {
+	return p.local
 }
 
-// ??
-func (p *proc) Start(cmd Command) error {
+// Start …
+func (p *Proc) Start(cmd Command) error {
 	b, err := json.Marshal(cmd)
 	if err != nil {
 		panic(0)
@@ -54,22 +53,17 @@ func (p *proc) Start(cmd Command) error {
 	return ioutil.WriteFile(path.Join(p.Path(), "start"), b, 0222)
 }
 
-// ??
-func (p *proc) WaitExit() error {
+// Wait …
+func (p *Proc) Wait() error {
 	b, err := ioutil.ReadFile(path.Join(p.Path(), "waitexit"))
 	if os.IsNotExist(err) { // a missing file indicates a dead circuit worker; we panic for those by convention
 		panic(err)
 	}
-	if err != nil { // other errors are process element specific; we report them traditionally
+	if err != nil { // other errors are Process element specific; we report them traditionally
 		return err
 	}
 	if len(b) == 0 {
 		return nil
 	}
 	return ErrExit
-}
-
-// XXX: "stat" and "waitexit" should have same return format
-func (p *proc) tryWaitExit() error {
-	?? 
 }

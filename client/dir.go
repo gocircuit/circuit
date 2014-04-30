@@ -14,7 +14,7 @@ import (
 	"runtime"
 )
 
-// Dir represents a descendant directory within the local circuit-mounted file system.
+// Dir represents a descendant directory within the local file system.
 type Dir struct {
 	walk string  // absolute directory path
 	dir *os.File // open file for this local directory; prevents removing

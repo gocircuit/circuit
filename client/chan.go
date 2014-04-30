@@ -15,39 +15,34 @@ import (
 	"strconv"
 )
 
-const channelDir = "chan"
+const chanDir = "chan"
 
-type channel struct {
-	namespace *Namespace
-	name      string
-	dir       *Dir
+// Chan is a handle for a circuit channel.
+type Chan struct {
+	local string
+	dir *Dir
 }
 
-func makeChan(namespace *Namespace, name string, cap_ int) (c *channel, err error) {
-	c = &channel{
-		namespace: namespace,
-		name:      name,
-	}
-	if err = os.Mkdir(c.Path(), 0777); err != nil {
-		return nil, err
-	}
-	if err = ioutil.WriteFile(path.Join(c.Path(), "cap"), []byte(strconv.Itoa(cap_)), 0222); err != nil {
-		os.Remove(c.Path())
-		return nil, err
-	}
+func openChan(local string) *Chan {
+	c = &Chan{local: local}
 	if c.dir, err = OpenDir(c.Path()); err != nil {
-		return nil, err
+		panic(err)
 	}
-	return c, nil
+	return c
 }
 
-// Path returns the path of this channel in the local circuit file system.
-func (c *channel) Path() string {
-	return path.Join(c.namespace.Path(), channelDir, c.name)
+// Path returns the path of this Chan in the local circuit file system.
+func (c *Chan) Path() string {
+	return c.local
 }
 
-// ??
-func (c *channel) Send() io.WriteCloser {
+// SetCap must be invoked once on a Chan before the Chan can be used.
+func (c *Chan) SetCap(n int) error {
+	return ioutil.WriteFile(path.Join(c.Path(), "cap"), []byte(strconv.Itoa(n)), 0222)
+}
+
+// Send …
+func (c *Chan) Send() io.WriteCloser {
 	f, err := os.OpenFile(path.Join(c.Path(), "send"), os.O_WRONLY, 0222)
 	if err != nil {
 		panic(err)
@@ -55,8 +50,8 @@ func (c *channel) Send() io.WriteCloser {
 	return f
 }
 
-// ??
-func (c *channel) Recv() io.ReadCloser {
+// Recv …
+func (c *Chan) Recv() io.ReadCloser {
 	f, err := os.OpenFile(path.Join(c.Path(), "recv"), os.O_RDONLY, 0444)
 	if err != nil {
 		return nil
@@ -64,30 +59,7 @@ func (c *channel) Recv() io.ReadCloser {
 	return f
 }
 
-func (c *channel) trySend() io.WriteCloser {
-	f, err := os.OpenFile(path.Join(c.Path(), "trysend"), os.O_WRONLY, 0222)
-	if err != nil {
-		return nil
-	}
-	return f
-}
-
-func (c *channel) tryRecv() io.ReadCloser {
-	f, err := os.OpenFile(path.Join(c.Path(), "tryrecv"), os.O_RDONLY, 0444)
-	if err != nil {
-		return nil
-	}
-	return f
-}
-
-// ??
-func (c *channel) Close() {
-	if err := ioutil.WriteFile(path.Join(c.Path(), "close"), []byte("close"), 0222); err != nil {
-		panic(err)
-	}
-}
-
-// Remove removes the channel element from the circuit environment (and local file system).
-func (c *channel) Remove() error {
-	return os.Remove(c.Path())
+// Close closes the circuit Chan.
+func (c *Chan) Close() error {
+	return ioutil.WriteFile(path.Join(c.Path(), "close"), []byte(`"close"`), 0222)
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 	"github.com/gocircuit/circuit/kit/fs/element/valve"
 	"github.com/gocircuit/circuit/kit/fs/element/proc"
-	"github.com/gocircuit/circuit/kit/fs/element/sel"
+	//"github.com/gocircuit/circuit/kit/fs/element/sel"
 	"github.com/gocircuit/circuit/kit/fs/rh"
 )
 
@@ -59,11 +59,11 @@ func NewDir(name string) *KnotDir {
 	s.mkr = []makerDir{
 		valve.NewMakerDir(path.Join(s.name, "chan")),
 		proc.NewMakerDir(path.Join(s.name, "proc")),
-		sel.NewMakerDir(path.Join(s.name, "select")),
+		//sel.NewMakerDir(path.Join(s.name, "select")),
 	}
 	s.dir.AddChild("chan", s.mkr[0])
 	s.dir.AddChild("proc", s.mkr[1])
-	s.dir.AddChild("select", s.mkr[2])
+	//s.dir.AddChild("select", s.mkr[2])
 	s.dir.AllowCreate()
 	return s
 }
