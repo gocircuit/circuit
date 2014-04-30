@@ -23,8 +23,9 @@ type Chan struct {
 	dir *Dir
 }
 
-func openChan(local string) *Chan {
+func openChan(local string) (c *Chan) {
 	c = &Chan{local: local}
+	var err error
 	if c.dir, err = OpenDir(c.Path()); err != nil {
 		panic(err)
 	}

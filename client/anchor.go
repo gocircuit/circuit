@@ -30,7 +30,7 @@ func openAnchor(slash string) (a *Anchor, err error) {
 
 // Path returns the path of this anchor within the local file system.
 func (a *Anchor) Path() string {
-	return path.Join(append([]string{a.slash}, walk...))
+	return path.Join(append([]string{a.slash}, a.walk...)...)
 }
 
 // UseAnchor
@@ -42,9 +42,9 @@ func (a *Anchor) UseAnchor(walk []string) (sub *Anchor, err error) {
 	case "chan", "proc", "help":
 		return nil, fmt.Errorf("subanchors not allowed in element directories")
 	}
-	os.MkdirAll(path.Join(a.Path(), walk[0]), 0777) { // TODO: unused directories are gc'd by the circuit daemon
+	os.MkdirAll(path.Join(a.Path(), walk[0]), 0777) // TODO: unused directories are gc'd by the circuit daemon
 	sub = &Anchor{
-		slash: slash,
+		slash: a.slash,
 		walk: append(a.walk, walk[0]),
 	}
 	if sub.dir, err = OpenDir(sub.Path()); err != nil {
@@ -61,7 +61,8 @@ func (a *Anchor) UseChan(name string) *Chan {
 }
 
 // UseProc
-func (a *Anchor) UseProc(name string) (Proc, error) {
-	?
-	return makeProc(n, name)
+func (a *Anchor) UseProc(name string) *Proc {
+	local := path.Join(a.Path(), "proc", name)
+	os.MkdirAll(local, 0777)
+	return openProc(local)
 }

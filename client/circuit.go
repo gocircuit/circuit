@@ -42,5 +42,5 @@ const anchorDir = "anchor"
 
 // UseAnchor
 func (c *Circuit) UseAnchor(walk []string) (_ *Anchor, err error) {
-	return c.anchor.Use(walk)
+	return c.anchor.UseAnchor(walk)
 }

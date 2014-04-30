@@ -31,8 +31,9 @@ type Proc struct {
 	dir *Dir
 }
 
-func openProc(local string) *Proc {
+func openProc(local string) (p *Proc) {
 	p = &Proc{local: local}
+	var err error
 	if p.dir, err = OpenDir(p.Path()); err != nil {
 		panic(err)
 	}
@@ -53,17 +54,26 @@ func (p *Proc) Start(cmd Command) error {
 	return ioutil.WriteFile(path.Join(p.Path(), "start"), b, 0222)
 }
 
+type Stat struct {
+	Exit string `json:"exit"`
+	State string `json:"state"`
+}
+
 // Wait …
 func (p *Proc) Wait() error {
-	b, err := ioutil.ReadFile(path.Join(p.Path(), "waitexit"))
+	b, err := ioutil.ReadFile(path.Join(p.Path(), "wait"))
 	if os.IsNotExist(err) { // a missing file indicates a dead circuit worker; we panic for those by convention
 		panic(err)
 	}
-	if err != nil { // other errors are Process element specific; we report them traditionally
+	if err != nil { // other errors are element specific; we report them traditionally
 		return err
 	}
-	if len(b) == 0 {
-		return nil
+	var stat Stat
+	if err = json.Unmarshal(b, &stat); err != nil {
+		panic(err)
 	}
-	return ErrExit
+	if stat.Exit != "" {
+		return ErrExit
+	}
+	return nil
 }
