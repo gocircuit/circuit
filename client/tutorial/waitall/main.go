@@ -23,7 +23,7 @@ func main() {
 	waitexit := make(chan int, len(ids))
 	for i, id := range ids {
 		q := c.Circuit(id)
-		a := q.Anchor("tutorial", "waitall")
+		a := q.Term("tutorial", "waitall")
 		p := a.Proc("sleeper")
 		p.Start(client.Command{
 			Path: "sleep",

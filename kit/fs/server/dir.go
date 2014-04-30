@@ -39,7 +39,7 @@ func NewDir(kinXID kinfolk.KinXID, shared ...Resource) (*ServerDir, error) {
 	// Add builtin resources
 	d.FID = d.dir.FID()
 	d.dir.AddChild("help", newFile(d.Help))
-	d.dir.AddChild("weave", knot.NonRemovableKnotDir{knot.NewDir(fmt.Sprintf("%s/weave", kinstr))})
+	d.dir.AddChild("term", knot.NonRemovableKnotDir{knot.NewDir(fmt.Sprintf("%s/term", kinstr))})
 	d.dir.AddChild("sys", NewDebugDir())
 	// Add shared resources
 	for _, rsc := range shared {

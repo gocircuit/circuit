@@ -16,7 +16,7 @@ type Circuit struct {
 	client *Client
 	id string
 	dir *dir
-	anchor *Anchor
+	term *Term
 }
 
 func openCircuit(client *Client, id string) (c *Circuit) {
@@ -28,7 +28,7 @@ func openCircuit(client *Client, id string) (c *Circuit) {
 	if c.dir, err = openDir(c.Path()); err != nil {
 		panic(err)
 	}
-	if c.anchor, err = openAnchor(path.Join(c.Path(), anchorDir)); err != nil {
+	if c.term, err = openTerm(path.Join(c.Path(), termDir)); err != nil {
 		panic(err)
 	}
 	return c
@@ -39,9 +39,9 @@ func (c *Circuit) Path() string {
 	return path.Join(c.client.Path(), string(c.id))
 }
 
-const anchorDir = "anchor"
+const termDir = "term"
 
-// Anchor
-func (c *Circuit) Anchor(walk ...string) *Anchor {
-	return c.anchor.Anchor(walk...)
+// Term
+func (c *Circuit) Term(walk ...string) *Term {
+	return c.term.Term(walk...)
 }

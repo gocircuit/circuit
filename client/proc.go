@@ -46,12 +46,14 @@ func (p *Proc) Path() string {
 }
 
 // Start …
-func (p *Proc) Start(cmd Command) error {
+func (p *Proc) Start(cmd Command) {
 	b, err := json.Marshal(cmd)
 	if err != nil {
 		panic(0)
 	}
-	return ioutil.WriteFile(path.Join(p.Path(), "start"), b, 0222)
+	if err = ioutil.WriteFile(path.Join(p.Path(), "cmd"), b, 0222); err != nil {
+		panic(err)
+	}
 }
 
 type stat struct {
