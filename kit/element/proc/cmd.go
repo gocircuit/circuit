@@ -12,8 +12,6 @@ import (
 	"encoding/json"
 
 	"github.com/gocircuit/circuit/kit/iomisc"
-	"github.com/gocircuit/circuit/kit/fs/rh"
-	"github.com/gocircuit/circuit/kit/fs/namespace/file"
 )
 
 // Cmd …
@@ -37,55 +35,4 @@ func (x *Cmd) String() string {
 		panic(0)
 	}
 	return string(b)
-}
-
-// CmdFile …
-type CmdFile struct {
-	p *Proc
-}
-
-func NewCmdFile(p *Proc) file.File {
-	return &CmdFile{p: p}
-}
-
-func (f *CmdFile) Perm() rh.Perm {
-	return 0666 // rw-rw-rw-
-}
-
-func (f *CmdFile) Open(flag rh.Flag, intr rh.Intr) (rh.FID, error) {
-	if flag.Truncate {
-		return rh.NopClunkerFID{}, nil
-	}
-	switch flag.Attr {
-	case rh.ReadOnly:
-		return file.NewOpenReaderFile(
-			iomisc.ReaderNopCloser(bytes.NewBufferString(f.p.GetCmd().String())),
-		), nil
-	case rh.WriteOnly:
-		return file.NewOpenWriterFile(&runWriteFile{p: f.p}), nil
-	}
-	return nil, rh.ErrPerm
-}
-
-func (f *CmdFile) Remove() error {
-	return rh.ErrPerm
-}
-
-type runWriteFile struct {
-	p *Proc
-	bytes.Buffer
-}
-
-func (w *runWriteFile) Close() error {
-	w.p.ErrorFile.Clear()
-	i, err := ParseCmd(w.Buffer.String())
-	if err != nil {
-		w.p.ErrorFile.Set("execution description not recognized as JSON")
-		return rh.ErrClash
-	}
-	w.p.SetCmd(i)
-	if err := w.p.Start(); err != nil {
-		return rh.ErrClash
-	}
-	return nil
 }
