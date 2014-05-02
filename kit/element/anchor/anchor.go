@@ -11,33 +11,31 @@ import (
 	"sync"
 )
 
-type Anchor interface {
-	Walk([]string) Anchor
-	Attach(string, interface{})
-	Detach(string)
-}
-
 type anchor struct {
 	parent *anchor
 	name string
 	sync.Mutex
-	children map[string]interface{}
+	children map[string]*anchor
 	nhandle int
+	elem Element // chan, proc, etc
+}
+
+type Element interface {
+	IsDone() bool
 }
 
 func newAnchor(parent *anchor, name string) *anchor {
 	return &anchor{
 		parent: parent,
 		name: name,
-		children: make(map[string]interface{}),
+		children: make(map[string]*anchor),
 	}
 }
 
-func (a *anchor) Use() *handle {
+func (a *anchor) scrub(name string) {
 	a.Lock()
 	defer a.Unlock()
-	a.nhandle++
-	return newHandle(a)
+	delete(a.children, name)
 }
 
 func (a *anchor) recycle() {
@@ -45,51 +43,42 @@ func (a *anchor) recycle() {
 	defer a.Unlock()
 	a.nhandle--
 	if a.unnecessary() && a.parent != nil {
-		a.parent.Detach(a.name)
-		a.parent = nil // to catch bugs
+		a.parent.scrub(a.name)
+		a.parent = nil // catch bugs
 	}
 }
 
 func (a *anchor) unnecessary() bool {
-	return a.nhandle == 0 && len(a.children) == 0
+	return a.nhandle == 0 && (a.elem == nil || a.elem.IsDone())
 }
 
-func (a *anchor) Walk(walk []string) *anchor {
-	if len(walk) == 0 {
-		return a
-	}
+func (a *anchor) Walk(walk []string) Anchor {
 	a.Lock()
 	defer a.Unlock()
+	if len(walk) == 0 {
+		a.nhandle++
+		return newHandle(a)
+	}
 	q, ok := a.children[walk[0]]
 	if !ok {
 		q = newAnchor(a, walk[0])
 		a.children[walk[0]] = q
 	}
-	u, ok := q.(*anchor)
-	if !ok {
-		return nil
-	}
-	return u.Walk(walk[1:])
+	return q.Walk(walk[1:])
 }
 
-func (a *anchor) Attach(name string, v interface{}) {
+func (a *anchor) Content() (Element, map[string]Anchor) {
 	a.Lock()
 	defer a.Unlock()
-	a.children[name] = v
-}
-
-func (a *anchor) Detach(name string) {
-	a.Lock()
-	defer a.Unlock()
-	delete(a.children, name)
-}
-
-func (a *anchor) Children() map[string]interface{} {
-	a.Lock()
-	defer a.Unlock()
-	r := make(map[string]interface{})
+	r := make(map[string]Anchor)
 	for k, v := range a.children {
-		r[k] = v
+		r[k] = v.Walk(nil)
 	}
-	return r
+	return a.elem, r
+}
+
+func (a *anchor) Set(elem Element) {
+	a.Lock()
+	defer a.Unlock()
+	a.elem = elem
 }

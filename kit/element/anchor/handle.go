@@ -9,21 +9,24 @@ package anchor
 
 import (
 	"runtime"
-	"sync"
+
+	//"github.com/gocircuit/circuit/kit/element/proc"
+	//"github.com/gocircuit/circuit/kit/element/valve"
 )
 
+type Anchor interface {
+	Walk(walk []string) Anchor
+	Content() (Element, map[string]Anchor)
+	Set(Element)
+}
+
+// handle …
 type handle struct {
-	a *anchor
+	*anchor
 }
 
 func newHandle(a *anchor) (h *handle) {
 	h = &handle{a}
-	runtime.SetFinalizer(h, func(h2 *handle) { h2.a.recycle() })
+	runtime.SetFinalizer(h, func(h2 *handle) { h2.anchor.recycle() })
 	return h
-}
-
-func (h *handle) Walk([]string) Anchor {
-}
-
-func (h *handle) MakeChan(name string) {
 }

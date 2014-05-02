@@ -10,8 +10,6 @@ package proc
 import (
 	"bytes"
 	"encoding/json"
-
-	"github.com/gocircuit/circuit/kit/iomisc"
 )
 
 // Cmd …

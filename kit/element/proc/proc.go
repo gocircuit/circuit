@@ -14,10 +14,6 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-
-	"github.com/gocircuit/circuit/kit/fs/namespace/file"
-	"github.com/gocircuit/circuit/kit/fs/rh"
-	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
 type Proc struct {
