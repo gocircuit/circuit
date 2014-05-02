@@ -1,0 +1,92 @@
+// Copyright 2013 The Go Circuit Project
+// Use of this source code is governed by the license for
+// The Go Circuit Project, found in the LICENSE file.
+//
+// Authors:
+//   2014 Petar Maymounkov <p@gocircuit.org>
+
+package valve
+
+import (
+	"encoding/json"
+	"errors"
+	"sync"
+)
+
+// Valve
+type Valve struct {
+	send struct {
+		abr <-chan struct{} // abort when closed
+		sync.Mutex
+		tun chan<- interface{}
+	}
+	recv struct {
+		abr <-chan struct{} // abort when closed
+		tun <-chan interface{}
+	}
+	ctrl struct {
+		sync.Mutex
+		abr  chan<- struct{}
+		stat Stat
+	}
+}
+
+type Stat struct {
+	Cap     int  `json:"cap"`
+	Opened  bool `json:"opened"`
+	Closed  bool `json:"closed"`
+	NumSend int  `json:"numsend"`
+	NumRecv int  `json:"numrecv"`
+}
+
+// Sender-receiver pipe capacity (once matched)
+const MessageCap = 32e3 // 32K
+
+func (s *Stat) String() string {
+	b, err := json.MarshalIndent(s, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+func MakeValve(n int) (*Valve, error) {
+	if n < 0 {
+		return nil, errors.New("negative capacity")
+	}
+	tun, abr := make(chan interface{}, n), make(chan struct{})
+	v.send.tun, v.recv.tun = tun, tun
+	v.ctrl.abr, v.send.abr, v.recv.abr = abr, abr, abr
+	v.ctrl.stat.Opened, v.ctrl.stat.Cap = true, n
+	return v, nil
+}
+
+func (v *Valve) incSend() {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	v.ctrl.stat.NumSend++
+}
+
+func (v *Valve) incRecv() {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	v.ctrl.stat.NumRecv++
+}
+
+// GetCap returns the capacity of the valve and whether it was set.
+func (v *Valve) GetCap() int {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	if v.ctrl.stat.Opened {
+		return v.ctrl.stat.Cap
+	}
+	return -1
+}
+
+// GetStat …
+func (v *Valve) GetStat() *Stat {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	var s Stat = v.ctrl.stat
+	return &s
+}
