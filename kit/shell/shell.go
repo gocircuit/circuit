@@ -10,8 +10,8 @@ package shell
 import (
 	"io"
 
-	xyexec "github.com/gocircuit/circuit/kit/xy/exec"
-	xyio "github.com/gocircuit/circuit/kit/xy/io"
+	xyexec "github.com/gocircuit/circuit/kit/x/exec"
+	xyio "github.com/gocircuit/circuit/kit/x/io"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/errors"
 )

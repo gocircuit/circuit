@@ -8,6 +8,7 @@
 package valve
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"sync"
@@ -37,6 +38,10 @@ type Stat struct {
 	Closed  bool `json:"closed"`
 	NumSend int  `json:"numsend"`
 	NumRecv int  `json:"numrecv"`
+}
+
+func init() {
+	gob.Register(&Stat{})
 }
 
 // Sender-receiver pipe capacity (once matched)
@@ -74,8 +79,8 @@ func (v *Valve) incRecv() {
 	v.ctrl.stat.NumRecv++
 }
 
-// GetCap returns the capacity of the valve and whether it was set.
-func (v *Valve) GetCap() int {
+// Cap returns the capacity of the valve and whether it was set.
+func (v *Valve) Cap() int {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	if v.ctrl.stat.Opened {
@@ -84,8 +89,8 @@ func (v *Valve) GetCap() int {
 	return -1
 }
 
-// GetStat …
-func (v *Valve) GetStat() *Stat {
+// Stat …
+func (v *Valve) Stat() *Stat {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	var s Stat = v.ctrl.stat

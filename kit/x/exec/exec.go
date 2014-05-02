@@ -15,7 +15,7 @@ import (
 	"syscall"
 
 	"github.com/gocircuit/circuit/kit/pty"
-	xyio "github.com/gocircuit/circuit/kit/xy/io"
+	xyio "github.com/gocircuit/circuit/kit/x/io"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/errors"
 )

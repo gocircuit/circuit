@@ -5,5 +5,5 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package xy encloses utilities for exporting and importing high-level objects like file systems, sockets, channels, etc.
-package xy
+// Package x encloses utilities for cross-sharing various types.
+package x
