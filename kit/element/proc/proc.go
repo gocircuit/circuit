@@ -8,163 +8,98 @@
 package proc
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"syscall"
+
+	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
 type Proc struct {
-	Stdin  interruptible.Writer
-	Stdout interruptible.Reader
-	Stderr interruptible.Reader
-	wait struct {
-		interruptible.Mutex
-		wait <-chan error
-	}
+	Stdin  io.WriteCloser
+	Stdout io.ReadCloser
+	Stderr io.ReadCloser
+	wait <-chan error
 	cmd struct {
 		sync.Mutex
 		cmd exec.Cmd
 		wait chan<- error
 		exit error // exit set by waiter
 	}
-	*file.ErrorFile
 }
 
-func MakeProc() *Proc {
-	p := &Proc{ErrorFile: file.NewErrorFile()}
-
-	// stdin
-	inr, inw := interruptible.Pipe()
-	in, err := p.cmd.cmd.StdinPipe()
-	if err != nil {
+func MakeProc(cmd *Cmd) *Proc {
+	var err error
+	p := &Proc{}
+	// std*
+	if p.Stdin, err = p.cmd.cmd.StdinPipe(); err != nil {
 		panic(0)
 	}
-	p.Stdin = inw
-	go func() {
-		io.Copy(in, inr)
-		in.Close()
-	}()
-	// stdout
-	outr, outw := interruptible.Pipe()
-	out, err := p.cmd.cmd.StdoutPipe()
-	if err != nil {
+	if p.Stdout, err = p.cmd.cmd.StdoutPipe(); err != nil {
 		panic(0)
 	}
-	p.Stdout = outr
-	go func() {
-		io.Copy(outw, out)
-		outw.Close()
-	}()
-	// stderr
-	er, ew := interruptible.Pipe()
-	e, err := p.cmd.cmd.StderrPipe()
-	if err != nil {
+	if p.Stderr, err = p.cmd.cmd.StderrPipe(); err != nil {
 		panic(0)
 	}
-	p.Stderr = er
-	go func() {
-		io.Copy(ew, e)
-		ew.Close()
-	}()
-
-
+	// exit
 	ch := make(chan error, 1)
-	p.cmd.wait, p.wait.wait = ch, ch
-	return p
-}
-
-func (p *Proc) ClunkIfNotBusy() error {
-	p.ErrorFile.Clear()
-	p.cmd.Lock()
-	defer p.cmd.Unlock()
-	//
-	switch p.getState() {
-	case Unknown, None, Exited:
-		return nil
-	}
-	p.ErrorFile.Set("process is busy")
-	return rh.ErrBusy
-}
-
-func (p *Proc) Start() error {
-	p.ErrorFile.Clear() // clear error file
-	p.cmd.Lock()
-	defer p.cmd.Unlock()
-	//
+	p.cmd.wait, p.wait = ch, ch
+	// cmd
+	p.cmd.cmd.Env = cmd.Env
+	bin := strings.TrimSpace(cmd.Path)
+	p.cmd.cmd.Path = bin
+	p.cmd.cmd.Args = append([]string{bin}, cmd.Args...)
+	// exec
 	if err := p.cmd.cmd.Start(); err != nil {
-		p.ErrorFile.Setf("exec error: %s", err.Error())
-		return err
+		p.cmd.wait <- fmt.Errorf("exec error: %s", err.Error())
+		close(p.cmd.wait)
+		return p
 	}
 	go func() {
 		p.cmd.wait <- p.cmd.cmd.Wait()
 		close(p.cmd.wait)
-		println("bye")
 	}()
-	return nil
+	return p
 }
 
-func (p *Proc) Wait(intr rh.Intr) (Stat, error) {
-	p.ErrorFile.Clear()
-	u := p.wait.Lock(intr)
-	if u == nil {
-		p.ErrorFile.Set("wait interrupted")
-		return Stat{}, rh.ErrIntr
-	}
-	defer u.Unlock()
-	//
+func (p *Proc) Wait(intr interruptible.Intr) (Stat, error) {
 	select {
-	case err, ok := <-p.wait.wait:
+	case err, ok := <-p.wait:
 		if !ok {
-			p.ErrorFile.Set("process already exited")
-			return p.TryWait(), nil
+			return p.Peek(), nil
 		}
 		p.cmd.Lock()
 		defer p.cmd.Unlock()
 		p.cmd.exit = err
-		return p.stat(), nil
+		return p.peek(), nil
 	case <-intr:
-		p.ErrorFile.Set("wait interrupted")
-		return Stat{}, rh.ErrIntr
+		return Stat{}, interruptible.ErrIntr
 	}
 }
 
 func (p *Proc) Signal(sig string) error {
-	p.ErrorFile.Clear() // clear error file
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
-	//
 	if p.cmd.cmd.Process == nil {
-		p.ErrorFile.Set("no running process to signal")
-		return rh.ErrClash
+		return fmt.Errorf("no running process to signal")
 	}
 	if sig, ok := sigMap[strings.TrimSpace(strings.ToUpper(sig))]; ok {
 		return p.cmd.cmd.Process.Signal(sig)
 	}
-	p.ErrorFile.Set("signal name/number not recognized")
-	return rh.ErrClash
+	return fmt.Errorf("signal name not recognized")
 }
 
 func (p *Proc) GetEnv() []string {
 	return os.Environ()
 }
 
-func (p *Proc) SetCmd(i *Cmd) {
-	p.cmd.Lock()
-	defer p.cmd.Unlock()
-	//
-	p.cmd.cmd.Env = i.Env
-	bin := strings.TrimSpace(i.Path)
-	p.cmd.cmd.Path = bin
-	p.cmd.cmd.Args = append([]string{bin}, i.Args...)
-}
-
 func (p *Proc) GetCmd() *Cmd {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
-	//
 	return &Cmd{
 		Env:  p.cmd.cmd.Env,
 		Path: p.cmd.cmd.Path,
@@ -172,13 +107,23 @@ func (p *Proc) GetCmd() *Cmd {
 	}
 }
 
-func (p *Proc) TryWait() Stat {
+func (p *Proc) IsDone() bool {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
-	return p.stat()
+	switch p.phase() {
+	case NotStarted, Exited, Signaled:
+		return true
+	}
+	return false
 }
 
-func (p *Proc) stat() Stat {
+func (p *Proc) Peek() Stat {
+	p.cmd.Lock()
+	defer p.cmd.Unlock()
+	return p.peek()
+}
+
+func (p *Proc) peek() Stat {
 	return Stat{
 		Cmd: Cmd{
 			Env: p.cmd.cmd.Env,
@@ -186,13 +131,13 @@ func (p *Proc) stat() Stat {
 			Args: p.cmd.cmd.Args,
 		},
 		Exit: p.cmd.exit,
-		State: p.getState().String(),
+		Phase: p.phase().String(),
 	}
 }
 
-func (p *Proc) getState() RunState {
+func (p *Proc) phase() Phase {
 	if p.cmd.cmd.Process == nil {
-		return None
+		return NotStarted // didn't start due to error
 	}
 	ps := p.cmd.cmd.ProcessState
 	if ps == nil {
@@ -209,5 +154,5 @@ func (p *Proc) getState() RunState {
 	case ws.Continued():
 		return Continued
 	}
-	return Unknown
+	panic(0)
 }

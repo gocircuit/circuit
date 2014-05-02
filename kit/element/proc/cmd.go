@@ -8,7 +8,6 @@
 package proc
 
 import (
-	"bytes"
 	"encoding/json"
 )
 

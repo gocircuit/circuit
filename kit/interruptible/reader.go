@@ -11,14 +11,12 @@ import (
 	"bytes"
 	"io"
 	"sync"
-
-	"github.com/gocircuit/circuit/kit/fs/rh" // TODO: backwards dep
 )
 
 //
 type Reader interface {
 	io.ReadCloser
-	ReadIntr([]byte, rh.Intr) (int, error)
+	ReadIntr([]byte, Intr) (int, error)
 }
 
 //
@@ -40,10 +38,10 @@ func (r *reader) Read(p []byte) (n int, err error) {
 	return r.ReadIntr(p, nil)
 }
 
-func (r *reader) ReadIntr(p []byte, intr rh.Intr) (n int, err error) {
+func (r *reader) ReadIntr(p []byte, intr Intr) (n int, err error) {
 	u := r.r.Lock(intr)
 	if u == nil {
-		return 0, rh.ErrIntr
+		return 0, ErrIntr
 	}
 	defer u.Unlock()
 	//

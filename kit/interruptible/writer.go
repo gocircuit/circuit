@@ -10,14 +10,12 @@ package interruptible
 import (
 	"io"
 	"sync"
-
-	"github.com/gocircuit/circuit/kit/fs/rh" // TODO: backwards dep
 )
 
 // Writer is an io.WriteCloser which also supports interruptible writes.
 type Writer interface {
 	io.WriteCloser
-	WriteIntr([]byte, rh.Intr) (int, error)
+	WriteIntr([]byte, Intr) (int, error)
 }
 
 //
@@ -42,10 +40,10 @@ func (w *writer) Write(p []byte) (int, error) {
 	return w.WriteIntr(p, nil)
 }
 
-func (w *writer) WriteIntr(p []byte, intr rh.Intr) (n int, err error) {
+func (w *writer) WriteIntr(p []byte, intr Intr) (n int, err error) {
 	u := w.w.Lock(intr)
 	if u == nil {
-		return 0, rh.ErrIntr
+		return 0, ErrIntr
 	}
 	defer u.Unlock()
 	//

@@ -9,8 +9,6 @@ package interruptible
 
 import (
 	"sync"
-
-	"github.com/gocircuit/circuit/kit/fs/rh" // TODO: backwards dep
 )
 
 // Mutex is analgous to sync.Mutex, but the lock operation can be interrupted by the locking user.
@@ -31,7 +29,7 @@ func (m *Mutex) init() {
 	m.lock, m.unlock = ch, ch
 }
 
-func (m *Mutex) Lock(intr rh.Intr) *Unlocker {
+func (m *Mutex) Lock(intr Intr) *Unlocker {
 	m.init()
 	select {
 	case <-m.lock:

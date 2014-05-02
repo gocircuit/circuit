@@ -15,7 +15,7 @@ import (
 type Stat struct {
 	Cmd Cmd `json:"cmd"`
 	Exit error `json:"exit"`
-	State string `json:"state"`
+	Phase string `json:"phase"`
 }
 
 func (s Stat) String() string {
@@ -26,11 +26,10 @@ func (s Stat) String() string {
 	return string(b)
 }
 
-type RunState int
+type Phase int
 
 const (
-	Unknown RunState = iota
-	None
+	NotStarted Phase = iota
 	Running
 	Exited
 	Stopped
@@ -38,10 +37,8 @@ const (
 	Continued
 )
 
-func (rs RunState) String() string {
-	switch rs {
-	case None:
-		return "not executed yet"
+func (ph Phase) String() string {
+	switch ph {
 	case Running:
 		return "running"
 	case Exited:
