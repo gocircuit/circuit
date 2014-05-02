@@ -54,6 +54,7 @@ func MakeValve(n int) (*Valve, error) {
 	if n < 0 {
 		return nil, errors.New("negative capacity")
 	}
+	v := &Valve{}
 	tun, abr := make(chan interface{}, n), make(chan struct{})
 	v.send.tun, v.recv.tun = tun, tun
 	v.ctrl.abr, v.send.abr, v.recv.abr = abr, abr, abr

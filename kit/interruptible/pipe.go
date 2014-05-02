@@ -27,6 +27,7 @@ func Pipe() (Reader, Writer) {
 	r := &reader{w: w}
 	r.r.ch = ch
 	//
+	runtime.SetFinalizer(r, func(r2 *reader) { r2.Close() })
 	runtime.SetFinalizer(w, func(w2 *writer) { w2.Close() })
 	//
 	return r, w
