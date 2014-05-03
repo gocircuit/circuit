@@ -10,6 +10,7 @@ package proc
 import (
 	"fmt"
 	"io"
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -98,7 +99,7 @@ func (p *proc) Wait() (Stat, error) {
 		p.cmd.exit = exit
 		return p.peek(), nil
 	case <-p.abr:
-		return nil, errors.New("aborted")
+		return Stat{}, errors.New("aborted")
 	}
 }
 
@@ -131,6 +132,9 @@ func (p *proc) GetCmd() *Cmd {
 func (p *proc) IsDone() bool {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
+	if p.cmd.abr == nil {
+		return true
+	}
 	switch p.phase() {
 	case NotStarted, Exited, Signaled:
 		return true
