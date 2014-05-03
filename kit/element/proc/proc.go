@@ -15,26 +15,36 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-
-	"github.com/gocircuit/circuit/kit/interruptible"
 )
 
-type Proc struct {
+type Proc interface {
+	Scrub()
+	Wait() (Stat, error)
+	Signal(sig string) error
+	GetEnv() []string
+	GetCmd() *Cmd
+	IsDone() bool
+	Peek() Stat
+}
+
+type proc struct {
 	Stdin  io.WriteCloser
 	Stdout io.ReadCloser
 	Stderr io.ReadCloser
 	wait <-chan error
+	abr <-chan struct{}
 	cmd struct {
 		sync.Mutex
 		cmd exec.Cmd
+		abr chan<- struct{}
 		wait chan<- error
 		exit error // exit set by waiter
 	}
 }
 
-func MakeProc(cmd *Cmd) *Proc {
+func MakeProc(cmd *Cmd) Proc {
 	var err error
-	p := &Proc{}
+	p := &proc{}
 	// std*
 	if p.Stdin, err = p.cmd.cmd.StdinPipe(); err != nil {
 		panic(0)
@@ -46,8 +56,9 @@ func MakeProc(cmd *Cmd) *Proc {
 		panic(0)
 	}
 	// exit
-	ch := make(chan error, 1)
+	ch, abr := make(chan error, 1), make(chan struct{})
 	p.cmd.wait, p.wait = ch, ch
+	p.abr, p.cmd.abr = abr, abr
 	// cmd
 	p.cmd.cmd.Env = cmd.Env
 	bin := strings.TrimSpace(cmd.Path)
@@ -66,38 +77,48 @@ func MakeProc(cmd *Cmd) *Proc {
 	return p
 }
 
-func (p *Proc) Wait(intr interruptible.Intr) (Stat, error) {
+func (p *proc) Scrub() {
+	p.cmd.Lock()
+	defer p.cmd.Unlock()
+	if p.cmd.abr == nil {
+		return
+	}
+	close(p.cmd.abr)
+	p.cmd.abr = nil
+}
+
+func (p *proc) Wait() (Stat, error) {
 	select {
-	case err, ok := <-p.wait:
+	case exit, ok := <-p.wait:
 		if !ok {
 			return p.Peek(), nil
 		}
 		p.cmd.Lock()
 		defer p.cmd.Unlock()
-		p.cmd.exit = err
+		p.cmd.exit = exit
 		return p.peek(), nil
-	case <-intr:
-		return Stat{}, interruptible.ErrIntr
+	case <-p.abr:
+		return nil, errors.New("aborted")
 	}
 }
 
-func (p *Proc) Signal(sig string) error {
+func (p *proc) Signal(sig string) error {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	if p.cmd.cmd.Process == nil {
-		return fmt.Errorf("no running process to signal")
+		return errors.New("no running process to signal")
 	}
 	if sig, ok := sigMap[strings.TrimSpace(strings.ToUpper(sig))]; ok {
 		return p.cmd.cmd.Process.Signal(sig)
 	}
-	return fmt.Errorf("signal name not recognized")
+	return errors.New("signal name not recognized")
 }
 
-func (p *Proc) GetEnv() []string {
+func (p *proc) GetEnv() []string {
 	return os.Environ()
 }
 
-func (p *Proc) GetCmd() *Cmd {
+func (p *proc) GetCmd() *Cmd {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	return &Cmd{
@@ -107,7 +128,7 @@ func (p *Proc) GetCmd() *Cmd {
 	}
 }
 
-func (p *Proc) IsDone() bool {
+func (p *proc) IsDone() bool {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	switch p.phase() {
@@ -117,13 +138,13 @@ func (p *Proc) IsDone() bool {
 	return false
 }
 
-func (p *Proc) Peek() Stat {
+func (p *proc) Peek() Stat {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	return p.peek()
 }
 
-func (p *Proc) peek() Stat {
+func (p *proc) peek() Stat {
 	return Stat{
 		Cmd: Cmd{
 			Env: p.cmd.cmd.Env,
@@ -135,7 +156,7 @@ func (p *Proc) peek() Stat {
 	}
 }
 
-func (p *Proc) phase() Phase {
+func (p *proc) phase() Phase {
 	if p.cmd.cmd.Process == nil {
 		return NotStarted // didn't start due to error
 	}

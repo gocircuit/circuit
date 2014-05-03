@@ -16,9 +16,12 @@ import (
 
 // Send …
 // The returned WriteCloser must be closed at finalization.
-func (v *Valve) Send() (io.WriteCloser, error) {
+func (v *valve) Send() (io.WriteCloser, error) {
 	v.send.Lock()
 	defer v.send.Unlock()
+	if v.send.tun == nil {
+		return nil, errors.New("channel closed")
+	}
 	r, w := interruptible.Pipe()
 	select {
 	case v.send.tun <- r:
@@ -29,24 +32,43 @@ func (v *Valve) Send() (io.WriteCloser, error) {
 	}
 }
 
+func (v *valve) IsDone() bool {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	return v.ctrl.stat.Closed || v.ctrl.stat.Aborted
+}
+
+func (v *valve) Scrub() {
+	v.ctrl.Lock()
+	defer v.ctrl.Unlock()
+	if v.ctrl.stat.Aborted {
+		return
+	}
+	close(v.ctrl.abr)
+	v.ctrl.stat.Aborted = true
+}
+
 // Close closes the channel
-func (v *Valve) Close() error {
+func (v *valve) Close() error {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	if v.ctrl.stat.Closed {
 		return errors.New("channel already closed")
 	}
 	v.ctrl.stat.Closed = true
-	close(v.ctrl.abr)
+	// The goroutine ensures close returns instantaneously, even if the
+	// user erroneously races a send with it. In the latter case, the racing
+	// sends will finish before closure takes place.
 	go func() {
 		v.send.Lock()
 		defer v.send.Unlock()
 		close(v.send.tun)
+		v.send.tun = nil
 	}()
 	return nil
 }
 
-func (v *Valve) Recv() (io.ReadCloser, error) {
+func (v *valve) Recv() (io.ReadCloser, error) {
 	select {
 	case g, ok := <-v.recv.tun:
 		if !ok {

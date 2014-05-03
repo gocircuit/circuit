@@ -11,11 +11,22 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"errors"
+	"io"
 	"sync"
 )
 
-// Valve
-type Valve struct {
+type Valve interface {
+	Send() (io.WriteCloser, error)
+	IsDone() bool
+	Scrub()
+	Close() error
+	Recv() (io.ReadCloser, error)
+	Cap() int
+	Stat() *Stat
+}
+
+// valve
+type valve struct {
 	send struct {
 		abr <-chan struct{} // abort when closed
 		sync.Mutex
@@ -36,6 +47,7 @@ type Stat struct {
 	Cap     int  `json:"cap"`
 	Opened  bool `json:"opened"`
 	Closed  bool `json:"closed"`
+	Aborted bool `json:"aborted"`
 	NumSend int  `json:"numsend"`
 	NumRecv int  `json:"numrecv"`
 }
@@ -55,11 +67,11 @@ func (s *Stat) String() string {
 	return string(b)
 }
 
-func MakeValve(n int) (*Valve, error) {
+func MakeValve(n int) (Valve, error) {
 	if n < 0 {
 		return nil, errors.New("negative capacity")
 	}
-	v := &Valve{}
+	v := &valve{}
 	tun, abr := make(chan interface{}, n), make(chan struct{})
 	v.send.tun, v.recv.tun = tun, tun
 	v.ctrl.abr, v.send.abr, v.recv.abr = abr, abr, abr
@@ -67,20 +79,20 @@ func MakeValve(n int) (*Valve, error) {
 	return v, nil
 }
 
-func (v *Valve) incSend() {
+func (v *valve) incSend() {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	v.ctrl.stat.NumSend++
 }
 
-func (v *Valve) incRecv() {
+func (v *valve) incRecv() {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	v.ctrl.stat.NumRecv++
 }
 
 // Cap returns the capacity of the valve and whether it was set.
-func (v *Valve) Cap() int {
+func (v *valve) Cap() int {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	if v.ctrl.stat.Opened {
@@ -90,7 +102,7 @@ func (v *Valve) Cap() int {
 }
 
 // Stat …
-func (v *Valve) Stat() *Stat {
+func (v *valve) Stat() *Stat {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
 	var s Stat = v.ctrl.stat

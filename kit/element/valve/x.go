@@ -20,7 +20,7 @@ func init() {
 }
 
 type XValve struct {
-	v *Valve
+	v *valve
 }
 
 func (x XValve) Send() (circuit.X, error) {
@@ -41,6 +41,14 @@ func (x XValve) Recv() (circuit.X, error) {
 		return nil, err
 	}
 	return xio.NewXReadCloser(r), nil
+}
+
+func (x XValve) Scrub() {
+	x.v.Scrub()
+}
+
+func (x XValve) IsDone() bool {
+	return x.v.IsDone()
 }
 
 func (x XValve) Cap() int {
@@ -83,4 +91,12 @@ func (y YValve) Cap() int {
 
 func (y YValve) Stat() *Stat {
 	return y.x.Call("Stat")[0].(*Stat)
+}
+
+func (y YValve) Scrub() {
+	y.x.Call("Scrub")
+}
+
+func (y YValve) IsDone() bool {
+	return y.x.Call("IsDone")[0].(bool)
 }

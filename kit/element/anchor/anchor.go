@@ -22,6 +22,7 @@ type anchor struct {
 
 type Element interface {
 	IsDone() bool
+	Scrub()
 }
 
 func newAnchor(parent *anchor, name string) *anchor {
