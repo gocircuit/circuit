@@ -12,6 +12,8 @@ import (
 	"encoding/json"
 	"io"
 	"sync"
+
+	"github.com/gocircuit/circuit/use/circuit"
 )
 
 type Valve interface {
@@ -22,6 +24,7 @@ type Valve interface {
 	Recv() (io.ReadCloser, error)
 	Cap() int
 	Stat() *Stat
+	X() circuit.X
 }
 
 // valve
@@ -73,6 +76,10 @@ func MakeValve(n int) Valve {
 	v.ctrl.abr, v.send.abr, v.recv.abr = abr, abr, abr
 	v.ctrl.stat.Opened, v.ctrl.stat.Cap = true, n
 	return v
+}
+
+func (v *valve) X() circuit.X {
+	return circuit.Ref(XValve{v})
 }
 
 func (v *valve) incSend() {

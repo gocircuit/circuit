@@ -100,12 +100,12 @@ func newAnchor(parent *anchor, name string) *anchor {
 	}
 }
 
-func (a *anchor) View() map[string]struct{} {
+func (a *anchor) View() map[string]*Anchor {
 	a.lk.Lock()
 	defer a.lk.Unlock()
-	r := make(map[string]struct{})
-	for k, _ := range a.children {
-		r[k] = struct{}{}
+	r := make(map[string]*Anchor)
+	for n, m := range a.children {
+		r[n] = m.use()
 	}
 	return r
 }

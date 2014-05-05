@@ -16,6 +16,8 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+
+	"github.com/gocircuit/circuit/use/circuit"
 )
 
 type Proc interface {
@@ -26,6 +28,7 @@ type Proc interface {
 	GetCmd() *Cmd
 	IsDone() bool
 	Peek() Stat
+	X() circuit.X
 }
 
 type proc struct {
@@ -76,6 +79,10 @@ func MakeProc(cmd *Cmd) Proc {
 		close(p.cmd.wait)
 	}()
 	return p
+}
+
+func (p *proc) X() circuit.X {
+	return circuit.Ref(XProc{p})
 }
 
 func (p *proc) Scrub() {

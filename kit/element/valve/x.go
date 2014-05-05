@@ -20,11 +20,11 @@ func init() {
 }
 
 type XValve struct {
-	v *valve
+	Valve Valve
 }
 
 func (x XValve) Send() (circuit.X, error) {
-	w, err := x.v.Send()
+	w, err := x.Valve.Send()
 	if err != nil {
 		return nil, err // errors created with errors.New are registered for cross-passing
 	}
@@ -32,11 +32,11 @@ func (x XValve) Send() (circuit.X, error) {
 }
 
 func (x XValve) Close() error {
-	return x.v.Close()
+	return x.Valve.Close()
 }
 
 func (x XValve) Recv() (circuit.X, error) {
-	r, err := x.v.Recv()
+	r, err := x.Valve.Recv()
 	if err != nil {
 		return nil, err
 	}
@@ -44,29 +44,29 @@ func (x XValve) Recv() (circuit.X, error) {
 }
 
 func (x XValve) Scrub() {
-	x.v.Scrub()
+	x.Valve.Scrub()
 }
 
 func (x XValve) IsDone() bool {
-	return x.v.IsDone()
+	return x.Valve.IsDone()
 }
 
 func (x XValve) Cap() int {
-	return x.v.Cap()
+	return x.Valve.Cap()
 }
 
 func (x XValve) Stat() *Stat {
-	return x.v.Stat()
+	return x.Valve.Stat()
 }
 
 type YValve struct {
-	x circuit.X
+	X circuit.X
 }
 
 // all methods below will panic on system-level errors
 
 func (y YValve) Send() (_ io.WriteCloser, err error) {
-	r := y.x.Call("Send")
+	r := y.X.Call("Send")
 	if err = errors.Unpack(r[1]); err != nil {
 		return nil, err
 	}
@@ -74,11 +74,11 @@ func (y YValve) Send() (_ io.WriteCloser, err error) {
 }
 
 func (y YValve) Close() error {
-	return errors.Unpack(y.x.Call("Close")[0])
+	return errors.Unpack(y.X.Call("Close")[0])
 }
 
 func (y YValve) Recv() (_ io.ReadCloser, err error) {
-	r := y.x.Call("Recv")
+	r := y.X.Call("Recv")
 	if err = errors.Unpack(r[1]); err != nil {
 		return nil, err
 	}
@@ -86,17 +86,17 @@ func (y YValve) Recv() (_ io.ReadCloser, err error) {
 }
 
 func (y YValve) Cap() int {
-	return y.x.Call("Cap")[0].(int)
+	return y.X.Call("Cap")[0].(int)
 }
 
 func (y YValve) Stat() *Stat {
-	return y.x.Call("Stat")[0].(*Stat)
+	return y.X.Call("Stat")[0].(*Stat)
 }
 
 func (y YValve) Scrub() {
-	y.x.Call("Scrub")
+	y.X.Call("Scrub")
 }
 
 func (y YValve) IsDone() bool {
-	return y.x.Call("IsDone")[0].(bool)
+	return y.X.Call("IsDone")[0].(bool)
 }
