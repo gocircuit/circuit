@@ -23,6 +23,15 @@ type anchor struct {
 	children map[string]*anchor
 	nhandle int
 	value interface{}
+	tx sync.Mutex
+}
+
+func (a *anchor) TxLock() {
+	a.tx.Lock()
+}
+
+func (a *anchor) TxUnlock() {
+	a.tx.Unlock()
 }
 
 func (a *anchor) use() *Anchor {
