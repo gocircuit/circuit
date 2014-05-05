@@ -10,6 +10,8 @@ package anchor
 import (
 	"runtime"
 	"sync"
+
+	"github.com/gocircuit/circuit/use/circuit"
 )
 
 type Anchor struct {
@@ -90,6 +92,14 @@ func (a *anchor) Walk(walk []string) *Anchor {
 		q.use() // ensures that if q is not used after Walk returns, it will be scrubbed
 	}
 	return q.Walk(walk[1:])
+}
+
+// NewAnchor create the root node of a new anchor file system.
+func NewAnchor(name string) circuit.X {
+	t := XTerminal{
+		(*Terminal)(newAnchor(nil, name).use()),
+	}
+	return circuit.Ref(t)
 }
 
 func newAnchor(parent *anchor, name string) *anchor {
