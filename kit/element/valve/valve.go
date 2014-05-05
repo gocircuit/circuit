@@ -10,7 +10,6 @@ package valve
 import (
 	"encoding/gob"
 	"encoding/json"
-	"errors"
 	"io"
 	"sync"
 )
@@ -67,16 +66,13 @@ func (s *Stat) String() string {
 	return string(b)
 }
 
-func MakeValve(n int) (Valve, error) {
-	if n < 0 {
-		return nil, errors.New("negative capacity")
-	}
+func MakeValve(n int) Valve {
 	v := &valve{}
 	tun, abr := make(chan interface{}, n), make(chan struct{})
 	v.send.tun, v.recv.tun = tun, tun
 	v.ctrl.abr, v.send.abr, v.recv.abr = abr, abr, abr
 	v.ctrl.stat.Opened, v.ctrl.stat.Cap = true, n
-	return v, nil
+	return v
 }
 
 func (v *valve) incSend() {

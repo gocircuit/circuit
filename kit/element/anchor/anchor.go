@@ -8,21 +8,79 @@
 package anchor
 
 import (
+	"runtime"
 	"sync"
 )
+
+type Anchor struct {
+	*anchor
+}
 
 type anchor struct {
 	parent *anchor
 	name string
-	sync.Mutex
+	lk sync.Mutex
 	children map[string]*anchor
 	nhandle int
-	elem Element // chan, proc, etc
+	value interface{}
 }
 
-type Element interface {
-	IsDone() bool
-	Scrub()
+func (a *anchor) use() *Anchor {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	u := &Anchor{a}
+	a.nhandle++
+	runtime.SetFinalizer(u, func(u2 *Anchor) {
+		u2.recycle()
+	})
+	return u
+}
+
+func (a *anchor) recycle() {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	a.nhandle--
+	if !a.busy() && a.parent != nil {
+		go a.parent.scrub(a.name)
+	}
+}
+
+func (a *anchor) Busy() bool {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	return a.busy()
+}
+
+func (a *anchor) busy() bool {
+	return a.nhandle > 0 || a.value != nil
+}
+
+func (a *anchor) scrub(name string) {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	q, ok := a.children[name]
+	if !ok {
+		return
+	}
+	if q.Busy() {
+		return
+	}
+	delete(a.children, name)
+}
+
+func (a *anchor) Walk(walk []string) *Anchor {
+	if len(walk) == 0 {
+		return a.use()
+	}
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	q, ok := a.children[walk[0]]
+	if !ok {
+		q = newAnchor(a, walk[0])
+		a.children[walk[0]] = q
+		q.use() // ensures that if q is not used after Walk returns, it will be scrubbed
+	}
+	return q.Walk(walk[1:])
 }
 
 func newAnchor(parent *anchor, name string) *anchor {
@@ -33,53 +91,27 @@ func newAnchor(parent *anchor, name string) *anchor {
 	}
 }
 
-func (a *anchor) scrub(name string) {
-	a.Lock()
-	defer a.Unlock()
-	delete(a.children, name)
+func (a *anchor) View() map[string]struct{} {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	r := make(map[string]struct{})
+	for k, _ := range a.children {
+		r[k] = struct{}{}
+	}
+	return r
 }
 
-func (a *anchor) recycle() {
-	a.Lock()
-	defer a.Unlock()
-	a.nhandle--
-	if a.unnecessary() && a.parent != nil {
-		a.parent.scrub(a.name)
-		a.parent = nil // catch bugs
+func (a *anchor) Set(v interface{}) {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	a.value = v
+	if !a.busy() && a.parent != nil {
+		go a.parent.scrub(a.name)
 	}
 }
 
-func (a *anchor) unnecessary() bool {
-	return a.nhandle == 0 && (a.elem == nil || a.elem.IsDone())
-}
-
-func (a *anchor) Walk(walk []string) Anchor {
-	a.Lock()
-	defer a.Unlock()
-	if len(walk) == 0 {
-		a.nhandle++
-		return newHandle(a)
-	}
-	q, ok := a.children[walk[0]]
-	if !ok {
-		q = newAnchor(a, walk[0])
-		a.children[walk[0]] = q
-	}
-	return q.Walk(walk[1:])
-}
-
-func (a *anchor) Content() (Element, map[string]Anchor) {
-	a.Lock()
-	defer a.Unlock()
-	r := make(map[string]Anchor)
-	for k, v := range a.children {
-		r[k] = v.Walk(nil)
-	}
-	return a.elem, r
-}
-
-func (a *anchor) Set(elem Element) {
-	a.Lock()
-	defer a.Unlock()
-	a.elem = elem
+func (a *anchor) Get() interface{} {
+	a.lk.Lock()
+	defer a.lk.Unlock()
+	return a.value
 }
