@@ -60,17 +60,17 @@ func main() {
 
 	// locus
 	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin(xjoin)
-	/*l := */ locus.NewLocus(kin, kinJoin, kinLeave)
+	xlocus := locus.NewLocus(kin, kinJoin, kinLeave)
 
 	circuit.Listen(KinfolkName, xkin) // Start kin services
-	//circuit.Listen(EyeName, ???)
+	circuit.Listen(LocusName, xlocus)
 	//circuit.Listen("cons", shell.NewXShell(*flagDir))
 
 	<-(chan int)(nil)
 }
 
 const KinfolkName = "kin"
-const EyeName = "eye"
+const LocusName = "locus"
 
 func dontPanic(call func(), ifPanic string) {
 	defer func() {

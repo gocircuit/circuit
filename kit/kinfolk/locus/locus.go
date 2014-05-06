@@ -24,7 +24,7 @@ type Locus struct {
 }
 
 // NewLocus creates a new locus device.
-func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) *Locus {
+func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus {
 	locus := &Locus{
 		tube: tube.New(kin, "locus"),
 		Peer: &Peer{
@@ -41,7 +41,7 @@ func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) *Locus 
 	go locus.loopLeave(kinLeave)
 	go locus.loopExpire()
 	log.Println(locus.Peer.Key())
-	return locus
+	return XLocus{locus}
 }
 
 // GetPeers asynchronously returns the current known list of live peers.
