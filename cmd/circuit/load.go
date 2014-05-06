@@ -38,8 +38,8 @@ func init() {
 
 type Config struct {
 	Addr     string
-	WorkerID string
 	Dir      string
+	WorkerID string
 }
 
 func load(c *Config) {

@@ -8,7 +8,6 @@
 package valve
 
 import (
-	"encoding/gob"
 	"encoding/json"
 	"io"
 	"sync"
@@ -52,10 +51,6 @@ type Stat struct {
 	Aborted bool `json:"aborted"`
 	NumSend int  `json:"numsend"`
 	NumRecv int  `json:"numrecv"`
-}
-
-func init() {
-	gob.Register(&Stat{})
 }
 
 // Sender-receiver pipe capacity (once matched)

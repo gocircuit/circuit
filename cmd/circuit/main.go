@@ -18,9 +18,6 @@ import (
 	"github.com/gocircuit/circuit/kit/kinfolk"
 	"github.com/gocircuit/circuit/kit/kinfolk/locus"
 
-	nsrv "github.com/gocircuit/circuit/kit/fs/namespace/server"
-	"github.com/gocircuit/circuit/kit/fs/client"
-
 	//"github.com/gocircuit/circuit/kit/shell"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
@@ -30,10 +27,6 @@ var (
 	flagAddr         = flag.String("addr", "", "Network address to use")
 	flagDir          = flag.String("lock", "", "Directory to lock to prevent duplication")
 	flagJoin         = flag.String("join", "", "Join an existing network of circuit workers")
-)
-
-const (
-	KinFolk   = "kin"
 )
 
 func main() {
@@ -56,36 +49,28 @@ func main() {
 	}
 
 	// start circuit runtime
-	c := &Config{
-		Addr: *flagAddr,
-		Dir: *flagDir,
-	}
+	c := &Config{Addr: *flagAddr, Dir: *flagDir}
 	load(c)
 
-	// kinfolk
+	// kinfolk join
 	var xjoin circuit.PermX
 	dontPanic(func() { 
-		xjoin = circuit.Dial(join, KinFolk) 
+		xjoin = circuit.Dial(join, KinfolkName) 
 	}, "join")
 
 	// locus
-	var xkin kinfolk.ExoKin
-	var rsc locus.Resources{}
-	rsc.Kin, xkin, rsc.KinJoin, rsc.KinLeave = kinfolk.NewKin(xjoin) // Join Kin network
-	lcs := locus.NewLocus(&rsc)                                   // Join Locus network
+	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin(xjoin)
+	/*l := */ locus.NewLocus(kin, kinJoin, kinLeave)
 
-	// shared resources
-	clientDir := client.NewDir(lcs.ServerDir(), lcs.Peer, lcs.GetPeers)    // Mount focus namespace
-	mount, err := fuserh.Mount(*flagMount, nsrv.NewSession(clientDir), 50) // Mount FUSE file system
-	if err != nil {
-		log.Fatalf("fuse mounting %s (%s)", *flagMount, err)
-	}
-
-	circuit.Listen(KinFolk, xkin) // Start kin services
+	circuit.Listen(KinfolkName, xkin) // Start kin services
+	//circuit.Listen(EyeName, ???)
 	//circuit.Listen("cons", shell.NewXShell(*flagDir))
 
 	<-(chan int)(nil)
 }
+
+const KinfolkName = "kin"
+const EyeName = "eye"
 
 func dontPanic(call func(), ifPanic string) {
 	defer func() {
