@@ -94,12 +94,12 @@ func (a *anchor) Walk(walk []string) *Anchor {
 	return q.Walk(walk[1:])
 }
 
-// NewAnchor create the root node of a new anchor file system.
-func NewAnchor(name string) circuit.X {
+// NewTerm create the root node of a new anchor file system.
+func NewTerm(name string) circuit.PermX {
 	t := XTerminal{
 		(*Terminal)(newAnchor(nil, name).use()),
 	}
-	return circuit.Ref(t)
+	return circuit.PermRef(t)
 }
 
 func newAnchor(parent *anchor, name string) *anchor {

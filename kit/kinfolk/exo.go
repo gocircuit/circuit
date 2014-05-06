@@ -5,18 +5,13 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package kinfolk ...
 package kinfolk
 
 import (
 	"github.com/gocircuit/circuit/kit/lang"
-	"github.com/gocircuit/circuit/use/circuit"
 )
 
-// XKin is a permanent cross-interface to ExoKin
-type XKin circuit.PermX
-
-// FolkXID is the XID of a …
+// FolkXID is an XID underlied by a user receiver for a service shared over the kinfolk system.
 type FolkXID XID
 
 func (xid FolkXID) XID() XID {
@@ -24,30 +19,30 @@ func (xid FolkXID) XID() XID {
 }
 
 func (xid FolkXID) String() string {
-	return "FolkXID." + XID(xid).String()
+	return "FolkXID:" + XID(xid).String()
 }
 
-// KinXID is an XID specifically for the ExoKin receiver.
+// KinXID is an XID specifically for the XKin receiver.
 type KinXID XID
 
 func (xid KinXID) String() string {
-	return "KinXID." + XID(xid).String()
+	return "KinXID:" + XID(xid).String()
 }
 
-// ExoKin is the cross-worker interface of the kinfolk system at this circuit.
-type ExoKin struct {
+// XKin is the cross-worker interface of the kinfolk system at this circuit.
+type XKin struct {
 	k *Kin
 }
 
-// Attach returns a cross-reference to an exo folk object
-func (x ExoKin) Attach(topic string) FolkXID {
+// Attach returns a cross-reference to a folk service at this worker.
+func (x XKin) Attach(topic string) FolkXID {
 	x.k.Lock()
 	defer x.k.Unlock()
 	return x.k.topic[topic]
 }
 
-// Join returns an initial set of peers that the joining kin should use as initial entry into the kin system.
-func (x ExoKin) Join() []KinXID {
+// Join returns an initial set of peers that the joining kin should use as initial entry into the kinfolk system.
+func (x XKin) Join() []KinXID {
 	m := make(map[lang.ReceiverID]KinXID)
 	for i := 0; i < Spread; i++ {
 		peerXID := x.Walk(Depth)
@@ -67,7 +62,9 @@ func (x ExoKin) Join() []KinXID {
 	return r
 }
 
-func (x ExoKin) Walk(t int) KinXID {
+// Walk performs a random walk through the expander-graph network of circuit workers
+// of length t steps and returns the kinfolk XID of the terminal node.
+func (x XKin) Walk(t int) KinXID {
 	if t <= 0 {
 		return x.k.XID()
 	}
@@ -94,7 +91,7 @@ func (y YKin) Join() []KinXID {
 }
 
 func (y YKin) Walk(t int) KinXID {
-	// Do not recover; ExoKin.Walk relies on panics
+	// Do not recover; XKin.Walk relies on panics
 	return y.xid.X.Call("Walk", t)[0].(KinXID)
 }
 

@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package kinfolk ...
+// Package kinfolk is an efficient “social” protocol for maintaining mutual awareness and sharing resources amongs circuit workers.
 package kinfolk
 
 import (
@@ -17,24 +17,25 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
-// Kin is the kinfolk system logic, visible inside this circuit process
+// Kin is the kinfolk system logic, visible inside the circuit process
 type Kin struct {
 	kinxid KinXID // Permanent circuit-wide unique ID for this kin
 	rtr    *Rotor
-	ach    chan KinXID // announcements
-	dch    chan KinXID // denouncements
+	ach    chan KinXID // announcements of newly discovered kins
+	dch    chan KinXID // denouncements of newly discovered deceased kins
 	sync.Mutex
 	topic  map[string]FolkXID // topic -> yfolk
 	folk   []*Folk
 }
 
-// NewKin creates a new kinfolk system server, which optionally
-// joins the kinfolk network of join.
+// NewKin creates a new kinfolk system server which, optionally,
+// joins the kinfolk network that join is a member of; join is a
+// permanent cross-interface to a peering kinfolk system.
 //
 // Additions and removals of new members to the circuit system
 // will be announced over add and rmv. These two channels must 
 // be consumed by the user.
-func NewKin(join XKin) (k *Kin, xkin ExoKin, add, rmv <-chan KinXID) {
+func NewKin(join circuit.PermX) (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
 	k = &Kin{
 		rtr:   NewRotor(),
 		ach:   make(chan KinXID, 3*Spread),
@@ -43,11 +44,11 @@ func NewKin(join XKin) (k *Kin, xkin ExoKin, add, rmv <-chan KinXID) {
 	}
 	// Create a KinXID for this system.
 	k.kinxid = KinXID(XID{
-		X:  circuit.PermRef(ExoKin{k}),
+		X:  circuit.PermRef(XKin{k}),
 		ID: lang.ComputeReceiverID(k),
 	})
 	if join == nil {
-		return k, ExoKin{k}, k.ach, k.dch
+		return k, XKin{k}, k.ach, k.dch
 	}
 	// Join peer
 	defer func() {
@@ -62,7 +63,7 @@ func NewKin(join XKin) (k *Kin, xkin ExoKin, add, rmv <-chan KinXID) {
 		w.WriteByte(' ')
 	}
 	log.Println("Initial peers:", w.String())
-	return k, ExoKin{k}, k.ach, k.dch
+	return k, XKin{k}, k.ach, k.dch
 }
 
 func (k *Kin) open(peer KinXID) KinXID {
@@ -79,14 +80,15 @@ func (k *Kin) replenish() {
 	if k.rtr.NOpened() >= Spread {
 		return
 	}
-	// Walk to a new ExoKin peer
-	kinXID := ExoKin{k}.Walk(Depth)
+	// Walk to a new XKin peer
+	kinXID := XKin{k}.Walk(Depth)
 	if XID(kinXID).IsNil() || kinXID.ID == k.XID().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
 		// If peer is nil or self, ignore it
 		return
 	}
 	// Open the peer
 	kinXID = k.open(kinXID)
+
 	// Send new peer to all folk
 	for _, folk := range k.snapfolk() {
 		folk.supply(YKin{kinXID}.Attach(folk.Topic))
