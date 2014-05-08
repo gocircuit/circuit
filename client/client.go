@@ -55,6 +55,11 @@ func NewClient(worker string) *Client {
 	return c
 }
 
-func (client *Client) Peers() []Terminal {
-	??
+func (c *Client) Peers() []Terminal {
+	peers := c.y.GetPeers()
+	var r = make([]Terminal, len(peers))
+	for i, p := range peers {
+		r[i] = anchor.YTerminal{p.Term} ?? // names
+	}
+	return r
 }

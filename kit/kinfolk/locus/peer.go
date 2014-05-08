@@ -19,7 +19,7 @@ import (
 // a cross-interface to its exported resource hierarchy.
 type Peer struct {
 	Kin kinfolk.KinXID // Cross-interface to the kin system at this locus
-	Term circuit.PermX  // Cross-interface to the anchor namespace of this peer, see “kit/anchor”
+	Term circuit.X  // Cross-interface to the anchor namespace of this peer, see “kit/anchor”
 }
 
 func (i Peer) Key() string {

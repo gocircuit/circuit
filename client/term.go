@@ -43,12 +43,7 @@ func (t Terminal) MakeChan(n int) (Chan, error) {
 }
 
 func (t Terminal) MakeProc(cmd Cmd) (Proc, error) {
-	yproc, err := t.y.Make(anchor.Proc, 
-		proc.Cmd{
-			Env: cmd.Env,
-			Path: cmd.Path,
-			Args: cmd.Args,
-		})
+	yproc, err := t.y.Make(anchor.Proc, cmd.cmd(cmd))
 	if err != nil {
 		return nil, err
 	}
