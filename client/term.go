@@ -8,28 +8,31 @@
 package client
 
 import (
-	"os"
-	"path"
-
 	"github.com/gocircuit/circuit/kit/anchor"
 	"github.com/gocircuit/circuit/kit/element/proc"
 	"github.com/gocircuit/circuit/kit/element/valve"
+	"github.com/gocircuit/circuit/kit/kinfolk"
 )
 
 
 type Terminal struct {
 	y anchor.YTerminal
+	k kinfolk.KinXID
+}
+
+func (t Terminal) Worker() string {
+	return t.k.ID.String()
 }
 
 func (t Terminal) Walk(walk []string) Terminal {
-	return Terminal{ t.y.Walk(walk) }
+	return Terminal{ y: t.y.Walk(walk), k: t.k }
 }
 
 func (t Terminal) View() map[string]Terminal {
 	v := t.y.View()
 	w := make(map[string]Terminal)
 	for name, y := range v {
-		w[name] = Terminal{y}
+		w[name] = Terminal{ y: y, k: t.k }
 	}
 	return w
 }

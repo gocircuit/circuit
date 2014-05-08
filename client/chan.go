@@ -32,35 +32,21 @@ type Stat struct {
 	NumRecv int
 }
 
+func statstat(s valve.Stat) Stat {
+	return Stat{
+		Cap: s.Cap,
+		Opened: s.Opened,
+		Closed: s.Closed,
+		Aborted: s.Aborted,
+		NumSend: s.NumSend,
+		NumRecv: s.NumRecv,
+	}
+}
+
 type yvalveChan struct {
-	y valve.YValue
-}
-
-func (y yvalveChan) Send() (io.WritCloser, error) {
-	??
-}
-
-func (y yvalveChan) IsDone() bool {
-	??
-}
-
-func (y yvalveChan) Scrub() {
-	??
-}
-
-func (y yvalveChan) Close() error {
-	??
-}
-
-func (y yvalveChan) Recv() (io.ReadCloser, error) {
-	??
-}
-
-func (y yvalveChan) Cap() int {
-	??
+	valve.YValve
 }
 
 func (y yvalveChan) Stat() Stat {
-	??
+	return statstat(y.YValve.Stat())
 }
-

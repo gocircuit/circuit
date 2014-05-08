@@ -12,15 +12,10 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
 	"time"
 
 	_ "github.com/gocircuit/circuit/kit/debug/ctrlc"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
-	"github.com/gocircuit/circuit/kit/lockfile"
 
 	"github.com/gocircuit/circuit/sys/lang"
 	"github.com/gocircuit/circuit/sys/tele"
@@ -42,12 +37,12 @@ func init() {
 
 // Client is a live session with a circuit worker.
 type Client struct {
-	y YLocus
+	y locus.YLocus
 }
 
-func NewClient(worker string) *Client {
+func NewClient(workerURL string) *Client {
 	c := &Client{}
-	w, err := n.ParseAddr(worker)
+	w, err := n.ParseAddr(workerURL)
 	if err != nil {
 		log.Fatalf("circuit address does not parse (%s)", err)
 	}
@@ -59,7 +54,14 @@ func (c *Client) Peers() []Terminal {
 	peers := c.y.GetPeers()
 	var r = make([]Terminal, len(peers))
 	for i, p := range peers {
-		r[i] = anchor.YTerminal{p.Term} ?? // names
+		r[i] = Terminal{y: p.Term, kin: p.Kin}
 	}
 	return r
 }
+
+// func (c *Client) newTerminal(xterm circuit.X, xkin ??) Terminal {
+// 	return Terminal{
+// 		y: ??,
+// 		k: c.k
+// 	}
+// }

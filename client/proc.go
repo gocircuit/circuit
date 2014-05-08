@@ -9,7 +9,6 @@ package client
 
 import (
 	"github.com/gocircuit/circuit/kit/element/proc"
-	"github.com/gocircuit/circuit/use/errors"
 )
 
 type Cmd struct {
@@ -55,36 +54,25 @@ type Proc interface {
 	GetCmd() Cmd
 	IsDone() bool
 	Peek() Stat
+	Scrub()
 }
 
 type yprocProc struct {
-	y proc.YProc
+	proc.YProc
 }
 
 func (y yprocProc) Wait() (Stat, error) {
-	s, err := y.y.Wait()
+	s, err := y.YValue.Wait()
 	if err != nil {
 		return Stat{}, err
 	}
 	return statstat(s), nil
 }
 
-func (y yprocProc) Signal(sig string) error {
-	return y.y.Signal(sig)
-}
-
-func (y yprocProc) GetEnv() []string {
-	return y.y.GetEnv()
-}
-
 func (y yprocProc) GetCmd() Cmd {
-	return cmdcmd(y.y.GetCmd())
-}
-
-func (y yprocProc) IsDone() bool {
-	return y.y.Done()
+	return cmdcmd(y.YValue.GetCmd())
 }
 
 func (y yprocProc) Peek() Stat {
-	return statstat(y.y.Peek())
+	return statstat(y.YValue.Peek())
 }
