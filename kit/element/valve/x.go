@@ -55,7 +55,7 @@ func (x XValve) Cap() int {
 	return x.Valve.Cap()
 }
 
-func (x XValve) Stat() *Stat {
+func (x XValve) Stat() Stat {
 	return x.Valve.Stat()
 }
 
@@ -89,8 +89,8 @@ func (y YValve) Cap() int {
 	return y.X.Call("Cap")[0].(int)
 }
 
-func (y YValve) Stat() *Stat {
-	return y.X.Call("Stat")[0].(*Stat)
+func (y YValve) Stat() Stat {
+	return y.X.Call("Stat")[0].(Stat)
 }
 
 func (y YValve) Scrub() {

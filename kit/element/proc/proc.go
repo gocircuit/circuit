@@ -25,7 +25,7 @@ type Proc interface {
 	Wait() (Stat, error)
 	Signal(sig string) error
 	GetEnv() []string
-	GetCmd() *Cmd
+	GetCmd() Cmd
 	IsDone() bool
 	Peek() Stat
 	X() circuit.X
@@ -46,7 +46,7 @@ type proc struct {
 	}
 }
 
-func MakeProc(cmd *Cmd) Proc {
+func MakeProc(cmd Cmd) Proc {
 	var err error
 	p := &proc{}
 	// std*
@@ -126,10 +126,10 @@ func (p *proc) GetEnv() []string {
 	return os.Environ()
 }
 
-func (p *proc) GetCmd() *Cmd {
+func (p *proc) GetCmd() Cmd {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
-	return &Cmd{
+	return Cmd{
 		Env:  p.cmd.cmd.Env,
 		Path: p.cmd.cmd.Path,
 		Args: p.cmd.cmd.Args,

@@ -10,59 +10,61 @@ package client
 import (
 	"os"
 	"path"
+
+	"github.com/gocircuit/circuit/kit/anchor"
+	"github.com/gocircuit/circuit/kit/element/proc"
+	"github.com/gocircuit/circuit/kit/element/valve"
 )
 
-// Term
-type Term struct {
-	slash string
-	walk []string // path to this term within term subtree
-	dir *dir // open directory of this term
+
+type Terminal struct {
+	y anchor.YTerminal
 }
 
-func openTerm(slash string) (a *Term, err error) {
-	a = &Term{slash: slash}
-	if a.dir, err = openDir(slash); err != nil {
+func (t Terminal) Walk(walk []string) Terminal {
+	return Terminal{ t.y.Walk(walk) }
+}
+
+func (t Terminal) View() map[string]Terminal {
+	v := t.y.View()
+	w := make(map[string]Terminal)
+	for name, y := range v {
+		w[name] = Terminal{y}
+	}
+	return w
+}
+
+func (t Terminal) MakeChan(n int) (Chan, error) {
+	yvalve, err := t.y.Make(anchor.Chan, n)
+	if err != nil {
 		return nil, err
 	}
-	return
+	return yvalveChan{yvalve}, nil
 }
 
-// Path returns the path of this term within the local file system.
-func (a *Term) Path() string {
-	return path.Join(append([]string{a.slash}, a.walk...)...)
+func (t Terminal) MakeProc(cmd Cmd) (Proc, error) {
+	yproc, err := t.y.Make(anchor.Proc, 
+		proc.Cmd{
+			Env: cmd.Env,
+			Path: cmd.Path,
+			Args: cmd.Args,
+		})
+	if err != nil {
+		return nil, err
+	}
+	return yprocProc{yproc}, nil
 }
 
-// UseTerm
-func (a *Term) Term(walk ...string) (sub *Term) {
-	if len(walk) == 0 {
-		return a
+func (t Terminal) Get() interface{} {
+	kind, y := t.y.Get()
+	if y == nil {
+		return nil
 	}
-	switch walk[0] {
-	case "chan", "proc", "help":
-		panic("subterms not allowed in element directories")
+	switch kind {
+	case anchor.Chan:
+		return yvalveChan{y.(valve.YValve)}
+	case anchor.Proc:
+		return yprocProc{y.(proc.YProc)}
 	}
-	os.MkdirAll(path.Join(a.Path(), walk[0]), 0777) // TODO: unused directories are gc'd by the circuit daemon
-	sub = &Term{
-		slash: a.slash,
-		walk: append(a.walk, walk[0]),
-	}
-	var err error
-	if sub.dir, err = openDir(sub.Path()); err != nil {
-		panic(err)
-	}
-	return sub.Term(walk[1:]...)
-}
-
-// UseChan
-func (a *Term) Chan(name string) *Chan {
-	local := path.Join(a.Path(), "chan", name)
-	os.MkdirAll(local, 0777)
-	return openChan(local)
-}
-
-// UseProc
-func (a *Term) Proc(name string) *Proc {
-	local := path.Join(a.Path(), "proc", name)
-	os.MkdirAll(local, 0777)
-	return openProc(local)
+	panic("client/circuit mismatch")
 }

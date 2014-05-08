@@ -22,7 +22,7 @@ type Valve interface {
 	Close() error
 	Recv() (io.ReadCloser, error)
 	Cap() int
-	Stat() *Stat
+	Stat() Stat
 	X() circuit.X
 }
 
@@ -99,10 +99,8 @@ func (v *valve) Cap() int {
 	return -1
 }
 
-// Stat …
-func (v *valve) Stat() *Stat {
+func (v *valve) Stat() Stat {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
-	var s Stat = v.ctrl.stat
-	return &s
+	return v.ctrl.stat
 }

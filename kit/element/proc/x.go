@@ -51,8 +51,8 @@ func (y YProc) GetEnv() []string {
 	return y.X.Call("GetEnv")[0].([]string)
 }
 
-func (y YProc) GetCmd() *Cmd {
-	return y.X.Call("GetCmd")[0].(*Cmd)
+func (y YProc) GetCmd() Cmd {
+	return y.X.Call("GetCmd")[0].(Cmd)
 }
 
 func (y YProc) IsDone() bool {

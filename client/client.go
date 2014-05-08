@@ -8,54 +8,53 @@
 package client
 
 import (
+	"fmt"
+	"log"
+	"math/rand"
+	"net"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
+	"time"
+
+	_ "github.com/gocircuit/circuit/kit/debug/ctrlc"
+	_ "github.com/gocircuit/circuit/kit/debug/kill"
+	"github.com/gocircuit/circuit/kit/lockfile"
+
+	"github.com/gocircuit/circuit/sys/lang"
+	"github.com/gocircuit/circuit/sys/tele"
+
+	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/gocircuit/circuit/use/n"
+
+	"github.com/gocircuit/circuit/kit/kinfolk/locus"
 )
 
-// Client is a live session with the circuit mount point on the local machine.
-type Client struct {
-	mount *dir
+// A one-off package side-effect initialization makes this process capable of talking to circuit workers.
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	tele.Init()
+	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{})
+	fmt.Println(t.Addr().String())
+	circuit.Bind(lang.New(t))
 }
 
-// Attach creates a new client for the circuit environment.  It opens the
-// circuit mount point and keeps it open (preventing it from being unmounted)
-// for the life of the returned Client object.
-func Attach(mount string) (c *Client) {
-	c = &Client{}
-	var err error
-	if c.mount, err = openDir(path.Clean(mount)); err != nil {
-		panic(err)
+// Client is a live session with a circuit worker.
+type Client struct {
+	y YLocus
+}
+
+func NewClient(worker string) *Client {
+	c := &Client{}
+	w, err := n.ParseAddr(worker)
+	if err != nil {
+		log.Fatalf("circuit address does not parse (%s)", err)
 	}
+	c.y = locus.YLocus{circuit.Dial(w, "locus")}
 	return c
 }
 
-// Path returns the local mount-point of the circuit file system used by this client.
-func (c *Client) Path() string {
-	return c.mount.Path()
-}
-
-// Circuits asynchronously returns a list of known live circuits.
-func (c *Client) Circuits() []string {
-	d, err := os.Open(c.mount.Path())
-	if err != nil {
-		panic(err)
-	}
-	defer d.Close()
-	children, err := d.Readdirnames(0)
-	if err != nil {
-		panic(err)
-	}
-	var w []string
-	for _, name := range children {
-		if name == "" || name[0] != 'X' {
-			continue
-		}
-		w = append(w, name)
-	}
-	return w
-}
-
-// Circuit returns a controller for the circuit instance with the given id.
-func (c *Client) Circuit(id string) *Circuit {
-	return openCircuit(c, id)
+func (client *Client) Peers() []Terminal {
+	??
 }

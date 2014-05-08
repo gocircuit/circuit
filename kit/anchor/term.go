@@ -69,7 +69,7 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 		t.carrier().Set(u)
 		return u.elem, nil
 	case Proc:
-		cmd, ok := arg.(*proc.Cmd)
+		cmd, ok := arg.(proc.Cmd)
 		if !ok {
 			return nil, errors.New("invalid argument")
 		}

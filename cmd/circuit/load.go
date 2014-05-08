@@ -38,7 +38,7 @@ func init() {
 
 type Config struct {
 	Addr     string
-	Dir      string
+	Dir string // directory to lock
 	WorkerID string
 }
 
