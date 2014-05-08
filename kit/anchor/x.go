@@ -61,25 +61,25 @@ func (x XTerminal) Scrub() {
 }
 
 type YTerminal struct {
-	x circuit.X
+	X circuit.X
 }
 
 func (y YTerminal) Walk(walk []string) YTerminal {
 	return YTerminal{
-		y.x.Call("Walk")[0].(circuit.X),
+		y.X.Call("Walk")[0].(circuit.X),
 	}
 }
 
 func (y YTerminal) View() map[string]YTerminal {
 	u := make(map[string]YTerminal)
-	for n, x := range y.x.Call("View")[0].(map[string]circuit.X) {
+	for n, x := range y.X.Call("View")[0].(map[string]circuit.X) {
 		u[n] = YTerminal{x}
 	}
 	return u
 }
 
 func (y YTerminal) Make(kind string, arg interface{}) (yelm interface{}, err error) {
-	r := y.x.Call("Make")
+	r := y.X.Call("Make")
 	if err = xerrors.Unpack(r[1]); err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (y YTerminal) Make(kind string, arg interface{}) (yelm interface{}, err err
 }
 
 func (y YTerminal) Get() (kind string, yelm interface{}) {
-	r := y.x.Call("Get")
+	r := y.X.Call("Get")
 	kind = r[0].(string)
 	switch kind {
 	case Chan:
@@ -105,5 +105,5 @@ func (y YTerminal) Get() (kind string, yelm interface{}) {
 }
 
 func (y YTerminal) Scrub() {
-	y.x.Call("Scrub")
+	y.X.Call("Scrub")
 }

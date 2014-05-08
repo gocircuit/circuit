@@ -42,15 +42,15 @@ func (t Terminal) MakeChan(n int) (Chan, error) {
 	if err != nil {
 		return nil, err
 	}
-	return yvalveChan{yvalve}, nil
+	return yvalveChan{yvalve.(valve.YValve)}, nil
 }
 
 func (t Terminal) MakeProc(cmd Cmd) (Proc, error) {
-	yproc, err := t.y.Make(anchor.Proc, cmd.cmd(cmd))
+	yproc, err := t.y.Make(anchor.Proc, cmd.retype())
 	if err != nil {
 		return nil, err
 	}
-	return yprocProc{yproc}, nil
+	return yprocProc{yproc.(proc.YProc)}, nil
 }
 
 func (t Terminal) Get() interface{} {

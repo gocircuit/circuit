@@ -17,7 +17,7 @@ type Cmd struct {
 	Args []string
 }
 
-func cmdcmd(c proc.Cmd) Cmd {
+func retypeProcStat(c proc.Cmd) Cmd {
 	return Cmd{
 		Env: c.Env,
 		Path: c.Path,
@@ -25,7 +25,7 @@ func cmdcmd(c proc.Cmd) Cmd {
 	}
 }
 
-func (cmd Cmd) cmd() proc.Cmd {
+func (cmd Cmd) retype() proc.Cmd {
 	return proc.Cmd{
 		Env: cmd.Env,
 		Path: cmd.Path,
@@ -33,27 +33,27 @@ func (cmd Cmd) cmd() proc.Cmd {
 	}
 }
 
-type Stat struct {
+type ProcStat struct {
 	Cmd Cmd
 	Exit error
 	Phase string
 }
 
-func statstat(s proc.Stat) Stat {
-	return Stat{
-		Cmd: cmdcmd(s.Cmd),
+func statstat(s proc.Stat) ProcStat {
+	return ProcStat{
+		Cmd: retypeProcStat(s.Cmd),
 		Exit: s.Exit,
 		Phase: s.Phase,
 	}
 }
 
 type Proc interface {
-	Wait() (Stat, error)
+	Wait() (ProcStat, error)
 	Signal(sig string) error
 	GetEnv() []string
 	GetCmd() Cmd
 	IsDone() bool
-	Peek() Stat
+	Peek() ProcStat
 	Scrub()
 }
 
@@ -61,18 +61,18 @@ type yprocProc struct {
 	proc.YProc
 }
 
-func (y yprocProc) Wait() (Stat, error) {
-	s, err := y.YValue.Wait()
+func (y yprocProc) Wait() (ProcStat, error) {
+	s, err := y.YProc.Wait()
 	if err != nil {
-		return Stat{}, err
+		return ProcStat{}, err
 	}
 	return statstat(s), nil
 }
 
 func (y yprocProc) GetCmd() Cmd {
-	return cmdcmd(y.YValue.GetCmd())
+	return retypeProcStat(y.YProc.GetCmd())
 }
 
-func (y yprocProc) Peek() Stat {
-	return statstat(y.YValue.Peek())
+func (y yprocProc) Peek() ProcStat {
+	return statstat(y.YProc.Peek())
 }

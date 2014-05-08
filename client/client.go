@@ -23,6 +23,8 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 
+	"github.com/gocircuit/circuit/kit/anchor"
+	"github.com/gocircuit/circuit/kit/kinfolk"
 	"github.com/gocircuit/circuit/kit/kinfolk/locus"
 )
 
@@ -54,14 +56,14 @@ func (c *Client) Peers() []Terminal {
 	peers := c.y.GetPeers()
 	var r = make([]Terminal, len(peers))
 	for i, p := range peers {
-		r[i] = Terminal{y: p.Term, kin: p.Kin}
+		r[i] = c.newTerminal(p.Term, p.Kin)
 	}
 	return r
 }
 
-// func (c *Client) newTerminal(xterm circuit.X, xkin ??) Terminal {
-// 	return Terminal{
-// 		y: ??,
-// 		k: c.k
-// 	}
-// }
+func (c *Client) newTerminal(xterm circuit.X, xkin kinfolk.KinXID) Terminal {
+	return Terminal{
+		y: anchor.YTerminal{xterm},
+		k: xkin,
+	}
+}

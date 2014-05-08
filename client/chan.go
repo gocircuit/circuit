@@ -20,10 +20,10 @@ type Chan interface {
 	Close() error
 	Recv() (io.ReadCloser, error)
 	Cap() int
-	Stat() Stat
+	Stat() ChanStat
 }
 
-type Stat struct {
+type ChanStat struct {
 	Cap int
 	Opened bool
 	Closed bool
@@ -32,8 +32,8 @@ type Stat struct {
 	NumRecv int
 }
 
-func statstat(s valve.Stat) Stat {
-	return Stat{
+func retypeChanStat(s valve.Stat) ChanStat {
+	return ChanStat{
 		Cap: s.Cap,
 		Opened: s.Opened,
 		Closed: s.Closed,
@@ -47,6 +47,6 @@ type yvalveChan struct {
 	valve.YValve
 }
 
-func (y yvalveChan) Stat() Stat {
-	return statstat(y.YValve.Stat())
+func (y yvalveChan) Stat() ChanStat {
+	return retypeChanStat(y.YValve.Stat())
 }
