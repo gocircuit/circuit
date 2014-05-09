@@ -24,12 +24,29 @@ import (
 )
 
 var (
-	flagAddr         = flag.String("addr", "", "Network address to use")
-	flagDir          = flag.String("lock", "", "Directory to lock to prevent duplication")
-	flagJoin         = flag.String("join", "", "Join an existing network of circuit workers")
+	flagAddr   = flag.String("addr", "", "Network address to use")
+	flagDir      = flag.String("lock", "", "Directory to lock to prevent duplication")
+	flagJoin     = flag.String("join", "", "Join an existing network of circuit workers")
 )
 
+func usage() {
+	var usage = `
+	circuit COMMAND ARGS
+	…
+`
+	println(usage)
+	os.Exit(1)
+}
+
 func main() {
+	if len(os.Args) < 2 {
+		usage()
+	}
+	if os.Args[1] != "server" {
+		mainTool()
+		return
+	}
+
 	flag.Parse()
 	println("CIRCUIT 2014 gocircuit.org")
 
