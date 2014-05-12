@@ -8,6 +8,8 @@
 package lang
 
 import (
+	"fmt"
+
 	"github.com/gocircuit/circuit/sys/lang/types"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
@@ -84,6 +86,7 @@ func writeReturn(conn n.Conn, msg interface{}) ([]interface{}, error) {
 }
 
 func (r *Runtime) importEitherPtr(retrn []interface{}, exporter n.Addr) (circuit.PermX, error) {
+	println(fmt.Sprintf("retrn=%v exporter=%v", retrn, exporter))
 	out, err := r.importValues(retrn, nil, exporter, false, nil)
 	if err != nil {
 		return nil, err

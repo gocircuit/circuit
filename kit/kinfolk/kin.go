@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"log"
 	"sync"
+	"runtime/debug"
 
 	"github.com/gocircuit/circuit/kit/lang"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -104,7 +105,7 @@ func (k *Kin) snapfolk() []*Folk {
 }
 
 func (k *Kin) scrub(kinXID KinXID) {
-	//debug.PrintStack()
+	debug.PrintStack()
 	if k.rtr.Scrub(kinXID.X).IsNil() {
 		return
 	}

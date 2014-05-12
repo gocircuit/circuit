@@ -9,6 +9,7 @@ package lang
 
 import (
 	"encoding/gob"
+	"fmt"
 
 	"github.com/gocircuit/circuit/sys/lang/types"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -89,22 +90,22 @@ type ptrMsg struct {
 	TypeID types.TypeID
 }
 
-func (*ptrMsg) HandleID() circuit.HandleID {
+func (msg *ptrMsg) HandleID() circuit.HandleID {
 	panic("(ptrMsg) not for use")
 }
 
-func (*ptrMsg) Addr() n.Addr {
+func (msg *ptrMsg) Addr() n.Addr {
 	panic("(ptrMsg) not for use")
 }
 
-func (*ptrMsg) IsX() {}
+func (msg *ptrMsg) IsX() {}
 
-func (*ptrMsg) Call(proc string, in ...interface{}) []interface{} {
+func (msg *ptrMsg) Call(proc string, in ...interface{}) []interface{} {
 	panic("hack: not meant to be used")
 }
 
-func (*ptrMsg) String() string {
-	panic("not for call")
+func (msg *ptrMsg) String() string {
+	return fmt.Sprintf("ptrMsg: id=%v type=%v", msg.ID, msg.TypeID)
 }
 
 // ptrPtrMsg carries ...
@@ -113,22 +114,22 @@ type ptrPtrMsg struct {
 	Src n.Addr
 }
 
-func (*ptrPtrMsg) HandleID() circuit.HandleID {
+func (msg *ptrPtrMsg) HandleID() circuit.HandleID {
 	panic("(ptrPtrMsg) not for use")
 }
 
-func (*ptrPtrMsg) Addr() n.Addr {
+func (msg *ptrPtrMsg) Addr() n.Addr {
 	panic("(ptrPtrMsg) not for use")
 }
 
-func (*ptrPtrMsg) IsX() {}
+func (msg *ptrPtrMsg) IsX() {}
 
-func (*ptrPtrMsg) Call(proc string, in ...interface{}) []interface{} {
+func (msg *ptrPtrMsg) Call(proc string, in ...interface{}) []interface{} {
 	panic("hack: not meant to be used")
 }
 
-func (*ptrPtrMsg) String() string {
-	panic("not for call")
+func (msg *ptrPtrMsg) String() string {
+	return fmt.Sprintf("ptrPtrMsg: id=%v src=%v", msg.ID, msg.Src)
 }
 
 // permPtrMsg carries ...
@@ -137,24 +138,24 @@ type permPtrMsg struct {
 	TypeID types.TypeID
 }
 
-func (*permPtrMsg) HandleID() circuit.HandleID {
+func (msg *permPtrMsg) HandleID() circuit.HandleID {
 	panic("(permPtrMsg) not for use")
 }
 
-func (*permPtrMsg) Addr() n.Addr {
+func (msg *permPtrMsg) Addr() n.Addr {
 	panic("(permPtrMsg) not for use")
 }
 
-func (*permPtrMsg) IsX() {}
+func (msg *permPtrMsg) IsX() {}
 
-func (*permPtrMsg) IsPermX() {}
+func (msg *permPtrMsg) IsPermX() {}
 
-func (*permPtrMsg) Call(proc string, in ...interface{}) []interface{} {
+func (msg *permPtrMsg) Call(proc string, in ...interface{}) []interface{} {
 	panic("hack: not meant to be used")
 }
 
-func (*permPtrMsg) String() string {
-	panic("not for call")
+func (msg *permPtrMsg) String() string {
+	return fmt.Sprintf("permPtrMsg: id=%v type=%v", msg.ID, msg.TypeID)
 }
 
 // permPtrPtrMsg carries a serialized parmenent x-pointer from a sender to a receiver,
@@ -165,22 +166,22 @@ type permPtrPtrMsg struct {
 	Src    n.Addr
 }
 
-func (*permPtrPtrMsg) HandleID() circuit.HandleID {
+func (msg *permPtrPtrMsg) HandleID() circuit.HandleID {
 	panic("(permPtrPtrMsg) not for use")
 }
 
-func (*permPtrPtrMsg) Addr() n.Addr {
+func (msg *permPtrPtrMsg) Addr() n.Addr {
 	panic("(permPtrPtrMsg) not for use")
 }
 
-func (*permPtrPtrMsg) IsX() {}
+func (msg *permPtrPtrMsg) IsX() {}
 
-func (*permPtrPtrMsg) IsPermX() {}
+func (msg *permPtrPtrMsg) IsPermX() {}
 
-func (*permPtrPtrMsg) Call(proc string, in ...interface{}) []interface{} {
+func (msg *permPtrPtrMsg) Call(proc string, in ...interface{}) []interface{} {
 	panic("hack: not meant to be used")
 }
 
-func (*permPtrPtrMsg) String() string {
-	panic("not for call")
+func (msg *permPtrPtrMsg) String() string {
+	return fmt.Sprintf("permPtrPtrMsg: id=%v type=%v src=%v", msg.ID, msg.TypeID, msg.Src)
 }

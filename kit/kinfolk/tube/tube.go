@@ -363,7 +363,7 @@ func (y YTube) Write(key string, rev Rev, value interface{}) bool {
 func (y YTube) BulkWrite(bulk []*Record) {
 	defer func() {
 		if r := recover(); r != nil {
-			// log.Printf("ytube bulk write panic\n%#v\n", r)
+			fmt.Printf("ytube bulk write panic\n%#v\n", r)
 		}
 	}()
 	y.xid.X.Call("BulkWrite", bulk)
