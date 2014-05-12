@@ -24,40 +24,24 @@ import (
 
 	// Sys
 	"github.com/gocircuit/circuit/sys/lang"
-	"github.com/gocircuit/circuit/sys/tele"
+	_ "github.com/gocircuit/circuit/sys/tele"
 
 	// Use
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 )
 
-// Achieves the effect of a parameterized import with side-effects.
-func init() {
-	tele.Init()
-}
-
-type Config struct {
-	Addr     string
-	Dir string // directory to lock
-	WorkerID string
-}
-
-func load(c *Config) {
+func load(addr, mutex string) {
 
 	// Randomize execution
 	rand.Seed(time.Now().UnixNano())
 
 	// Generate worker ID
-	var id n.WorkerID
-	if c.WorkerID == "" {
-		id = n.ChooseWorkerID()
-	} else {
-		id = n.ParseOrHashWorkerID(c.WorkerID)
-	}
-	c.Dir = strings.Replace(c.Dir, "%W", id.String(), 1)
+	id := n.ChooseWorkerID()
+	addr = strings.Replace(addr, "%W", id.String(), 1)
 
 	// Ensure chroot directory exists and we have access to it
-	dir, err := filepath.Abs(c.Dir)
+	dir, err := filepath.Abs(addr)
 	if err != nil {
 		log.Fatalf("abs (%s)", err)
 	}
@@ -73,9 +57,9 @@ func load(c *Config) {
 	log.Printf("created lock %s", lockname)
 
 	// Initialize networking
-	bindaddr_, err := n.ParseNetAddr(c.Addr)
+	bindaddr_, err := n.ParseNetAddr(addr)
 	if err != nil {
-		log.Fatalf("resolve %s (%s)\n", c.Addr, err)
+		log.Fatalf("resolve %s (%s)\n", addr, err)
 	}
 	bindaddr := bindaddr_.(*net.TCPAddr)
 	if len(bindaddr.IP) == 0 {

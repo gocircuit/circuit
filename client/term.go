@@ -14,30 +14,38 @@ import (
 	"github.com/gocircuit/circuit/kit/kinfolk"
 )
 
+type Anchor interface {
+	Worker() string
+	Walk(walk []string) Anchor
+	View() map[string]Anchor
+	MakeChan(n int) (Chan, error)
+	MakeProc(cmd Cmd) (Proc, error)
+	Get() interface{}
+}
 
-type Terminal struct {
+type terminal struct {
 	y anchor.YTerminal
 	k kinfolk.KinXID
 }
 
-func (t Terminal) Worker() string {
+func (t terminal) Worker() string {
 	return t.k.ID.String()
 }
 
-func (t Terminal) Walk(walk []string) Terminal {
-	return Terminal{ y: t.y.Walk(walk), k: t.k }
+func (t terminal) Walk(walk []string) Anchor {
+	return terminal{ y: t.y.Walk(walk), k: t.k }
 }
 
-func (t Terminal) View() map[string]Terminal {
+func (t terminal) View() map[string]Anchor {
 	v := t.y.View()
-	w := make(map[string]Terminal)
+	w := make(map[string]Anchor)
 	for name, y := range v {
-		w[name] = Terminal{ y: y, k: t.k }
+		w[name] = terminal{ y: y, k: t.k }
 	}
 	return w
 }
 
-func (t Terminal) MakeChan(n int) (Chan, error) {
+func (t terminal) MakeChan(n int) (Chan, error) {
 	yvalve, err := t.y.Make(anchor.Chan, n)
 	if err != nil {
 		return nil, err
@@ -45,7 +53,7 @@ func (t Terminal) MakeChan(n int) (Chan, error) {
 	return yvalveChan{yvalve.(valve.YValve)}, nil
 }
 
-func (t Terminal) MakeProc(cmd Cmd) (Proc, error) {
+func (t terminal) MakeProc(cmd Cmd) (Proc, error) {
 	yproc, err := t.y.Make(anchor.Proc, cmd.retype())
 	if err != nil {
 		return nil, err
@@ -53,7 +61,7 @@ func (t Terminal) MakeProc(cmd Cmd) (Proc, error) {
 	return yprocProc{yproc.(proc.YProc)}, nil
 }
 
-func (t Terminal) Get() interface{} {
+func (t terminal) Get() interface{} {
 	kind, y := t.y.Get()
 	if y == nil {
 		return nil

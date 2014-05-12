@@ -9,91 +9,35 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
 	"os"
-	"path"
-
-	"github.com/gocircuit/circuit/kit/kinfolk"
-	"github.com/gocircuit/circuit/kit/kinfolk/locus"
-
-	//"github.com/gocircuit/circuit/kit/shell"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/codegangsta/cli"
 )
-
-var (
-	flagAddr   = flag.String("addr", "", "Network address to use")
-	flagDir      = flag.String("lock", "", "Directory to lock to prevent duplication")
-	flagJoin     = flag.String("join", "", "Join an existing network of circuit workers")
-)
-
-func usage() {
-	var usage = `
-	circuit COMMAND ARGS
-	…
-`
-	println(usage)
-	os.Exit(1)
-}
 
 func main() {
-	if len(os.Args) < 2 {
-		usage()
+	app := cli.NewApp()
+	app.Name = "circuit"
+	app.Usage = "Circuit server and client tool"
+	app.Commands = []cli.Command{
+		{
+			Name: "server",
+			ShortName: "srv",
+			//Usage: "Run a circuit server",
+			Action: server,
+			Flags: []cli.Flag{
+				cli.StringFlag{"addr, a", "", "address of circuit server"},
+				cli.StringFlag{"mutex, m", "", "directory to use as a circuit instance mutex lock"},
+				cli.StringFlag{"join, j", "", "join a circuit through a current member by URL"},
+			},
+	 	},
+		// {
+		// 	Name: "ls",
+		// 	ShortName: "l",
+		// 	//Usage: "List anchors",
+		// 	Action: ls,
+		// 	Flags: []cli.Flag{
+		// 		cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+		// 	},
+		// },
 	}
-	if os.Args[1] != "server" {
-		mainTool()
-		return
-	}
-
-	flag.Parse()
-	println("CIRCUIT 2014 gocircuit.org")
-
-	// parse arguments
-	if *flagAddr == "" {
-		log.Fatal("network address not given")
-	}
-	var err error
-	var join n.Addr
-	if *flagJoin != "" {
-		if join, err = n.ParseAddr(*flagJoin); err != nil {
-			log.Fatalf("join address does not parse (%s)", err)
-		}
-	}
-	if *flagDir == "" {
-		*flagDir = path.Join(os.TempDir(), fmt.Sprintf("%s-%%W-P%04d", n.Scheme, os.Getpid()))
-	}
-
-	// start circuit runtime
-	c := &Config{Addr: *flagAddr, Dir: *flagDir}
-	load(c)
-
-	// kinfolk join
-	var xjoin circuit.PermX
-	dontPanic(func() { 
-		xjoin = circuit.Dial(join, KinfolkName) 
-	}, "join")
-
-	// locus
-	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin(xjoin)
-	xlocus := locus.NewLocus(kin, kinJoin, kinLeave)
-
-	circuit.Listen(KinfolkName, xkin) // Start kin services
-	circuit.Listen(LocusName, xlocus)
-	//circuit.Listen("cons", shell.NewXShell(*flagDir))
-
-	<-(chan int)(nil)
-}
-
-const KinfolkName = "kin"
-const LocusName = "locus"
-
-func dontPanic(call func(), ifPanic string) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Fatalf("%s (%s)", ifPanic, r)
-		}
-	}()
-	call()
+	app.Run(os.Args)
 }

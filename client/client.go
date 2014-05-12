@@ -9,6 +9,7 @@ package client
 
 import (
 	"fmt"
+	"errors"
 	"log"
 	"math/rand"
 	"net"
@@ -18,7 +19,7 @@ import (
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
 
 	"github.com/gocircuit/circuit/sys/lang"
-	"github.com/gocircuit/circuit/sys/tele"
+	_ "github.com/gocircuit/circuit/sys/tele"
 
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
@@ -31,7 +32,6 @@ import (
 // A one-off package side-effect initialization makes this process capable of talking to circuit workers.
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	tele.Init()
 	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{})
 	fmt.Println(t.Addr().String())
 	circuit.Bind(lang.New(t))
@@ -42,7 +42,7 @@ type Client struct {
 	y locus.YLocus
 }
 
-func NewClient(workerURL string) *Client {
+func New(workerURL string) *Client {
 	c := &Client{}
 	w, err := n.ParseAddr(workerURL)
 	if err != nil {
@@ -52,18 +52,45 @@ func NewClient(workerURL string) *Client {
 	return c
 }
 
-func (c *Client) Peers() []Terminal {
-	peers := c.y.GetPeers()
-	var r = make([]Terminal, len(peers))
-	for i, p := range peers {
-		r[i] = c.newTerminal(p.Term, p.Kin)
+func (c *Client) Walk(walk []string) Anchor {
+	if len(walk) == 0 {
+		return c
+	}
+	p := c.y.GetPeers()[walk[0]]
+	if p == nil {
+		return nil
+	}
+	t := c.newTerminal(p.Term, p.Kin)
+	return t.Walk(walk[1:])
+}
+
+func (c *Client) View() map[string]Anchor {
+	var r = make(map[string]Anchor)
+	for k, p := range c.y.GetPeers() {
+		r[k] = c.newTerminal(p.Term, p.Kin)
 	}
 	return r
 }
 
-func (c *Client) newTerminal(xterm circuit.X, xkin kinfolk.KinXID) Terminal {
-	return Terminal{
+func (c *Client) newTerminal(xterm circuit.X, xkin kinfolk.KinXID) terminal {
+	return terminal{
 		y: anchor.YTerminal{xterm},
 		k: xkin,
 	}
+}
+
+func (c *Client) Worker() string {
+	return ""
+}
+
+func (c *Client) MakeChan(n int) (Chan, error) {
+	return nil, errors.New("cannot create elements outside of workers")
+}
+
+func (c *Client) MakeProc(cmd Cmd) (Proc, error) {
+	return nil, errors.New("cannot create elements outside of workers")
+}
+
+func (c *Client) Get() interface{} {
+	return nil
 }

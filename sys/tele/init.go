@@ -12,6 +12,6 @@ import (
 	"github.com/gocircuit/circuit/use/n"
 )
 
-func Init() {
+func init() {
 	n.Bind(&System{})
 }

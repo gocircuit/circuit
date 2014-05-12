@@ -29,6 +29,10 @@ type YLocus struct {
 	X circuit.PermX
 }
 
-func (y YLocus) GetPeers() []*Peer {
-	return y.X.Call("GetPeers")[0].([]*Peer)
+func (y YLocus) GetPeers() map[string]*Peer {
+	r := make(map[string]*Peer)
+	for _, p := range y.X.Call("GetPeers")[0].([]*Peer) {
+		r[p.Key()] = p
+	}
+	return r
 }
