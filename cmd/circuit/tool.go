@@ -17,22 +17,23 @@ import (
 )
 
 func dial(x *cli.Context) *client.Client {
-	var join string
+	var dialAddr string
 	switch {
-	case x.IsSet("join"):
-		join = x.String("join")
+	case x.IsSet("dial"):
+		dialAddr = x.String("dial")
 	case os.Getenv("CIRCUIT_DIAL") != "":
-		join = os.Getenv("CIRCUIT_DIAL")
+		dialAddr = os.Getenv("CIRCUIT_DIAL")
 	default:
-		panic("no join address available")
+		panic("no dialAddr address available")
 	}
-	return client.Dial(join)
+	println("-- dialing:", dialAddr)
+	return client.Dial(dialAddr)
 }
 
 // circuit ls /Q123/apps/charlie
 // circuit ls /...
 func ls(x *cli.Context) {
-	c := client.Dial(x.String("join"))
+	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
 		println("ls needs a glob argument")

@@ -29,15 +29,27 @@ func main() {
 				cli.StringFlag{"join, j", "", "join a circuit through a current member by url"},
 			},
 	 	},
-		// {
-		// 	Name: "ls",
-		// 	ShortName: "l",
-		// 	//Usage: "List anchors",
-		// 	Action: ls,
-		// 	Flags: []cli.Flag{
-		// 		cli.StringFlag{"dial, d", "", "circuit member to dial into"},
-		// 	},
-		// },
+		{
+			Name: "ls",
+			ShortName: "l",
+			Usage: "Inspect the namespace of circuit elements",
+			Action: ls,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "ls",
+			ShortName: "l",
+			Usage: "Inspect the namespace of circuit elements",
+			Action: ls,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		// mkchan
+		// scrub
+		// mkproc
 	}
 	app.Run(os.Args)
 }
