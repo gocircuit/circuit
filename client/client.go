@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"net"
 	"time"
+	"sync"
 
 	_ "github.com/gocircuit/circuit/kit/debug/ctrlc"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
@@ -28,8 +29,8 @@ import (
 	"github.com/gocircuit/circuit/kit/kinfolk/locus"
 )
 
-// A one-off package side-effect initialization makes this process capable of talking to circuit workers.
-func init() {
+var _once sync.Once
+func _init() {
 	rand.Seed(time.Now().UnixNano())
 	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{})
 	fmt.Println(t.Addr().String())
@@ -42,6 +43,7 @@ type Client struct {
 }
 
 func Dial(workerURL string) *Client {
+	_once.Do(_init)
 	c := &Client{}
 	w, err := n.ParseAddr(workerURL)
 	if err != nil {
