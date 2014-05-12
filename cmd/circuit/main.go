@@ -19,9 +19,9 @@ func main() {
 	app.Usage = "Circuit server and client tool"
 	app.Commands = []cli.Command{
 		{
-			Name: "server",
-			ShortName: "srv",
-			//Usage: "Run a circuit server",
+			Name: "worker",
+			ShortName: "wrk",
+			Usage: "Run a circuit worker on this machine",
 			Action: server,
 			Flags: []cli.Flag{
 				cli.StringFlag{"addr, a", "", "address of circuit server"},

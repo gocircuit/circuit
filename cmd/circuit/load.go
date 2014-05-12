@@ -41,7 +41,7 @@ func load(addr, mutex string) {
 	addr = strings.Replace(addr, "%W", id.String(), 1)
 
 	// Ensure chroot directory exists and we have access to it
-	dir, err := filepath.Abs(addr)
+	dir, err := filepath.Abs(mutex)
 	if err != nil {
 		log.Fatalf("abs (%s)", err)
 	}
