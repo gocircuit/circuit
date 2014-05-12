@@ -26,7 +26,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{"addr, a", "", "address of circuit server"},
 				cli.StringFlag{"mutex, m", "", "directory to use as a circuit instance mutex lock"},
-				cli.StringFlag{"join, j", "", "join a circuit through a current member by URL"},
+				cli.StringFlag{"join, j", "", "join a circuit through a current member by url"},
 			},
 	 	},
 		// {

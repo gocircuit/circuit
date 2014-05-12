@@ -10,7 +10,6 @@ package client
 import (
 	"fmt"
 	"errors"
-	"log"
 	"math/rand"
 	"net"
 	"time"
@@ -42,11 +41,11 @@ type Client struct {
 	y locus.YLocus
 }
 
-func New(workerURL string) *Client {
+func Dial(workerURL string) *Client {
 	c := &Client{}
 	w, err := n.ParseAddr(workerURL)
 	if err != nil {
-		log.Fatalf("circuit address does not parse (%s)", err)
+		panic("circuit address does not parse")
 	}
 	c.y = locus.YLocus{circuit.Dial(w, "locus")}
 	return c

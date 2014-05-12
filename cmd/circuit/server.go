@@ -26,7 +26,7 @@ import (
 
 func server(c *cli.Context) {
 	println("CIRCUIT 2014 gocircuit.org")
-	println("Starting circuit peer ...")
+	println("Starting circuit peer.")
 	// parse arguments
 	if !c.IsSet("addr") {
 		log.Fatal("server network address not given; use -addr")
