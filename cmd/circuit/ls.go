@@ -16,6 +16,11 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+func fatalf(format string, arg ...interface{}) {
+	fmt.Fprintf(os.Stderr, format, arg...)
+	os.Exit(1)
+}
+
 func dial(x *cli.Context) *client.Client {
 	var dialAddr string
 	switch {
@@ -26,7 +31,6 @@ func dial(x *cli.Context) *client.Client {
 	default:
 		panic("no dialAddr address available")
 	}
-	println("-- dialing:", dialAddr)
 	return client.Dial(dialAddr)
 }
 
@@ -40,12 +44,7 @@ func ls(x *cli.Context) {
 		os.Exit(1)
 	}
 	w, ellipses := parseGlob(args[0])
-	a := c.Walk(w)
-	if a == nil {
-		println("anchor not found")
-		os.Exit(1)
-	}
-	list("/", a, ellipses)
+	list("/", c.Walk(w), ellipses)
 }
 
 func list(prefix string, anchor client.Anchor, recurse bool) {

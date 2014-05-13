@@ -20,7 +20,6 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name: "start",
-			ShortName: "s",
 			Usage: "Run a circuit worker on this machine",
 			Action: server,
 			Flags: []cli.Flag{
@@ -31,16 +30,60 @@ func main() {
 	 	},
 		{
 			Name: "ls",
-			ShortName: "l",
-			Usage: "Inspect the namespace of circuit elements",
+			Usage: "List circuit elements",
 			Action: ls,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
 		},
-		// mkchan
-		// scrub
-		// mkproc
+		{
+			Name: "mkchan",
+			Usage: "Create a channel element",
+			Action: mkchan,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		// {
+		// 	Name: "stat",
+		// 	Usage: "Query element state asynchronously",
+		// 	Action: stat,
+		// 	Flags: []cli.Flag{
+		// 		cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+		// 	},
+		// },
+		{
+			Name: "send",
+			Usage: "Send data to the channel from standard input",
+			Action: send,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "recv",
+			Usage: "Receive data from the channel on stadard output",
+			Action: recv,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "close",
+			Usage: "Close the channel after all current transmissions complete",
+			Action: clos,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "scrub",
+			Usage: "Abort and remove the channel",
+			Action: scrb,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
 	}
 	app.Run(os.Args)
 }
