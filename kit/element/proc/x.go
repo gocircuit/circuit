@@ -39,7 +39,7 @@ func (y YProc) Wait() (Stat, error) {
 }
 
 func (y YProc) Signal(sig string) error {
-	r := y.X.Call("Signal")
+	r := y.X.Call("Signal", sig)
 	return errors.Unpack(r[0])
 }
 

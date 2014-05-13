@@ -66,7 +66,7 @@ type YTerminal struct {
 
 func (y YTerminal) Walk(walk []string) YTerminal {
 	return YTerminal{
-		y.X.Call("Walk")[0].(circuit.X),
+		y.X.Call("Walk", walk)[0].(circuit.X),
 	}
 }
 
@@ -79,7 +79,7 @@ func (y YTerminal) View() map[string]YTerminal {
 }
 
 func (y YTerminal) Make(kind string, arg interface{}) (yelm interface{}, err error) {
-	r := y.X.Call("Make")
+	r := y.X.Call("Make", kind, arg)
 	if err = xerrors.Unpack(r[1]); err != nil {
 		return nil, err
 	}
