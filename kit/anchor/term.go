@@ -27,6 +27,7 @@ const (
 	//Mutex = "mutex"
 )
 
+// Terminal presents a facade to *Anchor with added element manipulation methods
 type Terminal Anchor
 
 func (t *Terminal) carrier() *Anchor {

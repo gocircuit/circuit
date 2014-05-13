@@ -63,7 +63,7 @@ func (a *anchor) Busy() bool {
 }
 
 func (a *anchor) busy() bool {
-	return a.nhandle > 0 || a.value != nil
+	return a.nhandle > 0 || a.value != nil || len(a.children) > 0
 }
 
 func (a *anchor) scrub(name string) {

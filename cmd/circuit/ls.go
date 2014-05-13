@@ -29,7 +29,7 @@ func dial(x *cli.Context) *client.Client {
 	case os.Getenv("CIRCUIT_DIAL") != "":
 		dialAddr = os.Getenv("CIRCUIT_DIAL")
 	default:
-		panic("no dialAddr address available")
+		panic("no dial address available")
 	}
 	return client.Dial(dialAddr)
 }
@@ -48,6 +48,7 @@ func ls(x *cli.Context) {
 }
 
 func list(prefix string, anchor client.Anchor, recurse bool) {
+	//println(fmt.Sprintf("prefix=%v a=%v/%T r=%v", prefix, anchor, anchor, recurse))
 	for n, a := range anchor.View() {
 		v := a.Get()
 		var k string
@@ -57,7 +58,7 @@ func list(prefix string, anchor client.Anchor, recurse bool) {
 		case client.Proc:
 			k = "proc"
 		default:
-			k = "····"
+			k = "nil "
 		}
 		fmt.Printf("%4s %s%s\n", k, prefix, n)
 		if recurse {

@@ -8,7 +8,7 @@
 package main
 
 import (
-	"log"
+	//"log"
 	"strconv"
 
 	"github.com/codegangsta/cli"
@@ -22,7 +22,6 @@ func mkchan(x *cli.Context) {
 		fatalf("mkchan needs an anchor and a capacity arguments")
 	}
 	w, _ := parseGlob(args[0])
-	log.Printf("walk %v", w)
 	a := c.Walk(w)
 	n, err := strconv.Atoi(args[1])
 	if err != nil || n < 0 {

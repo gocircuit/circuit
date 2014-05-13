@@ -8,7 +8,6 @@
 package client
 
 import (
-	"fmt"
 	"errors"
 	"math/rand"
 	"net"
@@ -33,7 +32,7 @@ var _once sync.Once
 func _init() {
 	rand.Seed(time.Now().UnixNano())
 	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{})
-	fmt.Println(t.Addr().String())
+	//fmt.Println(t.Addr().String())
 	circuit.Bind(lang.New(t))
 }
 
