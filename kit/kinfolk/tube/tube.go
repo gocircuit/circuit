@@ -18,27 +18,6 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
-/*
-	Operating diagram:
-
-	                              +––––+
-	                              |USER|
-	                              +––––+
-	                                 |
-	           (BulkRead/Write/BulkWrite/Lookup/Scrub/Forget)
-	                                 |
-	 ·+––––+                 +–––––+–V––+                 +–––––+·
-	··|Tube|––(Bulk/Write)––>|XTube|Tube|––(Bulk/Write)––>|XTube|··
-	 ·+––––+                 +–––––+––o–+                 +–––––+·
-	                                  |
-	                               +——o——+
-	                               |TABLE| Tube stops propagation of ops, already reflected in the local table.
-	                               +—————+
-
-	 UPSTREAM –––––>–––––>–––––>–––––>–––––>–––––>–––––> DOWNSTREAM
-
-*/
-
 // Tube is a folk data structure that maintains a key-value set sorted by key
 type Tube struct {
 	permXID kinfolk.FolkXID // XID to this tube
@@ -69,7 +48,7 @@ func New(kin *kinfolk.Kin, topic string) *Tube {
 		X:  circuit.PermRef(XTube{t}),
 		ID: lang.ComputeReceiverID(t),
 	}
-	t.folk = kin.Attach(topic, kinfolk.FolkXID(t.permXID))
+	t.folk = kin.Attach(topic, t.permXID)
 	go t.loop()
 	return t
 }
@@ -261,6 +240,7 @@ func (t *Tube) BulkWrite(bulk []*Record) {
 }
 
 func (x XTube) BulkWrite(bulk []*Record) {
+	println("xtube.BulkWrite")
 	if len(bulk) == 0 {
 		return
 	}
@@ -354,7 +334,7 @@ func (y YTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
 func (y YTube) Write(key string, rev Rev, value interface{}) bool {
 	defer func() {
 		if r := recover(); r != nil {
-			// log.Printf("ytube write panic\n%#v\n", r)
+			//log.Printf("ytube write panic\n%#v\n", r)
 		}
 	}()
 	return y.xid.X.Call("Write", key, rev, value)[0].(bool)
@@ -363,7 +343,7 @@ func (y YTube) Write(key string, rev Rev, value interface{}) bool {
 func (y YTube) BulkWrite(bulk []*Record) {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("ytube bulk write panic\n%#v\n", r)
+			//log.Printf("ytube bulk write panic\n%#v\n", r)
 		}
 	}()
 	y.xid.X.Call("BulkWrite", bulk)

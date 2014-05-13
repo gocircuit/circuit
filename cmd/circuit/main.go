@@ -19,8 +19,8 @@ func main() {
 	app.Usage = "Circuit server and client tool"
 	app.Commands = []cli.Command{
 		{
-			Name: "worker",
-			ShortName: "wrk",
+			Name: "start",
+			ShortName: "s",
 			Usage: "Run a circuit worker on this machine",
 			Action: server,
 			Flags: []cli.Flag{
@@ -29,15 +29,6 @@ func main() {
 				cli.StringFlag{"join, j", "", "join a circuit through a current member by url"},
 			},
 	 	},
-		{
-			Name: "ls",
-			ShortName: "l",
-			Usage: "Inspect the namespace of circuit elements",
-			Action: ls,
-			Flags: []cli.Flag{
-				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
-			},
-		},
 		{
 			Name: "ls",
 			ShortName: "l",

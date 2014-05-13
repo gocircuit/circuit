@@ -23,7 +23,6 @@ func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn n.Conn) {
 
 // Call invokes the method of the underlying remote receiver
 func (u *_ptr) Call(proc string, in ...interface{}) []interface{} {
-
 	//log.Printf("calling %s.%s on %s", u.imph.Type.Name(), proc, u.imph.Exporter.String())
 
 	conn, err := u.r.t.Dial(u.imph.Exporter)
@@ -99,7 +98,6 @@ func (r *Runtime) serveCall(req *callMsg, conn n.Conn) {
 		conn.Write(&returnMsg{Err: NewError("no func")})
 		return
 	}
-
 	in, err := r.importValues(req.In, fn.InTypes, conn.Addr(), true, nil)
 	if err != nil {
 		conn.Write(&returnMsg{Err: err})

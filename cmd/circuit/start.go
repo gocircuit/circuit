@@ -58,9 +58,8 @@ func server(c *cli.Context) {
 	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin(xjoin)
 	xlocus := locus.NewLocus(kin, kinJoin, kinLeave)
 
-	circuit.Listen(KinfolkName, xkin) // Start kin services
+	circuit.Listen(KinfolkName, xkin)
 	circuit.Listen(LocusName, xlocus)
-	//circuit.Listen("cons", shell.NewXShell(*flagDir))
 
 	<-(chan int)(nil)
 }

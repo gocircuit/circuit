@@ -8,7 +8,8 @@
 package lang
 
 import (
-	"fmt"
+	//"fmt"
+	//"runtime/debug"
 
 	"github.com/gocircuit/circuit/sys/lang/types"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -86,20 +87,21 @@ func writeReturn(conn n.Conn, msg interface{}) ([]interface{}, error) {
 }
 
 func (r *Runtime) importEitherPtr(retrn []interface{}, exporter n.Addr) (circuit.PermX, error) {
-	println(fmt.Sprintf("retrn=%v exporter=%v", retrn, exporter))
+	//debug.PrintStack()
+	//println(fmt.Sprintf("retrn=%v exporter=%v", retrn, exporter))
 	out, err := r.importValues(retrn, nil, exporter, false, nil)
 	if err != nil {
 		return nil, err
 	}
 	if len(out) != 1 {
-		return nil, NewError("foreign reply count")
+		return nil, NewError("unexpected return value count")
 	}
 	if out[0] == nil {
 		return nil, nil
 	}
 	ptr, ok := out[0].(circuit.PermX)
 	if !ok {
-		return nil, NewError("foreign reply value")
+		return nil, NewError("value is not a permanent cross-interface")
 	}
 	return ptr, nil
 }
