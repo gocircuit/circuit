@@ -78,7 +78,7 @@ func main() {
 		},
 		{
 			Name: "scrub",
-			Usage: "Abort and remove the channel",
+			Usage: "Abort and remove an element",
 			Action: scrb,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},

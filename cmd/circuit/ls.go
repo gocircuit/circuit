@@ -17,7 +17,7 @@ import (
 )
 
 func fatalf(format string, arg ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, arg...)
+	println(fmt.Sprintf(format, arg...))
 	os.Exit(1)
 }
 
@@ -29,7 +29,7 @@ func dial(x *cli.Context) *client.Client {
 	case os.Getenv("CIRCUIT_DIAL") != "":
 		dialAddr = os.Getenv("CIRCUIT_DIAL")
 	default:
-		panic("no dial address available")
+		fatalf("no dial address available; use -d or set CIRCUIT_DIAL")
 	}
 	return client.Dial(dialAddr)
 }

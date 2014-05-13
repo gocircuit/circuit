@@ -21,7 +21,7 @@ func peek(x *cli.Context) {
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
-		fatalf("stat needs one anchor argument")
+		fatalf("peek needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
 	switch t := c.Walk(w).Get().(type) {
@@ -34,6 +34,24 @@ func peek(x *cli.Context) {
 	case nil:
 		buf, _ := json.MarshalIndent(nil, "", "\t")
 		fmt.Println(string(buf))
+	default:
+		fatalf("unknown element")
+	}
+}
+
+func scrb(x *cli.Context) {
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("scrub needs one anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	switch t := c.Walk(w).Get().(type) {
+	case client.Chan:
+		t.Scrub()
+	case client.Proc:
+		t.Scrub()
+	case nil:
 	default:
 		fatalf("unknown element")
 	}

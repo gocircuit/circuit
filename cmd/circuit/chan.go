@@ -9,7 +9,11 @@ package main
 
 import (
 	//"log"
+	"io"
+	"os"
 	"strconv"
+
+	"github.com/gocircuit/circuit/client"
 
 	"github.com/codegangsta/cli"
 )
@@ -32,7 +36,58 @@ func mkchan(x *cli.Context) {
 	}
 }
 
-func send(x *cli.Context) {}
-func recv(x *cli.Context) {}
-func clos(x *cli.Context) {}
-func scrb(x *cli.Context) {}
+func send(x *cli.Context) {
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("send needs one anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	u, ok := c.Walk(w).Get().(client.Chan)
+	if !ok {
+		fatalf("not a channel")
+	}
+	msgw, err := u.Send()
+	if err != nil {
+		fatalf("send error: %v", err)
+	}
+	if _, err = io.Copy(msgw, os.Stdin); err != nil {
+		fatalf("transmission error: %v", err)
+	}
+}
+
+func recv(x *cli.Context) {
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("recv needs one anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	u, ok := c.Walk(w).Get().(client.Chan)
+	if !ok {
+		fatalf("not a channel")
+	}
+	msgr, err := u.Recv()
+	if err != nil {
+		fatalf("recv error: %v", err)
+	}
+	if _, err = io.Copy(os.Stdout, msgr); err != nil {
+		fatalf("transmission error: %v", err)
+	}
+}
+
+func clos(x *cli.Context) {
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("close needs one anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	u, ok := c.Walk(w).Get().(client.Chan)
+	if !ok {
+		fatalf("not a channel")
+	}
+	if err := u.Close(); err != nil {
+		fatalf("close error: %v", err)
+	}
+}
