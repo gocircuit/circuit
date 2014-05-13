@@ -44,14 +44,14 @@ func main() {
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
 		},
-		// {
-		// 	Name: "stat",
-		// 	Usage: "Query element state asynchronously",
-		// 	Action: stat,
-		// 	Flags: []cli.Flag{
-		// 		cli.StringFlag{"dial, d", "", "circuit member to dial into"},
-		// 	},
-		// },
+		{
+			Name: "peek",
+			Usage: "Query element state asynchronously",
+			Action: peek,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
 		{
 			Name: "send",
 			Usage: "Send data to the channel from standard input",
