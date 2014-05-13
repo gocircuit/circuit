@@ -103,5 +103,6 @@ func (r *Runtime) importEitherPtr(retrn []interface{}, exporter n.Addr) (circuit
 	if !ok {
 		return nil, NewError("value is not a permanent cross-interface")
 	}
+	// XXX: Shouldn't this also have a case for non-permanent crossreferences?
 	return ptr, nil
 }
