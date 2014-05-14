@@ -36,7 +36,7 @@ func dial(x *cli.Context) *client.Client {
 	default:
 		buf, err := ioutil.ReadFile(".circuit")
 		if err != nil {
-			fatalf("no dial address available; use flag -d or set CIRCUIT_DIAL")
+			fatalf("no dial address available; use flag -d or set CIRCUIT to a file name")
 		}
 		dialAddr = strings.TrimSpace(string(buf))
 	}

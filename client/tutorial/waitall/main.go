@@ -8,10 +8,42 @@
 package main
 
 import (
-	"flag"
+	"os"
 	"strconv"
+
+	"github.com/gocircuit/circuit/client"
 )
 
-func main() {
+const n = 5
 
+func pick(c *client.Client) client.Anchor {
+	for _, r := range c.View() {
+		return r
+	}
+	panic(0)
+}
+
+func main() {
+	c := client.Dial(os.Args[1]) // argument is the url of a circuit server
+	ch := make(chan int)
+	for i := 0; i < n; i++ {
+		cmd := client.Cmd{
+			Path: "/bin/sleep",
+			Args: []string{strconv.Itoa(3+i*3)},
+		}
+		i_ := i
+		go func() {
+			t := pick(c).Walk([]string{"wait_all", strconv.Itoa(i_)})
+			p, _ := t.MakeProc(cmd)
+			p.Stdin().Close()
+			p.Wait()
+			ch <- 1
+			t.Scrub()
+			println("process", i_+1, "done")
+		}()
+	}
+	for i := 0; i < n; i++ {
+		<-ch
+	}
+	println("all done.")
 }

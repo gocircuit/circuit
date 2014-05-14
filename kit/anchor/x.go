@@ -43,7 +43,7 @@ func (x XTerminal) View() map[string]circuit.X {
 func (x XTerminal) Make(kind string, arg interface{}) (xelm circuit.X, err error) {
 	elm, err := x.t.Make(kind, arg)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Pack(err)
 	}
 	return elm.X(), nil
 }

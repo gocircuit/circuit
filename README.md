@@ -10,6 +10,9 @@ by means of a command-line tool and a client library.
 The circuit comes as one binary, which serves the purpose of a server
 and a command-line client.
 
+The circuit programming metaphor is somewhat similar to that of Apache Zookeeper,
+but for a few key differences. 
+
 Build
 -----
 
