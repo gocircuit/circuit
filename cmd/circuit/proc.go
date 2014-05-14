@@ -9,7 +9,7 @@ package main
 
 import (
 	"encoding/json"
-	"io"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -29,11 +29,11 @@ func mkproc(x *cli.Context) {
 	}
 	w, _ := parseGlob(args[0])
 	buf, _ := ioutil.ReadAll(os.Stdin)
-	var cmd Cmd
+	var cmd client.Cmd
 	if err := json.Unmarshal(buf, &cmd); err != nil {
 		fatalf("command json not parsing: %v", err)
 	}
-	if _, err = c.Walk(w).MakeProc(cmd); err != nil {
+	if _, err := c.Walk(w).MakeProc(cmd); err != nil {
 		fatalf("mkproc error: %s", err)
 	}
 }
@@ -55,5 +55,20 @@ func sgnl(x *cli.Context) {
 }
 
 func wait(x *cli.Context) {
-	??
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("wait needs one anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	u, ok := c.Walk(w).Get().(client.Proc)
+	if !ok {
+		fatalf("not a process")
+	}
+	stat, err := u.Wait()
+	if err != nil {
+		fatalf("wait error: %v", err)
+	}
+	buf, _ := json.MarshalIndent(stat, "", "\t")
+	fmt.Println(string(buf))
 }
