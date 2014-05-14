@@ -240,7 +240,6 @@ func (t *Tube) BulkWrite(bulk []*Record) {
 }
 
 func (x XTube) BulkWrite(bulk []*Record) {
-	println("xtube.BulkWrite")
 	if len(bulk) == 0 {
 		return
 	}

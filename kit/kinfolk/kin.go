@@ -63,7 +63,7 @@ func NewKin(join circuit.PermX) (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')
 	}
-	log.Println("Initial peers:", w.String())
+	log.Println("Initial peering servers:", w.String())
 	return k, XKin{k}, k.ach, k.dch
 }
 

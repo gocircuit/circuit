@@ -40,7 +40,7 @@ func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus 
 	go loopJoin(kinJoin)
 	go locus.loopLeave(kinLeave)
 	go locus.loopExpire()
-	log.Println(locus.Peer.Key())
+	//log.Println(locus.Peer.Key())
 	return XLocus{locus}
 }
 
@@ -77,7 +77,7 @@ func loopJoin(kinjoin <-chan kinfolk.KinXID) {
 		if !ok {
 			panic("u")
 		}
-		log.Println("kin joined", kinXID.String())
+		log.Println("Peering server", kinXID.X.Addr(), "joined the circuit")
 	}
 }
 

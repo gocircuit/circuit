@@ -38,7 +38,7 @@ func load(addr, mutex string) {
 
 	// Generate worker ID
 	id := n.ChooseWorkerID()
-	addr = strings.Replace(addr, "%W", id.String(), 1)
+	mutex = strings.Replace(mutex, "%W", id.String(), 1)
 
 	// Ensure chroot directory exists and we have access to it
 	dir, err := filepath.Abs(mutex)
@@ -54,7 +54,7 @@ func load(addr, mutex string) {
 	if _, err := lockfile.Create(lockname); err != nil {
 		log.Fatalf("obtain lock (%s)\n", err)
 	}
-	log.Printf("created lock %s", lockname)
+	log.Printf("Created and locked %s", lockname)
 
 	// Initialize networking
 	bindaddr_, err := n.ParseNetAddr(addr)
