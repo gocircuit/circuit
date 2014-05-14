@@ -17,6 +17,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/gocircuit/circuit/kit/interruptible"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
@@ -50,18 +51,11 @@ type proc struct {
 }
 
 func MakeProc(cmd Cmd) Proc {
-	var err error
 	p := &proc{}
 	// std*
-	if p.stdin, err = p.cmd.cmd.StdinPipe(); err != nil {
-		panic(0)
-	}
-	if p.stdout, err = p.cmd.cmd.StdoutPipe(); err != nil {
-		panic(0)
-	}
-	if p.stderr, err = p.cmd.cmd.StderrPipe(); err != nil {
-		panic(0)
-	}
+	p.cmd.cmd.Stdin, p.stdin = interruptible.BufferPipe(32e3)
+	p.stdout, p.cmd.cmd.Stdout = interruptible.BufferPipe(32e3)
+	p.stderr, p.cmd.cmd.Stderr = interruptible.BufferPipe(32e3)
 	// exit
 	ch, abr := make(chan error, 1), make(chan struct{})
 	p.cmd.wait, p.wait = ch, ch
@@ -78,6 +72,7 @@ func MakeProc(cmd Cmd) Proc {
 		return p
 	}
 	go func() {
+		// XX // don't call wait before std streams drained or process scrubbed.
 		p.cmd.wait <- p.cmd.cmd.Wait()
 		close(p.cmd.wait)
 	}()
