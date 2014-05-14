@@ -14,7 +14,6 @@ import (
 	"time"
 	"sync"
 
-	_ "github.com/gocircuit/circuit/kit/debug/ctrlc"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
 
 	"github.com/gocircuit/circuit/sys/lang"

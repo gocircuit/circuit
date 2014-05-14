@@ -15,7 +15,6 @@ import (
 	"runtime"
 	"sync"
 
-	_ "github.com/gocircuit/circuit/kit/debug/ctrlc"
 	"github.com/gocircuit/circuit/use/errors"
 )
 
