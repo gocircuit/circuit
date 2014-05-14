@@ -9,6 +9,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -26,11 +27,24 @@ func dial(x *cli.Context) *client.Client {
 	switch {
 	case x.IsSet("dial"):
 		dialAddr = x.String("dial")
-	case os.Getenv("CIRCUIT_DIAL") != "":
-		dialAddr = os.Getenv("CIRCUIT_DIAL")
+	case os.Getenv("CIRCUIT") != "":
+		buf, err := ioutil.ReadFile(os.Getenv("CIRCUIT"))
+		if err != nil {
+			fatalf("circuit environment file %s is not readable: %v", os.Getenv("CIRCUIT"), err)
+		}
+		dialAddr = strings.TrimSpace(string(buf))
 	default:
-		fatalf("no dial address available; use -d or set CIRCUIT_DIAL")
+		buf, err := ioutil.ReadFile(".circuit")
+		if err != nil {
+			fatalf("no dial address available; use flag -d or set CIRCUIT_DIAL")
+		}
+		dialAddr = strings.TrimSpace(string(buf))
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("addressed server is gone or a newer one is in place")
+		}
+	}()
 	return client.Dial(dialAddr)
 }
 
