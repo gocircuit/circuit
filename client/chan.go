@@ -15,7 +15,6 @@ import (
 
 type Chan interface {
 	Send() (io.WriteCloser, error)
-	IsDone() bool
 	Scrub()
 	Close() error
 	Recv() (io.ReadCloser, error)

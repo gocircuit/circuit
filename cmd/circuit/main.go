@@ -18,6 +18,7 @@ func main() {
 	app.Name = "circuit"
 	app.Usage = "Circuit server and client tool"
 	app.Commands = []cli.Command{
+		// circuit
 		{
 			Name: "start",
 			Usage: "Run a circuit worker on this machine",
@@ -36,18 +37,11 @@ func main() {
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
 		},
+		// channel-specific
 		{
 			Name: "mkchan",
 			Usage: "Create a channel element",
 			Action: mkchan,
-			Flags: []cli.Flag{
-				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
-			},
-		},
-		{
-			Name: "peek",
-			Usage: "Query element state asynchronously",
-			Action: peek,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
@@ -76,6 +70,7 @@ func main() {
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
 		},
+		// common
 		{
 			Name: "scrub",
 			Usage: "Abort and remove an element",
@@ -84,6 +79,40 @@ func main() {
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
 		},
+		{
+			Name: "peek",
+			Usage: "Query element state asynchronously",
+			Action: peek,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		// proc-specific
+		{
+			Name: "mkproc",
+			Usage: "Create a process element",
+			Action: mkproc,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "signal",
+			Usage: "Send a signal to a running process",
+			Action: sgnl,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "wait",
+			Usage: "Wait until a process exits",
+			Action: wait,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		// stdin, stdout, stderr ???
 	}
 	app.Run(os.Args)
 }

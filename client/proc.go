@@ -52,7 +52,6 @@ type Proc interface {
 	Signal(sig string) error
 	GetEnv() []string
 	GetCmd() Cmd
-	IsDone() bool
 	Peek() ProcStat
 	Scrub()
 }
