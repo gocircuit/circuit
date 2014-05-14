@@ -8,6 +8,9 @@
 package proc
 
 import (
+	"io"
+	
+	xio "github.com/gocircuit/circuit/kit/x/io"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/errors"
 )
@@ -27,6 +30,18 @@ func (x XProc) Wait() (Stat, error) {
 
 func (x XProc) Signal(sig string) error {
 	return errors.Pack(x.Proc.Signal(sig))
+}
+
+func (x XProc) Stdin() circuit.X {
+	return xio.NewXWriteCloser(x.Proc.Stdin())
+}
+
+func (x XProc) Stdout() circuit.X {
+	return xio.NewXReadCloser(x.Proc.Stdout())
+}
+
+func (x XProc) Stderr() circuit.X {
+	return xio.NewXReadCloser(x.Proc.Stderr())
 }
 
 type YProc struct {
@@ -61,4 +76,16 @@ func (y YProc) IsDone() bool {
 
 func (y YProc) Peek() Stat {
 	return y.X.Call("Peek")[0].(Stat)
+}
+
+func (y YProc) Stdin() io.WriteCloser {
+	return xio.NewYWriteCloser(y.X.Call("Stdin")[0])
+}
+
+func (y YProc) Stdout() io.ReadCloser {
+	return xio.NewYReadCloser(y.X.Call("Stdout")[0])
+}
+
+func (y YProc) Stderr() io.ReadCloser {
+	return xio.NewYReadCloser(y.X.Call("Stderr")[0])
 }

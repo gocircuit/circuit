@@ -28,13 +28,16 @@ type Proc interface {
 	GetCmd() Cmd
 	IsDone() bool
 	Peek() Stat
+	Stdin() io.WriteCloser
+	Stdout() io.ReadCloser
+	Stderr() io.ReadCloser
 	X() circuit.X
 }
 
 type proc struct {
-	Stdin  io.WriteCloser
-	Stdout io.ReadCloser
-	Stderr io.ReadCloser
+	stdin  io.WriteCloser
+	stdout io.ReadCloser
+	stderr io.ReadCloser
 	wait <-chan error
 	abr <-chan struct{}
 	cmd struct {
@@ -50,13 +53,13 @@ func MakeProc(cmd Cmd) Proc {
 	var err error
 	p := &proc{}
 	// std*
-	if p.Stdin, err = p.cmd.cmd.StdinPipe(); err != nil {
+	if p.stdin, err = p.cmd.cmd.StdinPipe(); err != nil {
 		panic(0)
 	}
-	if p.Stdout, err = p.cmd.cmd.StdoutPipe(); err != nil {
+	if p.stdout, err = p.cmd.cmd.StdoutPipe(); err != nil {
 		panic(0)
 	}
-	if p.Stderr, err = p.cmd.cmd.StderrPipe(); err != nil {
+	if p.stderr, err = p.cmd.cmd.StderrPipe(); err != nil {
 		panic(0)
 	}
 	// exit
@@ -79,6 +82,18 @@ func MakeProc(cmd Cmd) Proc {
 		close(p.cmd.wait)
 	}()
 	return p
+}
+
+func (p *proc) Stdin() io.WriteCloser {
+	return p.stdin
+}
+
+func (p *proc) Stdout() io.ReadCloser {
+	return p.stdout
+}
+
+func (p *proc) Stderr() io.ReadCloser {
+	return p.stderr
 }
 
 func (p *proc) X() circuit.X {

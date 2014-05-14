@@ -8,6 +8,8 @@
 package client
 
 import (
+	"io"
+	
 	"github.com/gocircuit/circuit/kit/element/proc"
 )
 
@@ -54,6 +56,9 @@ type Proc interface {
 	GetCmd() Cmd
 	Peek() ProcStat
 	Scrub()
+	Stdin() io.WriteCloser
+	Stdout() io.ReadCloser
+	Stderr() io.ReadCloser
 }
 
 type yprocProc struct {
