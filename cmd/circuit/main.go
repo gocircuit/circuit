@@ -112,7 +112,31 @@ func main() {
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 			},
 		},
-		// stdin, stdout, stderr ???
+		// stdin, stdout, stderr
+		{
+			Name: "stdin",
+			Usage: "Forward this tool's standard input to that of the process",
+			Action: stdin,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "stdout",
+			Usage: "Forward the standard output of the process to the standard output of this tool",
+			Action: stdout,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
+		{
+			Name: "stderr",
+			Usage: "Forward the standard error of the process to the standard output of this tool",
+			Action: stderr,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+			},
+		},
 	}
 	app.Run(os.Args)
 }
