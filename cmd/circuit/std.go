@@ -26,8 +26,12 @@ func stdin(x *cli.Context) {
 	if !ok {
 		fatalf("not a process")
 	}
-	if _, err := io.Copy(u.Stdin(), os.Stdin); err != nil {
+	q := u.Stdin()
+	if _, err := io.Copy(q, os.Stdin); err != nil {
 		fatalf("transmission error: %v", err)
+	}
+	if err := q.Close(); err != nil {
+		fatalf("error closing stdin: %v", err)
 	}
 }
 

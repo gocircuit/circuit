@@ -72,9 +72,10 @@ func MakeProc(cmd Cmd) Proc {
 		return p
 	}
 	go func() {
-		// XX // don't call wait before std streams drained or process scrubbed.
 		p.cmd.wait <- p.cmd.cmd.Wait()
 		close(p.cmd.wait)
+		p.cmd.cmd.Stdout.(io.Closer).Close()
+		p.cmd.cmd.Stderr.(io.Closer).Close()
 	}()
 	return p
 }
