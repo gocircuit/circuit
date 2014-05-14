@@ -8,7 +8,7 @@
 package tele
 
 import (
-	"log"
+	// "log"
 	"sync"
 	"time"
 
@@ -75,7 +75,7 @@ func (d *Dialer) expire(workerID n.WorkerID, s *blend.DialSession, ready *bool) 
 	if numconn == 0 && time.Now().Sub(lastuse) > IdleDuration {
 		if *ready {
 			delete(d.open, workerID)
-			log.Printf("idle session %s expiring", s)
+			// log.Printf("idle session %s expiring", s)
 			s.Close()
 			return true
 		}

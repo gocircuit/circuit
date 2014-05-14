@@ -95,7 +95,7 @@ func (r *Runtime) exportPtr(v interface{}, importer n.Addr) interface{} {
 
 			conn, err := r.t.Dial(importer)
 			if err != nil {
-				log.Println("problem dialing lifeline to", importer.String(), err.Error())
+				// log.Println("problem dialing lifeline to", importer.String(), err.Error())
 				return
 			}
 			defer conn.Close()

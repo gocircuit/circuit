@@ -124,9 +124,9 @@ func (c *Conn) Close() (err error) {
 	defer c.Unlock()
 	c.bfr.Close()
 	go func() {
-		c.frame.Println("linger starting")
+		//c.frame.Println("linger starting")
 		<-time.NewTimer(LingerDuration).C
-		c.frame.Println("linger expired, carrier closed")
+		//c.frame.Println("linger expired, carrier closed")
 		c.sub.Kill()
 		close(c.ach)
 	}()
