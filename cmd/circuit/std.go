@@ -42,9 +42,10 @@ func stdout(x *cli.Context) {
 	if !ok {
 		fatalf("not a process")
 	}
-	if _, err := io.Copy(os.Stdout, u.Stdout()); err != nil {
-		fatalf("transmission error: %v", err)
-	}
+	io.Copy(os.Stdout, u.Stdout())
+	// if _, err := io.Copy(os.Stdout, u.Stdout()); err != nil {
+	// 	fatalf("transmission error: %v", err)
+	// }
 }
 
 func stderr(x *cli.Context) {
@@ -58,7 +59,8 @@ func stderr(x *cli.Context) {
 	if !ok {
 		fatalf("not a process")
 	}
-	if _, err := io.Copy(os.Stdout, u.Stderr()); err != nil {
-		fatalf("transmission error: %v", err)
-	}
+	io.Copy(os.Stdout, u.Stderr())
+	// if _, err := io.Copy(os.Stdout, u.Stderr()); err != nil {
+	// 	fatalf("transmission error: %v", err)
+	// }
 }

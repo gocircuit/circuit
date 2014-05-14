@@ -26,19 +26,19 @@ type XValve struct {
 func (x XValve) Send() (circuit.X, error) {
 	w, err := x.Valve.Send()
 	if err != nil {
-		return nil, err // errors created with errors.New are registered for cross-passing
+		return nil, errors.Pack(err)
 	}
 	return xio.NewXWriteCloser(w), nil
 }
 
 func (x XValve) Close() error {
-	return x.Valve.Close()
+	return errors.Pack(x.Valve.Close())
 }
 
 func (x XValve) Recv() (circuit.X, error) {
 	r, err := x.Valve.Recv()
 	if err != nil {
-		return nil, err
+		return nil, errors.Pack(err)
 	}
 	return xio.NewXReadCloser(r), nil
 }

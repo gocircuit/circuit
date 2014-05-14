@@ -9,14 +9,12 @@ package errors
 
 import (
 	"encoding/gob"
-	"errors"
 	"fmt"
 	"runtime"
 )
 
 func init() {
 	gob.Register(&Error{})
-	gob.Register(errors.New(""))
 }
 
 // NewError creates a simple text-based error that is registered with package

@@ -71,9 +71,10 @@ func recv(x *cli.Context) {
 	if err != nil {
 		fatalf("recv error: %v", err)
 	}
-	if _, err = io.Copy(os.Stdout, msgr); err != nil {
-		fatalf("transmission error: %v", err)
-	}
+	io.Copy(os.Stdout, msgr)
+	// if _, err = io.Copy(os.Stdout, msgr); err != nil {
+	// 	fatalf("transmission error: %v", err)
+	// }
 }
 
 func clos(x *cli.Context) {
