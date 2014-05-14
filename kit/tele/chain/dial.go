@@ -61,7 +61,7 @@ func (dl *dialLink) Link(reason error) (net.Conn, *bufio.Reader, SeqNo, error) {
 			if err == ErrRIP {
 				// Permanent error on the carrier connections dial attempts means
 				// do not retry.
-				dl.frame.Printf("permanently unreachable")
+				// dl.frame.Printf("permanently unreachable")
 				return nil, nil, 0, err
 			}
 			// Non-permanent errors result in redial.

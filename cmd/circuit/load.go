@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/gocircuit/circuit/kit/debug/ctrlc"
+	"github.com/gocircuit/circuit/kit/debug"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
 	"github.com/gocircuit/circuit/kit/lockfile"
 
@@ -32,6 +32,7 @@ import (
 )
 
 func load(addr, mutex string) {
+	debug.InstallCtrlCPanic()
 
 	// Randomize execution
 	rand.Seed(time.Now().UnixNano())
@@ -49,7 +50,7 @@ func load(addr, mutex string) {
 		log.Fatalf("mkdir %s (%s)", dir, err)
 	}
 
-	// Create a lock file in the chroot directory so its not managed by two REX instances at the same time
+	// Create a lock file in the chroot directory so its not managed by two circuit instances at the same time
 	lockname := path.Join(dir, ".lock")
 	if _, err := lockfile.Create(lockname); err != nil {
 		log.Fatalf("obtain lock (%s)\n", err)

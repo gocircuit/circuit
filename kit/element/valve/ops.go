@@ -22,7 +22,7 @@ func (v *valve) Send() (io.WriteCloser, error) {
 	if v.send.tun == nil {
 		return nil, errors.New("channel closed")
 	}
-	r, w := interruptible.Pipe()
+	r, w := interruptible.BufferPipe(32e3)
 	select {
 	case v.send.tun <- r:
 		v.incSend()

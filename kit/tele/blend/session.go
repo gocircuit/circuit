@@ -147,7 +147,7 @@ func (ssn *Session) readloop() {
 	defer ssn.teardown()
 	for {
 		if err := ssn.read(); err != nil {
-			ssn.frame.Printf("session read loop (%s)", err)
+			// ssn.frame.Printf("session read loop (%s)", err)
 			return
 		}
 	}
