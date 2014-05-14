@@ -1,22 +1,14 @@
 The Circuit
 ===========
 
-For a visual introduction to The Circuit, dive into the 
-[GopherCon 2014 Slides](https://docs.google.com/presentation/d/1ooedstHs8_ow-eHY7z8MCV_1m65gSaiB6Q1ruz3j7Hk/edit#slide=id.g26f183bd0_00).
+For a conceptual introduction to The Circuit, check out the
+[GopherCon 2014 Video](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures).
 
 The circuit is a tool for executing and synchronizing UNIX processes across entire clusters
-by means of a file-system interface. 
+by means of a command-line tool and a client library.
 
-The circuit represents any cluster of UNIX machines in Hoare's _Communicating
-Sequential Processes_ model, hereafter CSP for short.
-
-The circuit's CSP model provides three simple _elements_ that suffice for
-unconstrained general-purpose programmability and orchestration of cloud
-applications across clusters of any size. These elements are:
-
-* _Channel:_ An ordered, message-oriented communication primitive
-* _Selection:_ A synchronization mechanism for waiting on multiple event sources
-* _Process:_ A primitive for executing, monitoring and synchronizing with UNIX processes
+The circuit comes as one binary, which serves the purpose of a server
+and a command-line client.
 
 Build
 -----
@@ -31,30 +23,25 @@ you can build and install the circuit binary with one line:
 Run
 ---
 
-Prepare a local directory that can be FUSE-mounted by your user. 
-For instance, `/circuit` is a good choice.
-
 To run the circuit agent, pick a public IP address and port for it to
 listen on, and start it like so
 
-	circuit -a 10.20.30.7:11022 -m /circuit
+	circuit start -a 10.0.0.7:11022
 
-Among a few other things, the circuit agent will print its own circuit URL.
+The circuit server will print its own circuit URL on its standard output.
 It should look like this:
 
-	…
-	circuit://10.20.30.7:11022/78517/R56e7a2a0d47a7b5d
-	…
+	circuit://10.0.0.7:11022/78517/Q56e7a2a0d47a7b5d
 
-Copy it. We will need it to tell the next circuit agent to join this one.
+Copy it. We will need it to tell the next circuit server to “join” this one
+in a network, i.e. circuit.
 
-Log onto another machine and similarly start a circuit agent there, as well.
-This time, use the `-j` option to tell the new agent to join the
-circuit of the first one:
+Log onto another machine and similarly start a circuit server there, as well.
+This time, use the `-j` option to tell the new server to join the first one:
 
-	circuit -a 10.20.30.5:11088 -m /circuit -j circuit://10.20.30.7:11022/78517/R56e7a2a0d47a7b5d
+	circuit start -a 10.0.0.5:11088 -j circuit://10.0.0.7:11022/78517/Q56e7a2a0d47a7b5d
 
-You now have two mutually-aware circuit agents, running on two different hosts in your cluster.
+You now have two mutually-aware circuit servers, running on two different hosts in your cluster.
 You can join any number of additional hosts to the circuit environment in a similar fashion,
 even billions:
 
@@ -62,17 +49,10 @@ The circuit uses a modern [expander graph](http://en.wikipedia.org/wiki/Expander
 algorithm for presence awareness and ordered communication, which is genuinely distributed;
 It uses communication and connectivity sparingly, hardly leaving a footprint when idle.
 
-Explore
+Programming metaphor
 -------
 
-On any host with a running circuit agent, go to the local circuit mount directory
-
-	cd /circuit
-	ls
-
-Each of its subdirectories corresponds to a live circuit agent. Navigate into
-any one of them and explore the file system. Each directory is equipped with a
-`help` file to guide you.
+??
 
 Learn more
 ----------
