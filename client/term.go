@@ -21,6 +21,7 @@ type Anchor interface {
 	MakeChan(n int) (Chan, error)
 	MakeProc(cmd Cmd) (Proc, error)
 	Get() interface{}
+	Scrub()
 }
 
 type terminal struct {
@@ -73,4 +74,8 @@ func (t terminal) Get() interface{} {
 		return yprocProc{y.(proc.YProc)}
 	}
 	panic("client/circuit mismatch")
+}
+
+func (t terminal) Scrub() {
+	t.y.Scrub()
 }

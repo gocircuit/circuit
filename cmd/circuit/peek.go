@@ -46,13 +46,5 @@ func scrb(x *cli.Context) {
 		fatalf("scrub needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	switch t := c.Walk(w).Get().(type) {
-	case client.Chan:
-		t.Scrub()
-	case client.Proc:
-		t.Scrub()
-	case nil:
-	default:
-		fatalf("unknown element")
-	}
+	c.Walk(w).Scrub()
 }

@@ -93,3 +93,5 @@ func (c *Client) MakeProc(cmd Cmd) (Proc, error) {
 func (c *Client) Get() interface{} {
 	return nil
 }
+
+func (c *Client) Scrub() {}
