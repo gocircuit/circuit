@@ -90,17 +90,19 @@ func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) bool {
 		return g.Change
 
 	case reflect.Map:
+		println("--")
 		// For now, we do not rewrite map key values
 		if src.IsNil() || isTerminalKind(t) {
 			return false
 		}
 		dst.Set(reflect.MakeMap(t))
 		for _, mk := range src.MapKeys() {
+			println("oh")
 			src__ := src.MapIndex(mk)
 			dst__ := reflect.New(t.Elem()).Elem()
-			g.Add(1)
-			go func() {
-				defer g.Done()
+			// g.Add(1)
+			// go func() {
+			// 	defer g.Done()
 				if rewriteValue(rewrite, src__, dst__) {
 					dst.SetMapIndex(mk, dst__)
 					g.Lock()
@@ -109,9 +111,9 @@ func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) bool {
 				} else {
 					dst.SetMapIndex(mk, src__)
 				}
-			}()
+			// }()
 		}
-		g.Wait()
+		// g.Wait()
 		return g.Change
 
 	case reflect.Ptr:

@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gocircuit/circuit/kit/debug"
+	//"github.com/gocircuit/circuit/kit/debug"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
 	"github.com/gocircuit/circuit/kit/lockfile"
 
@@ -32,7 +32,7 @@ import (
 )
 
 func load(addr, mutex string) {
-	debug.InstallCtrlCPanic()
+	//debug.InstallCtrlCPanic()
 
 	// Randomize execution
 	rand.Seed(time.Now().UnixNano())

@@ -62,6 +62,9 @@ func ls(x *cli.Context) {
 }
 
 func list(prefix string, anchor client.Anchor, recurse bool) {
+	if anchor == nil {
+		return
+	}
 	//println(fmt.Sprintf("prefix=%v a=%v/%T r=%v", prefix, anchor, anchor, recurse))
 	for n, a := range anchor.View() {
 		v := a.Get()

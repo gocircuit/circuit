@@ -10,11 +10,12 @@ package lang
 import (
 	"fmt"
 	"testing"
+	"github.com/gocircuit/circuit/use/circuit"
 )
 
 func TestExportImport(t *testing.T) {
 	r := New(NewSandbox())
-	x := r.Export(1, 2)
+	x := r.Export(1, 2, map[string]circuit.X{"a": nil, "b": nil})
 	fmt.Printf("x=%#v\n", x)
 	v, s, err := r.Import(x)
 	if err != nil {

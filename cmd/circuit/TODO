@@ -1,0 +1,7 @@
+
+re-appearing proc directories in waitall
+	procs should not need Scrub() to disappear
+
+README
+client package documentation, terminology
+worm watch tutorial
