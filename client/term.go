@@ -25,6 +25,23 @@ type Anchor interface {
 	Scrub()
 }
 
+func Split(walk string) (r []string) {
+	var j int
+	for i, c := range walk {
+		if c != '/' {
+			continue
+		}
+		if i - j > 0 {
+			r = append(r, walk[j:i])
+		}
+		j = i+1
+	}
+	if len(walk) - j > 0 {
+		r = append(r, walk[j:])
+	}
+	return
+}
+
 type terminal struct {
 	y anchor.YTerminal
 	k kinfolk.KinXID

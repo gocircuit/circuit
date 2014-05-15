@@ -1,17 +1,18 @@
 The Circuit
 ===========
 
+The circuit is a tiny daemon process, say like `sshd`. 
+
 For a conceptual introduction to The Circuit, check out the
 [GopherCon 2014 Video](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures).
+Since this video was recorded, the API-via-file-system approach was abandoned
+in favor of a simpler command-line tool and a Go client library.
 
 The circuit is a tool for executing and synchronizing UNIX processes across entire clusters
 by means of a command-line tool and a client library.
 
 The circuit comes as one binary, which serves the purpose of a server
 and a command-line client.
-
-The circuit programming metaphor is somewhat similar to that of Apache Zookeeper,
-but for a few key differences. 
 
 Build
 -----
@@ -55,7 +56,7 @@ It uses communication and connectivity sparingly, hardly leaving a footprint whe
 Programming metaphor
 -------
 
-??
+Each circuit server instance maintains a unique namespace : 
 
 Learn more
 ----------
