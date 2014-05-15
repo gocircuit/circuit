@@ -1,6 +1,10 @@
 
-re-appearing proc directories in waitall
-	procs should not need Scrub() to disappear
+
+procs should not need Scrub() to disappear
+	processes need active exit monitors
+	scrub directories before walking into them? skip printing empty directories
+
+channel scrub condition and triggers?
 
 README
 client package documentation, terminology

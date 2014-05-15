@@ -9,6 +9,7 @@ package anchor
 
 import (
 	"errors"
+	"io"
 
 	"github.com/gocircuit/circuit/kit/element/proc"
 	"github.com/gocircuit/circuit/kit/element/valve"
@@ -65,7 +66,7 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 		}
 		u := &urn{
 			kind: Chan,
-			elem: valve.MakeValve(capacity),
+			elem: &scrubValve{t, valve.MakeValve(capacity)},
 		}
 		t.carrier().Set(u)
 		return u.elem, nil
@@ -79,6 +80,13 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 			elem: proc.MakeProc(cmd),
 		}
 		t.carrier().Set(u)
+		go func() {
+			defer func() {
+				recover()
+			}()
+			defer t.Scrub()
+			u.elem.(proc.Proc).Wait()
+		}()
 		return u.elem, nil
 	}
 	return nil, errors.New("element kind not known")
@@ -103,4 +111,27 @@ func (t *Terminal) Scrub() {
 	}
 	u.elem.Scrub()
 	t.carrier().Set(nil)
+}
+
+type scrubValve struct {
+	t *Terminal
+	valve.Valve
+}
+
+func (v *scrubValve) Close() error {
+	defer func() {
+		if v.Valve.IsDone() {
+			v.t.Scrub()
+		}
+	}()
+	return v.Valve.Close()
+}
+
+func (v *scrubValve) Recv() (io.ReadCloser, error) {
+	defer func() {
+		if v.Valve.IsDone() {
+			v.t.Scrub()
+		}
+	}()
+	return v.Valve.Recv()
 }

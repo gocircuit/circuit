@@ -35,7 +35,7 @@ func (v *valve) Send() (io.WriteCloser, error) {
 func (v *valve) IsDone() bool {
 	v.ctrl.Lock()
 	defer v.ctrl.Unlock()
-	return v.ctrl.stat.Closed || v.ctrl.stat.Aborted
+	return (v.ctrl.stat.Closed && v.ctrl.stat.NumSend == v.ctrl.stat.NumRecv) || v.ctrl.stat.Aborted
 }
 
 func (v *valve) Scrub() {
