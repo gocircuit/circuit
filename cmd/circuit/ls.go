@@ -58,10 +58,10 @@ func ls(x *cli.Context) {
 		os.Exit(1)
 	}
 	w, ellipses := parseGlob(args[0])
-	list("/", c.Walk(w), ellipses)
+	list(0, "/", c.Walk(w), ellipses)
 }
 
-func list(prefix string, anchor client.Anchor, recurse bool) {
+func list(level int, prefix string, anchor client.Anchor, recurse bool) {
 	if anchor == nil {
 		return
 	}
@@ -75,11 +75,15 @@ func list(prefix string, anchor client.Anchor, recurse bool) {
 		case client.Proc:
 			k = "proc"
 		default:
-			k = "nil "
+			if level == 0 {
+				k = "    "
+			}
 		}
-		fmt.Printf("%4s %s%s\n", k, prefix, n)
+		if k != "" {
+			fmt.Printf("%4s %s%s\n", k, prefix, n)
+		}
 		if recurse {
-			list(prefix + n + "/", a, true)
+			list(level + 1, prefix + n + "/", a, true)
 		}
 	}
 }
