@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/gocircuit/circuit/client"
@@ -66,26 +67,51 @@ func list(level int, prefix string, anchor client.Anchor, recurse bool) {
 		return
 	}
 	//println(fmt.Sprintf("prefix=%v a=%v/%T r=%v", prefix, anchor, anchor, recurse))
+	var c children
 	for n, a := range anchor.View() {
+		e := &entry{n: n, a: a}
 		v := a.Get()
-		var k string
 		switch v.(type) {
 		case client.Chan:
-			k = "chan"
+			e.k = "chan"
 		case client.Proc:
-			k = "proc"
+			e.k = "proc"
 		default:
 			if level == 0 {
-				k = "    "
+				e.k = "----"
 			}
 		}
-		if k != "" {
-			fmt.Printf("%4s %s%s\n", k, prefix, n)
+		c = append(c, e)
+	}
+	sort.Sort(c)
+	for _, e := range c {
+		if e.k != "" {
+			fmt.Printf("%4s %s%s\n", e.k, prefix, e.n)
 		}
 		if recurse {
-			list(level + 1, prefix + n + "/", a, true)
+			list(level + 1, prefix + e.n + "/", e.a, true)
 		}
 	}
+}
+
+type entry struct {
+	n string
+	a client.Anchor
+	k string
+}
+
+type children []*entry
+
+func (c children) Len() int {
+	return len(c)
+}
+
+func (c children) Less(i, j int) bool {
+	return c[i].n < c[j].n
+}
+
+func (c children) Swap(i, j int) {
+	c[i], c[j] = c[j], c[i]
 }
 
 func parseGlob(pattern string) (walk []string, ellipses bool) {

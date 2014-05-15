@@ -51,6 +51,10 @@ func Dial(workerURL string) *Client {
 	return c
 }
 
+func (c *Client) Addr() string {
+	return c.y.X.Addr().String()
+}
+
 func (c *Client) Walk(walk []string) Anchor {
 	if len(walk) == 0 {
 		return c

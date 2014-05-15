@@ -15,6 +15,7 @@ import (
 )
 
 type Anchor interface {
+	Addr() string
 	Worker() string
 	Walk(walk []string) Anchor
 	View() map[string]Anchor
@@ -27,6 +28,10 @@ type Anchor interface {
 type terminal struct {
 	y anchor.YTerminal
 	k kinfolk.KinXID
+}
+
+func (t terminal) Addr() string {
+	return t.k.X.Addr().String()
 }
 
 func (t terminal) Worker() string {

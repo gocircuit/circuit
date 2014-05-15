@@ -14,8 +14,7 @@ import (
 	"github.com/gocircuit/circuit/client"
 )
 
-const n = 5
-
+// pick returns the root anchor of a randomly-chosen circuit member
 func pick(c *client.Client) client.Anchor {
 	for _, r := range c.View() {
 		return r
@@ -23,27 +22,33 @@ func pick(c *client.Client) client.Anchor {
 	panic(0)
 }
 
+// watch
+func watch(c *client.Client, service string) {
+	c.Walk(client.Split(service))
+	??
+}
+
+// wormwatch dial_url service_anchor?
 func main() {
 	c := client.Dial(os.Args[1]) // argument is the url of a circuit server
 	ch := make(chan int)
-	for i := 0; i < n; i++ {
-		cmd := client.Cmd{
-			Path: "/bin/sleep",
-			Args: []string{strconv.Itoa(3+i*3)},
-		}
-		i_ := i
-		go func() {
-			t := pick(c).Walk([]string{"wait_all", strconv.Itoa(i_)})
-			p, _ := t.MakeProc(cmd)
-			p.Stdin().Close()
-			p.Wait()
-			ch <- 1
-			t.Scrub()
-			println("process", i_+1, "done")
-		}()
+
+	service := client.Cmd{ // a pretend long-running user binary
+		Path: "/bin/sleep",
+		Args: []string{strconv.Itoa(5)}, // with simulated unexpected exits
 	}
-	for i := 0; i < n; i++ {
-		<-ch
+
+	a := pick(c)
+	watch := client.Cmd{
+		Path: os.Args[0], // we assume that the binary of this tool is on the same path everywhere
+		Args: []string{c.Addr()}, // instruct the watcher to use its local circuit for dial-in
 	}
-	println("all done.")
+
+	t := a.Walk([]string{"worm_watch", "service"})
+	pservice, _ := t.MakeProc(service)
+	pservice.Stdin().Close()
+	p.Wait()
+
+	ch <- 1
+	println("process", i_+1, "done")
 }
