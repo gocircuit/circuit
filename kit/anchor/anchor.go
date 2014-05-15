@@ -48,7 +48,6 @@ func (a *anchor) use() *Anchor {
 }
 
 func (a *anchor) recycle() {
-	println("recycle")
 	a.lk.Lock()
 	defer a.lk.Unlock()
 	a.nhandle--
@@ -77,7 +76,6 @@ func (a *anchor) scrub(name string) {
 	if q.Busy() {
 		return
 	}
-	println("del", name)
 	delete(a.children, name)
 }
 
@@ -89,7 +87,6 @@ func (a *anchor) Walk(walk []string) *Anchor {
 	defer a.lk.Unlock()
 	q, ok := a.children[walk[0]]
 	if !ok {
-		println("makin", walk[0])
 		q = newAnchor(a, walk[0])
 		a.children[walk[0]] = q
 		q.use() // ensures that if q is not used after Walk returns, it will be scrubbed

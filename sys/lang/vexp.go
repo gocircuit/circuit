@@ -8,7 +8,7 @@
 package lang
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 	"reflect"
 	"sync"
@@ -26,11 +26,9 @@ func (r *Runtime) exportValues(values []interface{}, importer n.Addr) ([]interfa
 	rewriter := func(src, dst reflect.Value) bool {
 		return r.exportRewrite(src, dst, importer, eg)
 	}
-	println(fmt.Sprintf("export-> %#v", values))
-	x := rewriteInterface(rewriter, values).([]interface{})
-	println(fmt.Sprintf("export/re-> %#v", x))
-	return x, eg.PtrPtr
-	//return rewriteInterface(rewriter, values).([]interface{}), eg.PtrPtr
+	// x := rewriteInterface(rewriter, values).([]interface{})
+	// return x, eg.PtrPtr
+	return rewriteInterface(rewriter, values).([]interface{}), eg.PtrPtr
 }
 
 func (r *Runtime) exportRewrite(src, dst reflect.Value, importer n.Addr, eg *exportGroup) bool {

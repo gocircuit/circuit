@@ -9,7 +9,6 @@ package lang
 
 import (
 	"reflect"
-	"sync"
 )
 
 // rewriteFunc can selectively rewrite a src value by writing
@@ -29,20 +28,13 @@ func rewriteInterface(rewrite rewriteFunc, src interface{}) interface{} {
 	return src
 }
 
-type rewriteGroup struct {
-	sync.WaitGroup
-	sync.Mutex
-	Change bool
-}
-
 // dst must be addressable.
-func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) bool {
+func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) (changed bool) {
 	if rewrite(src, dst) {
 		return true
 	}
 
 	// Recursive step
-	var g rewriteGroup
 	t := src.Type()
 	switch src.Kind() {
 
@@ -52,20 +44,13 @@ func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) bool {
 		}
 		for i := 0; i < src.Len(); i++ {
 			src__, dst__ := src.Index(i), dst.Index(i)
-			g.Add(1)
-			go func() {
-				defer g.Done()
-				if rewriteValue(rewrite, src__, dst__) {
-					g.Lock()
-					g.Change = true
-					g.Unlock()
-				} else {
-					dst__.Set(src__)
-				}
-			}()
+			if rewriteValue(rewrite, src__, dst__) {
+				changed = true
+			} else {
+				dst__.Set(src__)
+			}
 		}
-		g.Wait()
-		return g.Change
+		return
 
 	case reflect.Slice:
 		if src.IsNil() || isTerminalKind(t) {
@@ -74,47 +59,31 @@ func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) bool {
 		dst.Set(reflect.MakeSlice(t, src.Len(), src.Len()))
 		for i := 0; i < src.Len(); i++ {
 			src__, dst__ := src.Index(i), dst.Index(i)
-			g.Add(1)
-			go func() {
-				defer g.Done()
-				if rewriteValue(rewrite, src__, dst__) {
-					g.Lock()
-					g.Change = true
-					g.Unlock()
-				} else {
-					dst__.Set(src__)
-				}
-			}()
+			if rewriteValue(rewrite, src__, dst__) {
+				changed = true
+			} else {
+				dst__.Set(src__)
+			}
 		}
-		g.Wait()
-		return g.Change
+		return
 
 	case reflect.Map:
-		println("--")
 		// For now, we do not rewrite map key values
 		if src.IsNil() || isTerminalKind(t) {
 			return false
 		}
 		dst.Set(reflect.MakeMap(t))
 		for _, mk := range src.MapKeys() {
-			println("oh")
 			src__ := src.MapIndex(mk)
 			dst__ := reflect.New(t.Elem()).Elem()
-			// g.Add(1)
-			// go func() {
-			// 	defer g.Done()
-				if rewriteValue(rewrite, src__, dst__) {
-					dst.SetMapIndex(mk, dst__)
-					g.Lock()
-					g.Change = true
-					g.Unlock()
-				} else {
-					dst.SetMapIndex(mk, src__)
-				}
-			// }()
+			if rewriteValue(rewrite, src__, dst__) {
+				dst.SetMapIndex(mk, dst__)
+				changed = true
+			} else {
+				dst.SetMapIndex(mk, src__)
+			}
 		}
-		// g.Wait()
-		return g.Change
+		return
 
 	case reflect.Ptr:
 		if src.IsNil() || isTerminalKind(t) {
@@ -158,21 +127,14 @@ func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) bool {
 			if t.Field(i).PkgPath == "" {
 				// If field is public
 				src__, dst__ := src.Field(i), dst.Field(i)
-				g.Add(1)
-				go func() {
-					defer g.Done()
-					if rewriteValue(rewrite, src__, dst__) {
-						g.Lock()
-						g.Change = true
-						g.Unlock()
-					} else {
-						dst__.Set(src__)
-					}
-				}()
+				if rewriteValue(rewrite, src__, dst__) {
+					changed = true
+				} else {
+					dst__.Set(src__)
+				}
 			}
 		}
-		g.Wait()
-		return g.Change
+		return
 
 	case reflect.Chan:
 		panic("rewrite chan, not supported yet")

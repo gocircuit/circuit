@@ -72,9 +72,7 @@ func (y YTerminal) Walk(walk []string) YTerminal {
 
 func (y YTerminal) View() map[string]YTerminal {
 	u := make(map[string]YTerminal)
-	println("yv..")
 	for n, x := range y.X.Call("View")[0].(map[string]circuit.X) {
-		println("n=", n)
 		u[n] = YTerminal{x}
 	}
 	return u
