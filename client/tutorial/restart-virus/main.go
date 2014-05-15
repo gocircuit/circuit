@@ -14,7 +14,7 @@ import (
 	"github.com/gocircuit/circuit/client"
 )
 
-// pick returns the root anchor of a randomly-chosen circuit member
+// pick returns the root anchor of a randomly-chosen circuit server in the cluster
 func pick(c *client.Client) client.Anchor {
 	for _, r := range c.View() {
 		return r
@@ -26,10 +26,12 @@ func watch(c *client.Client, service string) {
 	defer func() {
 		recover()
 	}()
-	c.Walk(client.Split(service)).Get().(client.Proc).Wait()
+	t := c.Walk(client.Split(service))
+	t.Get().(client.Proc).Wait()
+	t.Scrub()
 }
 
-// wormwatch dial_url service_anchor?
+// restart-virus dial_url service_anchor?
 func main() {
 	c := client.Dial(os.Args[1]) // argument is the url of a circuit server
 	if len(os.Args) == 3 {
@@ -43,16 +45,17 @@ func main() {
 	}
 	a := pick(c)
 	serviceAnchor := []string{"restart_virus", "service"}
-	pservice, _ := a.Walk(client.Split(serviceAnchor)).MakeProc(service)
+	pservice, _ := a.Walk(serviceAnchor).MakeProc(service)
 	pservice.Stdin().Close()
+	println("started service")
 
 	// start watcher
 	b := pick(c)
 	watcher := client.Cmd{
 		Path: os.Args[0], // we assume that the binary of this tool is on the same path everywhere
-		Args: []string{b.Addr(), serviceAnchor},
+		Args: []string{b.Addr(), "/" + a.Worker() + "/restart_virus/service"},
 	}
-	watcherAnchor := []string{"restart_virus", "watcher"}
-	pwatcher, _ := b.Walk(watcherAnchor).MakeProc(service)
+	pwatcher, _ := b.Walk([]string{"restart_virus", "watcher"}).MakeProc(watcher)
 	pwatcher.Stdin().Close()
+	println("started watcher")
 }
