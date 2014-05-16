@@ -21,6 +21,7 @@ import (
 // circuit mkproc /X1234/hola/charlie << EOF
 // { … }
 // EOF
+// TODO: Proc element disappears if command misspelled and error condition not obvious.
 func mkproc(x *cli.Context) {
 	c := dial(x)
 	args := x.Args()

@@ -8,8 +8,9 @@
 package main
 
 import (
+	"path/filepath"
 	"os"
-	"strconv"
+	"time"
 
 	"github.com/gocircuit/circuit/client"
 )
@@ -24,11 +25,14 @@ func pick(c *client.Client) client.Anchor {
 
 func watch(c *client.Client, service string) {
 	defer func() {
-		recover()
+		if r := recover(); r != nil {
+			println(r)
+		}
 	}()
 	t := c.Walk(client.Split(service))
 	t.Get().(client.Proc).Wait()
 	t.Scrub()
+	time.Sleep(time.Second/2)
 }
 
 // restart-virus dial_url service_anchor?
@@ -40,19 +44,20 @@ func main() {
 
 	// start service
 	service := client.Cmd{ // a pretend long-running user binary
-		Path: "/bin/sleep",
-		Args: []string{strconv.Itoa(5)}, // with simulated unexpected exits
+		Path: "/usr/bin/say", 
+		Args: []string{"hola."}, // with simulated unexpected exits
 	}
 	a := pick(c)
-	serviceAnchor := []string{"restart_virus", "service"}
-	pservice, _ := a.Walk(serviceAnchor).MakeProc(service)
+	pservice, _ := a.Walk([]string{"restart_virus", "service"}).MakeProc(service)
 	pservice.Stdin().Close()
 	println("started service")
 
 	// start watcher
 	b := pick(c)
+	virus, _ := filepath.Abs(os.Args[0]) // we assume that the binary of this tool is on the same path everywhere
+	println("/" + a.Worker() + "/restart_virus/service")
 	watcher := client.Cmd{
-		Path: os.Args[0], // we assume that the binary of this tool is on the same path everywhere
+		Path: virus,
 		Args: []string{b.Addr(), "/" + a.Worker() + "/restart_virus/service"},
 	}
 	pwatcher, _ := b.Walk([]string{"restart_virus", "watcher"}).MakeProc(watcher)

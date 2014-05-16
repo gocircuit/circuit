@@ -10,6 +10,7 @@ package anchor
 import (
 	"errors"
 	"io"
+	"log"
 
 	"github.com/gocircuit/circuit/kit/element/proc"
 	"github.com/gocircuit/circuit/kit/element/valve"
@@ -53,6 +54,7 @@ type urn struct {
 }
 
 func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) {
+	log.Printf("%s make %s with %v", t.carrier().Path(), kind, arg)
 	t.carrier().TxLock()
 	defer t.carrier().TxUnlock()
 	if t.carrier().Get() != nil {
@@ -103,6 +105,7 @@ func (t *Terminal) Get() (string, Element) {
 }
 
 func (t *Terminal) Scrub() {
+	log.Printf("scrubbing %s", t.carrier().Path())
 	t.carrier().TxLock()
 	defer t.carrier().TxUnlock()
 	u, ok := t.carrier().Get().(*urn)

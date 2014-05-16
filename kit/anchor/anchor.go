@@ -8,6 +8,7 @@
 package anchor
 
 import (
+	"path"
 	"runtime"
 	"sync"
 
@@ -19,6 +20,7 @@ type Anchor struct {
 }
 
 type anchor struct {
+	walk []string
 	parent *anchor
 	name string
 	lk sync.Mutex
@@ -103,11 +105,22 @@ func NewTerm(name string) circuit.PermX {
 }
 
 func newAnchor(parent *anchor, name string) *anchor {
+	var w = []string{name}
+	if parent != nil {
+		w = make([]string, len(parent.walk))
+		copy(w, parent.walk)
+		w = append(w, name)
+	}
 	return &anchor{
+		walk: w,
 		parent: parent,
 		name: name,
 		children: make(map[string]*anchor),
 	}
+}
+
+func (a *anchor) Path() string {
+	return "/" + path.Join(a.walk...)
 }
 
 func (a *anchor) View() (r map[string]*Anchor) {
