@@ -21,7 +21,7 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 
-	"github.com/codegangsta/cli"
+	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 func server(c *cli.Context) {

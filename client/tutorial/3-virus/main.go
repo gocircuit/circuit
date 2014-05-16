@@ -5,7 +5,7 @@
 // Authors:
 //   2014 Petar Maymounkov <p@gocircuit.org>
 
-// Tutorial 3-virus ??
+// Virus is a simple, mildly-resilient to failure mechanism that runs around a cluster and delivers its payload, in a self-sustained fashion.
 package main
 
 import (

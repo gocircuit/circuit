@@ -12,7 +12,7 @@ import (
 	"os"
 	"github.com/gocircuit/circuit/client"
 
-	"github.com/codegangsta/cli"
+	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 func stdin(x *cli.Context) {

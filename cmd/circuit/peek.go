@@ -13,7 +13,7 @@ import (
 
 	"github.com/gocircuit/circuit/client"
 
-	"github.com/codegangsta/cli"
+	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 // circuit peek /X1234/hola/charlie

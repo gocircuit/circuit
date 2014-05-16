@@ -16,7 +16,8 @@ import (
 
 const n = 5
 
-func pick(c *client.Client) client.Anchor {
+// pickServer returns the root anchor of a randomly-chosen circuit server in the cluster.
+func pickServer(c *client.Client) client.Anchor {
 	for _, r := range c.View() {
 		return r
 	}
@@ -24,7 +25,11 @@ func pick(c *client.Client) client.Anchor {
 }
 
 func main() {
-	c := client.Dial(os.Args[1]) // argument is the url of a circuit server
+
+	// The first argument is the circuit server address that this execution will use.
+	c := client.Dial(os.Args[1])
+
+	// ??
 	ch := make(chan int)
 	for i := 0; i < n; i++ {
 		cmd := client.Cmd{
@@ -33,7 +38,7 @@ func main() {
 		}
 		i_ := i
 		go func() {
-			t := pick(c).Walk([]string{"wait_all", strconv.Itoa(i_)})
+			t := pickServer(c).Walk([]string{"wait_all", strconv.Itoa(i_)})
 			p, _ := t.MakeProc(cmd)
 			p.Stdin().Close()
 			p.Wait()
