@@ -5,7 +5,24 @@
 // Authors:
 //   2014 Petar Maymounkov <p@gocircuit.org>
 
-// Virus is a simple, mildly-resilient to failure mechanism that runs around a cluster and delivers its payload, in a self-sustained fashion.
+/*
+
+	Virus is a simple, mildly-resilient to failure mechanism that runs around a cluster
+	and delivers its payload (a process execution), in a self-sustained fashion.
+
+	The virus mechanism contains two parts: a payload process and a nucleus process.
+
+	The payload can be any OS process, available locally as a binary.
+
+	The nucleus is embodied in this circuit application. It executes the payload OS process
+	on a random machine in the circuit cluster. Then it installs itself on a machine different
+	from that of the payload process, and proceeds to watch the payload until it dies.
+
+	When the payload dies, the nucleus executes a new payload instance on another 
+	randomly chosen host, and replaces itself with a new nucleus process on yet
+	another new random host. And so on ...
+
+*/
 package main
 
 import (
