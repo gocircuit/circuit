@@ -145,7 +145,8 @@ Close the standard input to indicate no intention to write to it:
 
 	cat /dev/null | circuit stdin /X88550014d4c82e4d/pippi
 
-Read the output
+Read the output (note that the output won't show until you close 
+the standard input first, as shown above):
 
 	circuit stdout /X88550014d4c82e4d/pippi
 
