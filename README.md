@@ -58,15 +58,16 @@ It uses communication and connectivity sparingly, hardly leaving a footprint whe
 Programming metaphor
 -------
 
-Each circuit server hosts a hierarchical namespace of _elements_, where the elements
-are control primitives like _process_ or _channel_.
+Each circuit server hosts a hierarchical namespace of control primitives,
+currently _process_ or _channel_. Processes aid the execution and synchronization of
+OS processes. Channels …
 
 Elements are addressed by paths of the form
 
 	/X317c2314a386a9db/hi/charlie
 
-where the first part of the path is necessarily the ID of the circuit server hosting the element,
-while the rest are user-specific.
+which are called _anchors_. The first part of a path is necessarily the ID of the circuit server
+hosting it, while the remainder is user-specific.
 
 Learn more
 ----------
@@ -81,6 +82,12 @@ packages in the circuit repo are internal.
 Tutorials can be found within the client package directory
 
 	github.com/gocircuit/circuit/client/tutorial
+
+Additionally, the circuit binary directory contains the implementation
+of the circuit tool, which is itself built using the client and is another
+comprehensive example of a circuit app. It can be found in
+
+	github.com/gocircuit/circuit/cmd/circuit
 
 To stay up to date with new developments, documentation and articles, follow
 The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit) or

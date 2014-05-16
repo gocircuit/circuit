@@ -5,6 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
+// Package client provides access to the circuit programming environment to user programs
 package client
 
 import (
@@ -35,15 +36,20 @@ func _init() {
 	circuit.Bind(lang.New(t))
 }
 
-// Client is a live session with a circuit worker.
+// Client is a live session with a circuit server.
 type Client struct {
 	y locus.YLocus
 }
 
-func Dial(workerURL string) *Client {
+// Dial establishes a connection to a circuit server specified by a circuit address.
+// Circuit addresses are printed to standard output when a server is started with the 
+// "circuit start …" command.
+// Errors in communication, such as a missing server, or invalid URL format
+// are reported through panics.
+func Dial(addr string) *Client {
 	_once.Do(_init)
 	c := &Client{}
-	w, err := n.ParseAddr(workerURL)
+	w, err := n.ParseAddr(addr)
 	if err != nil {
 		panic("circuit address does not parse")
 	}
@@ -51,10 +57,16 @@ func Dial(workerURL string) *Client {
 	return c
 }
 
+// Address returns the circuit address of the server that this client is connected to.
 func (c *Client) Addr() string {
 	return c.y.X.Addr().String()
 }
 
+// Walk traverses the global virtual anchor namespace and returns a handle dor the desired anchor.
+// The first element of walk should be the ID of a live circuit server.
+// An up to date list of available circuit servers in the cluster can be obtained by calling View.
+// The remainder of the walk slice is up to the user.
+// Errors in communication or missing servers are reported as panics.
 func (c *Client) Walk(walk []string) Anchor {
 	if len(walk) == 0 {
 		return c
@@ -67,6 +79,7 @@ func (c *Client) Walk(walk []string) Anchor {
 	return t.Walk(walk[1:])
 }
 
+// View 
 func (c *Client) View() map[string]Anchor {
 	var r = make(map[string]Anchor)
 	for k, p := range c.y.GetPeers() {
