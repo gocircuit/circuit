@@ -5,7 +5,11 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package client provides access to the circuit programming environment to user programs
+/*
+	Package client provides access to the circuit programming environment to user programs.
+
+	??
+*/
 package client
 
 import (
@@ -79,7 +83,8 @@ func (c *Client) Walk(walk []string) Anchor {
 	return t.Walk(walk[1:])
 }
 
-// View 
+// View returns a map of all currently-live circuit server anchors.
+// Errors in communication are reported as panics.
 func (c *Client) View() map[string]Anchor {
 	var r = make(map[string]Anchor)
 	for k, p := range c.y.GetPeers() {
@@ -95,20 +100,25 @@ func (c *Client) newTerminal(xterm circuit.X, xkin kinfolk.KinXID) terminal {
 	}
 }
 
+// Worker is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) Worker() string {
 	return ""
 }
 
+// MakeChan is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeChan(n int) (Chan, error) {
 	return nil, errors.New("cannot create elements outside of workers")
 }
 
+// MakeProc is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeProc(cmd Cmd) (Proc, error) {
 	return nil, errors.New("cannot create elements outside of workers")
 }
 
+// Get is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) Get() interface{} {
 	return nil
 }
 
+// Scrub is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) Scrub() {}

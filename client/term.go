@@ -14,17 +14,60 @@ import (
 	"github.com/gocircuit/circuit/kit/kinfolk"
 )
 
+// An Anchor represents a location in the global anchor namespace of a circuit
+// cluster. Anchors are named locations where the user can store and operate
+// control primitives, called circuit elements. The anchor namespace hierarchy
+// is represented in paths of the form
+//
+//	/X8817c114d4941522/hello/dolly
+//
+// The root anchor "/" represents the cluster abstractly and is the only
+// anchor within which one cannot create elements or freely-named subanchors.
+// The root anchor contains a dynamically changing set of sub-anchors that
+// correspond to the live circuit servers in the cluster.
+//
+// Every anchor, other than "/", can be used to make, store and operate a
+// circuit element (a process or a channel). Anchors are created on access, if
+// not present, and are garbage-collected when not used or referenced.
+// Therefore the interface allows users to access arbitrary paths without
+// having to create them first.
+//
 type Anchor interface {
+
+	// Addr returns the address of the circuit server hosting this anchor.
 	Addr() string
+
+	// Worker returns the ID within the anchor namespace of the circuit server hosting this anchor.
 	Worker() string
+
+	// Walk traverses the anchor namespace, starting from this anchor along the path in walk.
+	// Errors in communication or a missing circuit server condition are reported via panics.
 	Walk(walk []string) Anchor
+
+	// View returns the set of its sub-anchors.
 	View() map[string]Anchor
+
+	// MakeChan creates a new circuit channel element at this anchor with a given capacity n.
+	// If the anchor already stores an element, a non-nil error is returned.
+	// Panics indicate that the server hosting the anchor is gone.
 	MakeChan(n int) (Chan, error)
+
+	// MakeProc issues the execution of an OS process, described by cmd, at the server hosting the anchor
+	// and creates a corresponding circuit process element at this anchor.
+	// If the anchor already stores an element, a non-nil error is returned.
+	// Panics indicate that the server hosting the anchor is gone.
 	MakeProc(cmd Cmd) (Proc, error)
+
+	// Get returns a handle for the circuit element (one of Chan or Proc) stored at this anchor, and nil otherwise. 
+	// Panics indicate that the server hosting the anchor and its element has already died.
 	Get() interface{}
+
+	// Scrub aborts and abandons the circuit element stored at this anchor, if one is present.
+	// If the hosting server is dead, a panic will be issued.
 	Scrub()
 }
 
+// Split breaks up an anchor path into components.
 func Split(walk string) (r []string) {
 	var j int
 	for i, c := range walk {
