@@ -20,6 +20,11 @@ import (
 
 // circuit mkchan /X1234/hola/charlie 0
 func mkchan(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 2 {
@@ -37,6 +42,11 @@ func mkchan(x *cli.Context) {
 }
 
 func send(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
@@ -57,6 +67,11 @@ func send(x *cli.Context) {
 }
 
 func recv(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {

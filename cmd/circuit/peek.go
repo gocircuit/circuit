@@ -18,6 +18,11 @@ import (
 
 // circuit peek /X1234/hola/charlie
 func peek(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
@@ -40,6 +45,11 @@ func peek(x *cli.Context) {
 }
 
 func scrb(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {

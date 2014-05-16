@@ -121,6 +121,41 @@ The rest of the tool's commands can be seen by typing
 They exactly correspond to the API of the `github.com/gocircuit/client` package,
 which has a more detailed documentation and a set of tutorials.
 
+Here are a few examples. To run a new process on some chosen
+cluster machine, first see what machines are available:
+
+	circuit ls /...
+	---- /X88550014d4c82e4d
+	---- /X938fe923bcdef2390
+
+Run a new `ls` process:
+
+	circuit mkproc /X88550014d4c82e4d/pippi << EOF
+	{
+		"Path": "/bin/ls", 
+		"Args":["/"]
+	}
+	EOF
+
+See what happened:
+
+	circuit peek /X88550014d4c82e4d/pippi
+
+Close the standard input to indicate no intention to write to it:
+
+	cat /dev/null | circuit stdin /X88550014d4c82e4d/pippi
+
+Read the output
+
+	circuit stdout /X88550014d4c82e4d/pippi
+
+Remove the process element from the anchor hierarchy
+
+	circuit scrub /X88550014d4c82e4d/pippi
+
+Be creative
+-------------
+
 The circuit allows for unusual flexibilities in process orchestration.
 Take a look, for instance, at the “virus” tutorial which demonstrates
 how to implement a semi-resilient self-sustained mechanism within 

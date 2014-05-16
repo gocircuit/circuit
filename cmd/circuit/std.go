@@ -16,6 +16,11 @@ import (
 )
 
 func stdin(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
@@ -36,6 +41,11 @@ func stdin(x *cli.Context) {
 }
 
 func stdout(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
@@ -53,6 +63,11 @@ func stdout(x *cli.Context) {
 }
 
 func stderr(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {

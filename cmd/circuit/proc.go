@@ -23,6 +23,11 @@ import (
 // EOF
 // TODO: Proc element disappears if command misspelled and error condition not obvious.
 func mkproc(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
@@ -45,6 +50,11 @@ func mkproc(x *cli.Context) {
 }
 
 func sgnl(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 2 {
@@ -61,6 +71,11 @@ func sgnl(x *cli.Context) {
 }
 
 func wait(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
