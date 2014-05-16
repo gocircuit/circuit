@@ -119,7 +119,14 @@ The rest of the tool's commands can be seen by typing
 	circuit help
 
 They exactly correspond to the API of the `github.com/gocircuit/client` package,
-which has a more detailed documentation.
+which has a more detailed documentation and a set of tutorials.
+
+The circuit allows for unusual flexibilities in process orchestration.
+Take a look, for instance, at the “virus” tutorial which demonstrates
+how to implement a semi-resilient self-sustained mechanism within 
+a cluster. Find it in
+
+	github.com/gocircuit/circuit/client/tutorial/3-virus
 
 Learn more
 ----------
