@@ -1,9 +1,9 @@
 The Circuit
 ===========
 
-The circuit is a tiny server process which runs instances on a cluster of machines
-to form a network, which enables distributed process orchestration and synchronization
-from any one machine.
+The circuit is a tiny server process which runs instances on a cluster of
+machines to form a network, which enables distributed process orchestration
+and synchronization from any one machine.
 
 For a conceptual introduction to The Circuit, check out the
 [GopherCon 2014 Video](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures).
@@ -47,27 +47,79 @@ This time, use the `-j` option to tell the new server to join the first one:
 
 	circuit start -a 10.0.0.5:11088 -j circuit://10.0.0.7:11022/78517/Q56e7a2a0d47a7b5d
 
-You now have two mutually-aware circuit servers, running on two different hosts in your cluster.
-You can join any number of additional hosts to the circuit environment in a similar fashion,
-even billions:
+You now have two mutually-aware circuit servers, running on two different
+hosts in your cluster. You can join any number of additional hosts to the
+circuit environment in a similar fashion, even billions:
 
-The circuit uses a modern [expander graph](http://en.wikipedia.org/wiki/Expander_graph)-based
-algorithm for presence awareness and ordered communication, which is genuinely distributed;
-It uses communication and connectivity sparingly, hardly leaving a footprint when idle.
+The circuit uses a modern [expander
+graph](http://en.wikipedia.org/wiki/Expander_graph)-based algorithm for
+presence awareness and ordered communication, which is genuinely distributed;
+It uses communication and connectivity sparingly, hardly leaving a footprint
+when idle.
 
 Programming metaphor
 -------
 
-Each circuit server hosts a hierarchical namespace of control primitives,
-currently _process_ or _channel_. Processes aid the execution and synchronization of
-OS processes. Channels …
+The purpose of each circuit server is to host a collection of control
+primitives, called _elements_, on behalf of the user. On each server the
+hosted elements are organized in a hierarchy (similarly to the file system in
+Apache Zookeeper), whose nodes are called _anchors_. Anchors (akin to file
+system directories) have names and each anchor can host one circuit element or
+be empty.
 
-Elements are addressed by paths of the form
+The hierarchies of all servers are logically unified by a global circuit root
+anchor, whose children are the individual circuit server hierarchies. A
+typical anchor path looks like this
 
 	/X317c2314a386a9db/hi/charlie
 
-which are called _anchors_. The first part of a path is necessarily the ID of the circuit server
-hosting it, while the remainder is user-specific.
+The first component of the path is the ID of the circuit server hosting the leaf anchor.
+
+Except for the circuit root anchor (which does not correspond to any
+particular circuit server), all other anchors can store a _process_ or a
+_channel_ element, at most one, and additionally can have any number of sub-
+anchors. In a way, anchors are like directories that can have any number of
+subdirectories, but at most one file.
+
+Creating and interacting with circuit elements is the mechanism through which
+the  user controls and reflects on their distributed application.
+This can be accomplished by means of the included Go client library, or using
+the command-line tool embodied in the circuit executable itself.
+
+Process elements are used to execute, monitor and synchronize OS-level
+processes at the hosting circuit server. They allow visibility and control
+over OS processes from any machine in the circuit cluster, regardless
+of the physical location of the underlying OS process.
+
+Channel elements are a synchronization primitive, similar to the channels in Go,
+whose send and receive sides are accessible from any location in the
+circuit cluster, while their data structure lives on the circuit server hosting
+their anchor.
+
+Use
+---
+
+Once the circuit servers are started, one can iteractively create, observe and control
+circuit elements, using the circuit binary which doubles as a command-line client.
+
+To list the entire circuit cluster anchor hierarchy, type in
+
+	circuit ls /...
+
+Before this command can work, however, you need to give it the address of
+any one of the circuit servers as a _dial-in_ point. The choice of dial-in
+server does not matter at all. All circuit servers are equally good for this job.
+
+There are two ways to provide the dial-in address to the tool: with
+the command-line option -d or by setting the environment variable `CIRCUIT`
+to point to a file whose contents in the desired dial-in address.
+
+The rest of the tool's commands can be seen by typing
+
+	circuit help
+
+They exactly correspond to the API of the `github.com/gocircuit/client` package,
+which has a more detailed documentation.
 
 Learn more
 ----------
