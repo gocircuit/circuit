@@ -64,7 +64,8 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("%s:%d <%s> %s", e.File, e.Line, e.Func, e.Body)
+	return e.Body
+	//return fmt.Sprintf("%s:%d <%s> %s", e.File, e.Line, e.Func, e.Body)
 }
 
 func Unpack(x interface{}) error {

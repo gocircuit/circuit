@@ -23,9 +23,19 @@ type XProc struct {
 	Proc
 }
 
+func unpack(stat Stat) Stat {
+	stat.Exit = errors.Unpack(stat.Exit)
+	return stat
+}
+
+func pack(stat Stat) Stat {
+	stat.Exit = errors.Pack(stat.Exit)
+	return stat
+}
+
 func (x XProc) Wait() (Stat, error) {
 	stat, err := x.Proc.Wait()
-	return stat, errors.Pack(err)
+	return pack(stat), errors.Pack(err)
 }
 
 func (x XProc) Signal(sig string) error {
@@ -44,13 +54,17 @@ func (x XProc) Stderr() circuit.X {
 	return xio.NewXReadCloser(x.Proc.Stderr())
 }
 
+func (x XProc) Peek() Stat {
+	return pack(x.Proc.Peek())
+}
+
 type YProc struct {
 	X circuit.X
 }
 
 func (y YProc) Wait() (Stat, error) {
 	r := y.X.Call("Wait")
-	return r[0].(Stat), errors.Unpack(r[1])
+	return unpack(r[0].(Stat)), errors.Unpack(r[1])
 }
 
 func (y YProc) Signal(sig string) error {
@@ -75,7 +89,7 @@ func (y YProc) IsDone() bool {
 }
 
 func (y YProc) Peek() Stat {
-	return y.X.Call("Peek")[0].(Stat)
+	return unpack(y.X.Call("Peek")[0].(Stat))
 }
 
 func (y YProc) Stdin() io.WriteCloser {
