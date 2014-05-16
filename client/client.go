@@ -7,7 +7,6 @@
 
 /*
 	Package client provides access to the circuit programming environment to user programs.
-
 */
 package client
 
