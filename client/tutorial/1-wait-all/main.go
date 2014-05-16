@@ -41,6 +41,7 @@ func main() {
 		go func() {
 			// Pick a random circuit server to run payload on.
 			t := pickServer(c).Walk([]string{"wait-all", strconv.Itoa(i_)})
+			// Execute the process and store it in the anchor.
 			p, _ := t.MakeProc(cmd)
 			// Close the process standard input to indicte no intention to write data.
 			p.Stdin().Close()
