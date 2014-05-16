@@ -5,6 +5,7 @@
 // Authors:
 //   2014 Petar Maymounkov <p@gocircuit.org>
 
+// WaitAll is a simple circuit application that starts a few worker processes and waits until all finish.
 package main
 
 import (
@@ -29,26 +30,32 @@ func main() {
 	// The first argument is the circuit server address that this execution will use.
 	c := client.Dial(os.Args[1])
 
-	// ??
+	// Fire-off n payload processes.
 	ch := make(chan int)
 	for i := 0; i < n; i++ {
 		cmd := client.Cmd{
-			Path: "/bin/sleep",
+			Path: "/bin/sleep", 
 			Args: []string{strconv.Itoa(3+i*3)},
 		}
 		i_ := i
 		go func() {
-			t := pickServer(c).Walk([]string{"wait_all", strconv.Itoa(i_)})
+			// Pick a random circuit server to run payload on.
+			t := pickServer(c).Walk([]string{"wait-all", strconv.Itoa(i_)})
 			p, _ := t.MakeProc(cmd)
+			// Close the process standard input to indicte no intention to write data.
 			p.Stdin().Close()
+			// Block until the process exits.
 			p.Wait()
+			// Notify the unifying waiting logic.
 			ch <- 1
+			// Remove the anchor storing the process.
 			t.Scrub()
-			println("process", i_+1, "done")
+			println("Payload", i_+1, "finished.")
 		}()
 	}
+	// Wait for all payload processes to complete.
 	for i := 0; i < n; i++ {
 		<-ch
 	}
-	println("all done.")
+	println("All done.")
 }
