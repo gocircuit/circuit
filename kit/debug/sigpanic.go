@@ -65,7 +65,10 @@ func InstallKillPanic() {
 		ch := make(chan os.Signal, 1)
 		signal.Notify(ch, os.Kill)
 		for _ = range ch {
-			panic("sigkill")
+			prof := pprof.Lookup("goroutine")
+			prof.WriteTo(os.Stderr, 2)
+			os.Exit(1)
+			//panic("sigkill")
 		}
 	}()
 }

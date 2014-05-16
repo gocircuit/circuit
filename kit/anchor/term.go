@@ -54,7 +54,7 @@ type urn struct {
 }
 
 func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) {
-	log.Printf("%s make %s with %v", t.carrier().Path(), kind, arg)
+	log.Printf("Making %s as %s with %v", t.carrier().Path(), kind, arg)
 	t.carrier().TxLock()
 	defer t.carrier().TxUnlock()
 	if t.carrier().Get() != nil {
