@@ -1,7 +1,9 @@
 The Circuit
 ===========
 
-The circuit is a tiny daemon process, say like `sshd`. 
+The circuit is a tiny server process which runs instances on a cluster of machines
+to form a network, which enables distributed process orchestration and synchronization
+from any one machine.
 
 For a conceptual introduction to The Circuit, check out the
 [GopherCon 2014 Video](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures).
@@ -56,10 +58,29 @@ It uses communication and connectivity sparingly, hardly leaving a footprint whe
 Programming metaphor
 -------
 
-Each circuit server instance maintains a unique namespace : 
+Each circuit server hosts a hierarchical namespace of _elements_, where the elements
+are control primitives like _process_ or _channel_.
+
+Elements are addressed by paths of the form
+
+	/X317c2314a386a9db/hi/charlie
+
+where the first part of the path is necessarily the ID of the circuit server hosting the element,
+while the rest are user-specific.
 
 Learn more
 ----------
+
+The Go client for writing circuit apps is package
+
+	github.com/gocircuit/circuit/client
+
+The public interface of this package is self-contained. Other
+packages in the circuit repo are internal.
+
+Tutorials can be found within the client package directory
+
+	github.com/gocircuit/circuit/client/tutorial
 
 To stay up to date with new developments, documentation and articles, follow
 The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit) or
