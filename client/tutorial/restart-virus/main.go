@@ -23,19 +23,20 @@ func pick(c *client.Client) client.Anchor {
 	panic(0)
 }
 
-func watch(c *client.Client, service string) {
+func watch(c *client.Client, virus string) {
 	defer func() {
 		if r := recover(); r != nil {
 			println(r)
 		}
 	}()
-	t := c.Walk(client.Split(service))
+	c.Walk(append(client.Split(virus), "watcher")).Scrub()
+	t := c.Walk(append(client.Split(virus), "service"))
 	t.Get().(client.Proc).Wait()
 	t.Scrub()
 	time.Sleep(time.Second/2)
 }
 
-// restart-virus dial_url service_anchor?
+// restart-virus dial_url virus_anchor?
 func main() {
 	c := client.Dial(os.Args[1]) // argument is the url of a circuit server
 	if len(os.Args) == 3 {
@@ -55,10 +56,9 @@ func main() {
 	// start watcher
 	b := pick(c)
 	virus, _ := filepath.Abs(os.Args[0]) // we assume that the binary of this tool is on the same path everywhere
-	println("/" + a.Worker() + "/restart_virus/service")
 	watcher := client.Cmd{
 		Path: virus,
-		Args: []string{b.Addr(), "/" + a.Worker() + "/restart_virus/service"},
+		Args: []string{b.Addr(), "/" + a.Worker() + "/restart_virus"},
 	}
 	pwatcher, _ := b.Walk([]string{"restart_virus", "watcher"}).MakeProc(watcher)
 	pwatcher.Stdin().Close()
