@@ -7,9 +7,9 @@ and synchronization from any one machine.
 
 Some of the target applications of the circuit are:
 
-	* Automatic dynamic orchestration of complex compute pipelines, as in numerical computation, for instance
-	* Packaging and distribution of universal distributed binaries
-	* Incremental automation of small and large OPS engineering workflows
+* Automatic dynamic orchestration of complex compute pipelines, as in numerical computation, for instance
+* Packaging and distribution of universal distributed binaries
+* Incremental automation of small and large OPS engineering workflows
 
 For a conceptual introduction to The Circuit, check out the
 [GopherCon 2014 Video](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures).
