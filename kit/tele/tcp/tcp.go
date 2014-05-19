@@ -47,7 +47,7 @@ func (transport) Dial(addr net.Addr) (net.Conn, error) {
 		}
 		return nil, chain.ErrRIP
 	}
-	return &conn{trace.NewFrame("tcp", "dial"), c}, nil
+	return newConn(trace.NewFrame("tcp", "dial"), c.(*net.TCPConn)), nil
 }
 
 type listener struct {
@@ -59,10 +59,17 @@ func (l listener) Accept() (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &conn{trace.NewFrame("tcp", "acpt"), c}, nil
+	return newConn(trace.NewFrame("tcp", "acpt"), c.(*net.TCPConn)), nil
 }
 
 type conn struct {
 	trace.Frame
-	net.Conn
+	*net.TCPConn
+}
+
+func newConn(f trace.Frame, c *net.TCPConn) *conn {
+	if err := c.SetKeepAlive(true); err != nil {
+		panic(err)
+	}
+	return &conn{f, c}
 }

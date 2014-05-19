@@ -38,12 +38,12 @@ Run the servers
 To run the circuit server on the first machine, pick a public IP address and port for it to
 listen on, and start it like so
 
-	circuit start -a 10.0.0.7:11022
+	circuit start -a 10.0.0.1:11022
 
 The circuit server will print its own circuit URL on its standard output.
 It should look like this:
 
-	circuit://10.0.0.7:11022/78517/Q56e7a2a0d47a7b5d
+	circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d
 
 Copy it. We will need it to tell the next circuit server to “join” this one
 in a network, i.e. circuit.
@@ -51,7 +51,7 @@ in a network, i.e. circuit.
 Log onto another machine and similarly start a circuit server there, as well.
 This time, use the `-j` option to tell the new server to join the first one:
 
-	circuit start -a 10.0.0.5:11088 -j circuit://10.0.0.7:11022/78517/Q56e7a2a0d47a7b5d
+	circuit start -a 10.0.0.2:11088 -j circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d
 
 You now have two mutually-aware circuit servers, running on two different
 hosts in your cluster. You can join any number of additional hosts to the
