@@ -58,6 +58,7 @@ func (ds *DialSession) Dial() *Conn {
 // Session
 type Session struct {
 	frame   trace.Frame
+	//
 	scrb    func()
 	ach     chan *Conn
 	dialing bool

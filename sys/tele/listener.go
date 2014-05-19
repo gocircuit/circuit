@@ -39,9 +39,7 @@ func newListener(workerID n.WorkerID, pid int, listener *blend.Listener) *Listen
 func (l *Listener) loop() {
 	for {
 		session := l.listener.AcceptSession()
-		println("xxx> accepted new session")
 		go func() {
-			defer println("xxx> session closed")
 			defer session.Close()
 			// Authenticate dialer on first connection
 			sourceAddr, err := l.handshake(session.Accept())

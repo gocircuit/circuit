@@ -15,7 +15,7 @@ import (
 
 type Cascade struct {
 	frame trace.Frame
-	rw    sync.Mutex  // Read/write lock
+	rw    sync.Mutex
 	v     interface{} // Current value
 	i     int
 	exp   chan struct{} // Expire broadcast for current value

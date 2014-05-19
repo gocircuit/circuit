@@ -12,6 +12,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/gocircuit/circuit/kit/tele/trace"
 )
@@ -80,18 +81,28 @@ func (al *acceptLink) Link(reason error) (net.Conn, *bufio.Reader, SeqNo, error)
 		al.carrier.Close()
 	}
 	for {
-		replaceWith, ok := <-al.ach
-		if !ok {
+		select {
+		case <-time.After(7*time.Second): 
+			// If the dialer does not attempt to recover the connection within 7 seconds,
+			// the listener (us) drops it.
+			// TODO: If the reason for the disconnect is a temporary network partition,
+			// the dialer won't be able to recover this particular chain, but higher-level
+			// logic should retry connecting  to the same address on a new connection once,
+			// since this should succeed as a new chain connection after the partition is over.
 			return nil, nil, 0, io.ErrUnexpectedEOF
+		case replaceWith, ok := <-al.ach:
+			if !ok {
+				return nil, nil, 0, io.ErrUnexpectedEOF
+			}
+			if replaceWith.SeqNo > al.seqno {
+				al.seqno = replaceWith.SeqNo
+				al.carrier = replaceWith.Carrier
+				//al.Conn.frame.Printf("ACCEPTED #%d", al.seqno)
+				return al.carrier, replaceWith.R, al.seqno, nil
+			}
+			al.Conn.frame.Printf("out-of-order redial #%d arrived while using #%d", replaceWith.SeqNo, al.seqno)
+			replaceWith.Carrier.Close()
 		}
-		if replaceWith.SeqNo > al.seqno {
-			al.seqno = replaceWith.SeqNo
-			al.carrier = replaceWith.Carrier
-			//al.Conn.frame.Printf("ACCEPTED #%d", al.seqno)
-			return al.carrier, replaceWith.R, al.seqno, nil
-		}
-		al.Conn.frame.Printf("out-of-order redial #%d arrived while using #%d", replaceWith.SeqNo, al.seqno)
-		replaceWith.Carrier.Close()
 	}
 	panic("u")
 }
