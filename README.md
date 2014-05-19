@@ -32,10 +32,10 @@ you can build and install the circuit binary with one line:
 
 	go get github.com/gocircuit/circuit/cmd/circuit
 
-Run
----
+Run the servers
+---------------
 
-To run the circuit agent, pick a public IP address and port for it to
+To run the circuit server on the first machine, pick a public IP address and port for it to
 listen on, and start it like so
 
 	circuit start -a 10.0.0.7:11022
@@ -127,6 +127,9 @@ The rest of the tool's commands can be seen by typing
 They exactly correspond to the API of the `github.com/gocircuit/client` package,
 which has a more detailed documentation and a set of tutorials.
 
+Example: Make a process
+-----------------------
+
 Here are a few examples. To run a new process on some chosen
 cluster machine, first see what machines are available:
 
@@ -159,6 +162,57 @@ the standard input first, as shown above):
 Remove the process element from the anchor hierarchy
 
 	circuit scrub /X88550014d4c82e4d/pippi
+
+Example: Create a channel
+-------------------------
+
+Again, take a look at what servers are available:
+
+	circuit ls /...
+	---- /X88550014d4c82e4d
+	---- /X938fe923bcdef2390
+
+Pick one. Say `X88550014d4c82e4d`. Now, 
+let's create a channel on `X88550014d4c82e4d`:
+
+	circuit mkchan /X88550014d4c82e4d/this/is/charlie 3
+
+The last argument of this line is the channel buffer capacity,
+analogously to the way channels are created in Go.
+
+Verify the channel was created:
+
+	circuit peek /X88550014d4c82e4d/this/is/charlie
+
+This should print out something like this:
+
+	{
+			"Cap": 3,
+			"Closed": false,
+			"Aborted": false,
+			"NumSend": 0,
+			"NumRecv": 0
+	}
+
+Sending a message to the channel is accomplished with the command
+
+	circuit send /X88550014d4c82e4d/this/is/charlie < some_file
+
+The contents of the message is read out from the standard input of the
+command above. This command will block until a receiver is available,
+unless there is free space in the channel buffer for a message.
+
+When the command unblocks, it will send any data to the receiver.
+If there is no receiver, but there is a space in the message buffer,
+the command will also unblock and consume its standard input (saving
+it for an eventual receiver) but only up to 32K bytes.
+
+Receiving is accomplished with the command
+
+	circuit recv /X88550014d4c82e4d/this/is/charlie
+
+The received message will be produced on the standard output of 
+the command above.
 
 Be creative
 -------------
