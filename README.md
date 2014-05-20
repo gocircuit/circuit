@@ -264,3 +264,10 @@ comprehensive example of a circuit app. It can be found in
 To stay up to date with new developments, documentation and articles, follow
 The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit) or
 me [@maymounkov](https://twitter.com/maymounkov).
+
+Help
+----
+
+Please, tweet about the circuit (mention [@gocircuit](https://twitter.com/gocircuit)).
+Tweets are a much appreciated donation and they help us and our funders
+gauge the interest in this unconventional idea.
