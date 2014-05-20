@@ -9,21 +9,19 @@ package codec
 
 import (
 	"net"
-
-	"github.com/gocircuit/circuit/kit/tele/faithful"
 )
 
 type Conn struct {
 	enc   Encoder
 	dec   Decoder
-	faith *faithful.Conn
+	carrier CarrierConn
 }
 
-func NewConn(faith *faithful.Conn, codec Codec) *Conn {
+func NewConn(carrier CarrierConn, codec Codec) *Conn {
 	return &Conn{
 		enc:   codec.NewEncoder(),
 		dec:   codec.NewDecoder(),
-		faith: faith,
+		carrier: carrier,
 	}
 }
 
@@ -32,7 +30,7 @@ func (c *Conn) String() string {
 }
 
 func (c *Conn) RemoteAddr() net.Addr {
-	return c.faith.RemoteAddr()
+	return c.carrier.RemoteAddr()
 }
 
 func (c *Conn) Write(v interface{}) error {
@@ -40,11 +38,11 @@ func (c *Conn) Write(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return c.faith.Write(chunk)
+	return c.carrier.Write(chunk)
 }
 
 func (c *Conn) Read(v interface{}) error {
-	chunk, err := c.faith.Read()
+	chunk, err := c.carrier.Read()
 	if err != nil {
 		return err
 	}
@@ -52,5 +50,5 @@ func (c *Conn) Read(v interface{}) error {
 }
 
 func (c *Conn) Close() error {
-	return c.faith.Close()
+	return c.carrier.Close()
 }

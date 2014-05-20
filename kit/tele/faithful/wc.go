@@ -64,6 +64,7 @@ func (wc *writeConn) writeUser(writer *chain.ConnWriter, payload interface{}, se
 func (wc *writeConn) loop() {
 	bfrch := NewBufferReadChan(wc.bfr) // bfrchan returns a stream of chunks coming from buffer.Read
 	defer func() {
+		wc.bfr.Close()
 		// Drain buffer Read until error
 		for _ = range bfrch {
 		}

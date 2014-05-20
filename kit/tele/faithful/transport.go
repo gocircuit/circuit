@@ -12,6 +12,7 @@ import (
 
 	"github.com/gocircuit/circuit/kit/tele/chain"
 	"github.com/gocircuit/circuit/kit/tele/trace"
+	"github.com/gocircuit/circuit/kit/tele/codec"
 )
 
 // Transport
@@ -20,19 +21,19 @@ type Transport struct {
 	chain *chain.Transport
 }
 
-func NewTransport(frame trace.Frame, chain *chain.Transport) *Transport {
+func NewTransport(frame trace.Frame, chain *chain.Transport) codec.CarrierTransport {
 	t := &Transport{frame: frame, chain: chain}
 	t.frame.Bind(t)
 	return t
 }
 
-func (t *Transport) Listen(addr net.Addr) *Listener {
+func (t *Transport) Listen(addr net.Addr) codec.CarrierListener {
 	return NewListener(t.frame.Refine("listener"), t.chain.Listen(addr))
 }
 
 // Dial returns instanteneously (it does not wait on I/O operations) and always succeeds,
 // returning a non-nil connection object.
-func (t *Transport) Dial(addr net.Addr) *Conn {
+func (t *Transport) Dial(addr net.Addr) codec.CarrierConn {
 	conn := t.chain.Dial(addr)
 	return NewConn(t.frame.Refine("dial"), conn)
 }
@@ -43,7 +44,7 @@ type Listener struct {
 	sub   *chain.Listener
 }
 
-func NewListener(f trace.Frame, sub *chain.Listener) *Listener {
+func NewListener(f trace.Frame, sub *chain.Listener) codec.CarrierListener {
 	l := &Listener{frame: f, sub: sub}
 	l.frame.Bind(l)
 	return l
@@ -53,6 +54,6 @@ func (l *Listener) Addr() net.Addr {
 	return l.sub.Addr()
 }
 
-func (l *Listener) Accept() *Conn {
+func (l *Listener) Accept() codec.CarrierConn {
 	return NewConn(l.frame.Refine("accept"), l.sub.Accept())
 }

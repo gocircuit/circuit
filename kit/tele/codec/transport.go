@@ -9,16 +9,31 @@ package codec
 
 import (
 	"net"
-
-	"github.com/gocircuit/circuit/kit/tele/faithful"
 )
 
+type CarrierTransport interface {
+	Listen(addr net.Addr) CarrierListener
+	Dial(addr net.Addr) CarrierConn
+}
+
+type CarrierListener interface {
+	Addr() net.Addr
+	Accept() CarrierConn
+}
+
+type CarrierConn interface {
+	RemoteAddr() net.Addr
+	Read() (chunk []byte, err error)
+	Write(chunk []byte) (err error)
+	Close() (err error)
+}
+
 type Transport struct {
-	sub   *faithful.Transport
+	sub   CarrierTransport
 	codec Codec
 }
 
-func NewTransport(sub *faithful.Transport, codec Codec) *Transport {
+func NewTransport(sub CarrierTransport, codec Codec) *Transport {
 	return &Transport{sub: sub, codec: codec}
 }
 
@@ -32,19 +47,19 @@ func (t *Transport) Dial(addr net.Addr) *Conn {
 func (t *Transport) Listen(addr net.Addr) *Listener {
 	return &Listener{
 		codec:    t.codec,
-		Listener: t.sub.Listen(addr),
+		CarrierListener: t.sub.Listen(addr),
 	}
 }
 
 type Listener struct {
 	codec Codec
-	*faithful.Listener
+	CarrierListener
 }
 
 func (l *Listener) Accept() *Conn {
-	return NewConn(l.Listener.Accept(), l.codec)
+	return NewConn(l.CarrierListener.Accept(), l.codec)
 }
 
 func (l *Listener) Addr() net.Addr {
-	return l.Listener.Addr()
+	return l.CarrierListener.Addr()
 }

@@ -100,7 +100,7 @@ func main() {
 	virus, _ := filepath.Abs(os.Args[0]) // We assume that the virus binary is on the same path everywhere
 	nucleus := client.Cmd{
 		Path: virus,
-		Args: []string{b.Addr(), "/" + a.Worker() + "/virus"},
+		Args: []string{b.Addr(), "/" + a.ServerID() + "/virus"},
 	}
 	pnucleus, _ := b.Walk([]string{"virus", "nucleus"}).MakeProc(nucleus)
 	if err := pnucleus.Peek().Exit; err != nil {
