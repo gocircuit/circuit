@@ -159,6 +159,8 @@ Run a new `ls` process:
 	}
 	EOF
 
+![Process elements execute OS processes on behalf of the user](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/mkproc.png)
+
 See what happened:
 
 	circuit peek /X88550014d4c82e4d/pippi
