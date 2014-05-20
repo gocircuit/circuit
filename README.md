@@ -107,8 +107,19 @@ their anchor.
 Use
 ---
 
-Once the circuit servers are started, one can iteractively create, observe and control
-circuit elements, using the circuit binary which doubles as a command-line client.
+Once the circuit servers are started, one can create, observe and control
+circuit elements (i) interactively using the circuit binary which doubles as a command-line client,
+as well as (ii) programmatically using the circuit Go client package `github.com/gocircuit/circuit/client`.
+In fact, the circuit command-line tool is merely a front for a subset the Go client library,
+and is a circuit client itself.
+
+Clients (the tool or your own) connect into a circuit server and perform
+operations via this server. Which server a client connects to is called
+the _dial-in_ server. In general, it does not matter which server you
+connect your client to. They are all equally good. And they all can control
+the whole system.
+
+![Circuit client connected to a server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/servers.png)
 
 To list the entire circuit cluster anchor hierarchy, type in
 
