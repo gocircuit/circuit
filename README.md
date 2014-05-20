@@ -56,7 +56,7 @@ This time, use the `-j` option to tell the new server to join the first one:
 You now have two mutually-aware circuit servers, running on two different
 hosts in your cluster. 
 
-![A circuit system of two hosts.](https://raw.github.com/gocircuit/circuit/trunk/misc/img/servers.png)
+![A circuit system of two hosts.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/servers.png)
 
 You can join any number of additional hosts to the circuit environment in a
 similar fashion, even billions.  The circuit uses a modern [expander
