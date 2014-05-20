@@ -119,7 +119,7 @@ the _dial-in_ server. In general, it does not matter which server you
 connect your client to. They are all equally good. And they all can control
 the whole system.
 
-![Circuit client connected to a server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/servers.png)
+![Circuit client connected to a server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/client.png)
 
 To list the entire circuit cluster anchor hierarchy, type in
 
