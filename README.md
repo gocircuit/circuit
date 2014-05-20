@@ -193,6 +193,8 @@ let's create a channel on `X88550014d4c82e4d`:
 The last argument of this line is the channel buffer capacity,
 analogously to the way channels are created in Go.
 
+![Channel elements reside in the memory of a circuit server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/mkchan.png)
+
 Verify the channel was created:
 
 	circuit peek /X88550014d4c82e4d/this/is/charlie
