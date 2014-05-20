@@ -37,8 +37,9 @@ type Anchor interface {
 	// Addr returns the address of the circuit server hosting this anchor.
 	Addr() string
 
-	// Worker returns the ID within the anchor namespace of the circuit server hosting this anchor.
-	Worker() string
+	// ServerID returns the ID of the circuit server hosting this anchor.
+	// The returned string will look like "X123..."
+	ServerID() string
 
 	// Walk traverses the anchor namespace, starting from this anchor along the path in walk.
 	// Errors in communication or a missing circuit server condition are reported via panics.
@@ -94,7 +95,7 @@ func (t terminal) Addr() string {
 	return t.k.X.Addr().String()
 }
 
-func (t terminal) Worker() string {
+func (t terminal) ServerID() string {
 	return t.k.ID.String()
 }
 

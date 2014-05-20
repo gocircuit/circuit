@@ -98,8 +98,8 @@ func (c *Client) newTerminal(xterm circuit.X, xkin kinfolk.KinXID) terminal {
 	}
 }
 
-// Worker is an Anchor interface method, not applicable to the root-level anchor.
-func (c *Client) Worker() string {
+// ServerID is an Anchor interface method, not applicable to the root-level anchor.
+func (c *Client) ServerID() string {
 	return ""
 }
 
