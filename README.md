@@ -125,6 +125,15 @@ To list the entire circuit cluster anchor hierarchy, type in
 
 	circuit ls /...
 
+You get
+
+	---- /X88550014d4c82e4d
+	---- /X938fe923bcdef2390
+
+The two root-level anchors correspond to the two circuit servers.
+
+![Circuit servers correspond to root-level anchors](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/serveranchor.png)
+
 Before this command can work, however, you need to give it the address of
 any one of the circuit servers as a _dial-in_ point. The choice of dial-in
 server does not matter at all. All circuit servers are equally good for this job.
