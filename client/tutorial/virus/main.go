@@ -50,8 +50,8 @@ func waitFotPayloadDeath(c *client.Client, payloadAnchor string) (recov interfac
 	// }()
 	t := c.Walk(client.Split(payloadAnchor)) // Access the process anchor of the currently-running payload of the virus.
 	t.Get().(client.Proc).Wait() // Wait until the payload process exits.
-	time.Sleep(2*time.Second) // Wait a touch to slow down the spin
 	t.Scrub() // scrub payload anchor from old process element
+	time.Sleep(2*time.Second) // Wait a touch to slow down the spin
 	return
 }
 
@@ -76,8 +76,8 @@ func main() {
 
 	// The nucleus role waits for the payload process to die before it proceeds.
 	if nucleusAnchor != "" {
-		c.Walk(client.Split(nucleusAnchor)).Scrub() // remove anchor pointing to us
 		waitFotPayloadDeath(c, payloadAnchor)
+		c.Walk(client.Split(nucleusAnchor)).Scrub() // remove anchor pointing to us
 	}
 	spawnNucleus(c, spawnPayload(c))
 }
