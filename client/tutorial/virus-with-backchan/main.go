@@ -28,6 +28,7 @@
 package main
 
 import (
+	"fmt"
 	"path"
 	"path/filepath"
 	"os"
@@ -113,7 +114,7 @@ func main() {
 	} else {
 		// Make the back channel
 		backServer := pickServer(c)
-		backChan, err = backServer.Walk([]string{"virus", "back"}).MakeChan(1)
+		backChan, err = backServer.Walk([]string{"virus", "back"}).MakeChan(2)
 		if err != nil {
 			panic(err)
 		}
@@ -121,11 +122,7 @@ func main() {
 	}
 
 	// Acquire permission to send to back channel
-	backPipe, err := backChan.Send()
-	if err != nil {
-		panic(err)
-	}
-	defer backPipe.Close()
+	backPipe := acquireBackChan(c, backChan)
 
 	// The nucleus role waits for the payload process to die before it proceeds.
 	if isNucleus {
@@ -150,6 +147,30 @@ func main() {
 
 	payloadAnchor = spawnPayload(c, epoch)
 	spawnNucleus(c, backAnchor, payloadAnchor, epoch)
+}
+
+func acquireBackChan(c *client.Client, backChan client.Chan) io.ReadCloser {
+	// Acquire permission to send to back channel
+	backPipe, err := backChan.Send()
+	if err != nil {
+		panic(err)
+	}
+	go func() {
+		defer backPipe.Close()
+		defer func() {
+			recover()
+		}()
+		for {
+			rc, err := backPipe.Recv()
+			if err != nil {
+				panic(err)
+			}
+			io.Copy(os.Stdout, rc)
+		}
+	}()
+	fmt.Fprintf(backPipe, "<%d>\n", epoch)
+	fmt.Fprintf(backPipe, "nucleus epoch %d acquired back channel\n", epoch)
+	return backPipe
 }
 
 func spawnPayload(c *client.Client, epoch int) (payloadAnchor string) {

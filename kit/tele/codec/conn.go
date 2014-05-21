@@ -18,6 +18,9 @@ type Conn struct {
 }
 
 func NewConn(carrier CarrierConn, codec Codec) *Conn {
+	if carrier == nil {
+		panic("nil carrier")
+	}
 	return &Conn{
 		enc:   codec.NewEncoder(),
 		dec:   codec.NewDecoder(),
