@@ -279,7 +279,7 @@ To stay up to date with new developments, documentation and articles, follow
 The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit) or
 me [@maymounkov](https://twitter.com/maymounkov).
 
-Help
+Donate with a tweet
 ----
 
 Please, tweet about the circuit (mention [@gocircuit](https://twitter.com/gocircuit)).
