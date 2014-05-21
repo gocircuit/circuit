@@ -15,11 +15,7 @@ package tele
 	+----------------+
 	|     BLEND      | Logical connection de/multiplexing over a single underlying connection.
 	+----------------+
-	|     CODEC      | Per-faithful-connection, stateful encoding/decoding layer, e.g. gob/ProtoBuf/etc.
-	+----------------+
-	|    FAITHFUL    | Recover dropped messages from lossy connection.
-	+----------------+
-	|     CHAIN      | Linkup of multiple disconnect-prone carrier connections into a single lossy disconnect-less connection.
+	|     CODEC      | Stateful encoding/decoding layer, e.g. gob/ProtoBuf/etc.
 	+----------------+
 	|    CARRIER     | Underlying transport, e.g. TCP/WebRTC/sandbox/etc.
 	+----------------+
