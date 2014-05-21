@@ -25,6 +25,10 @@ type Cmd struct {
 	// Args is a list of command line arguments to be passed on to the process.
 	// The first element in the slice corresponds to the first argument to the process (not to its binary path).
 	Args []string
+
+	// If Scrub is set, the process element will automatically be removed from its anchor
+	// when the process exits.
+	Scrub bool
 }
 
 func retypeProcStat(c proc.Cmd) Cmd {
@@ -32,6 +36,7 @@ func retypeProcStat(c proc.Cmd) Cmd {
 		Env: c.Env,
 		Path: c.Path,
 		Args: c.Args,
+		Scrub: c.Scrub,
 	}
 }
 
@@ -40,6 +45,7 @@ func (cmd Cmd) retype() proc.Cmd {
 		Env: cmd.Env,
 		Path: cmd.Path,
 		Args: cmd.Args,
+		Scrub: cmd.Scrub,
 	}
 }
 

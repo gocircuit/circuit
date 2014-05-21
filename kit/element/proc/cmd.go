@@ -16,6 +16,7 @@ type Cmd struct {
 	Env  []string `json:"env"`
 	Path string   `json:"path"`
 	Args []string `json:"args"`
+	Scrub bool `json:"scrub"`
 }
 
 func ParseCmd(src string) (*Cmd, error) {

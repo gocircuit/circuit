@@ -97,6 +97,7 @@ func main() {
 			Action: mkproc,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.BoolFlag{"scrub", "scrub the process anchor automatically on exit"},
 			},
 		},
 		{

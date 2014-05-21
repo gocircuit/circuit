@@ -39,6 +39,9 @@ func mkproc(x *cli.Context) {
 	if err := json.Unmarshal(buf, &cmd); err != nil {
 		fatalf("command json not parsing: %v", err)
 	}
+	if x.Bool("scrub") {
+		cmd.Scrub = true
+	}
 	p, err := c.Walk(w).MakeProc(cmd)
 	if err != nil {
 		fatalf("mkproc error: %s", err)

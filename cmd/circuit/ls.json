@@ -1,4 +1,4 @@
 {
-	"path": "/bin/ls",
-	"args": ["/"]
+	"Path": "/bin/ls",
+	"Args": ["/"]
 }

@@ -1,0 +1,4 @@
+{
+	"Path": "/usr/bin/say",
+	"Args": ["i am pippi"]
+}

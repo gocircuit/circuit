@@ -44,6 +44,7 @@ type proc struct {
 	cmd struct {
 		sync.Mutex
 		cmd exec.Cmd
+		scrb bool
 		abr chan<- struct{}
 		wait chan<- error
 		exit error // exit set by waiter
@@ -65,6 +66,7 @@ func MakeProc(cmd Cmd) Proc {
 	bin := strings.TrimSpace(cmd.Path)
 	p.cmd.cmd.Path = bin
 	p.cmd.cmd.Args = append([]string{bin}, cmd.Args...)
+	p.cmd.scrb = cmd.Scrub
 	// exec
 	if err := p.cmd.cmd.Start(); err != nil {
 		p.cmd.wait <- fmt.Errorf("exec error: %s", err.Error())
@@ -143,7 +145,8 @@ func (p *proc) GetCmd() Cmd {
 	return Cmd{
 		Env:  p.cmd.cmd.Env,
 		Path: p.cmd.cmd.Path,
-		Args: p.cmd.cmd.Args,
+		Args: p.cmd.cmd.Args[1:],
+		Scrub: p.cmd.scrb,
 	}
 }
 
@@ -155,7 +158,7 @@ func (p *proc) IsDone() bool {
 	}
 	switch p.phase() {
 	case NotStarted, Exited, Signaled:
-		return true
+		return p.cmd.scrb
 	}
 	return false
 }
@@ -171,7 +174,8 @@ func (p *proc) peek() Stat {
 		Cmd: Cmd{
 			Env: p.cmd.cmd.Env,
 			Path: p.cmd.cmd.Path,
-			Args: p.cmd.cmd.Args,
+			Args: p.cmd.cmd.Args[1:],
+			Scrub: p.cmd.scrb,
 		},
 		Exit: p.cmd.exit,
 		Phase: p.phase().String(),

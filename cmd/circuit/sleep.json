@@ -1,4 +1,4 @@
 {
-	"path": "/bin/sleep",
-	"args": ["20"]
+	"Path": "/bin/sleep",
+	"Args": ["20"]
 }
