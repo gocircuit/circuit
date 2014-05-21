@@ -39,7 +39,7 @@ func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus 
 	}
 	go loopJoin(kinJoin)
 	go locus.loopLeave(kinLeave)
-	go locus.loopExpire()
+	go locus.loopAnnounceAndExpire()
 	//log.Println(locus.Peer.Key())
 	return XLocus{locus}
 }
@@ -54,12 +54,14 @@ func (locus *Locus) GetPeers() []*Peer {
 	return s
 }
 
-func (locus *Locus) loopExpire() {
-	const GarbageDuration = time.Second * 3
+// loopAnnounceAndExpire writes a new version of this server's peer record to the tube view every 2 seconds,
+// then it iterates through all peer records in the tube view, forgetting those older than 4 seconds.
+func (locus *Locus) loopAnnounceAndExpire() {
+	const GarbageDuration = time.Second * 4
 	var rev tube.Rev
 	for {
 		rev++
-		//log.Printf("WRITING (%s,%d,%v)", locus.info.Key(), rev, locus.info)
+		// log.Printf("(Re)announcing ourselves (%s,%d,%v)", locus.Peer.Key(), rev, locus.Peer)
 		locus.tube.Write(locus.Peer.Key(), rev, locus.Peer)
 		//
 		time.Sleep(GarbageDuration / 2)
@@ -77,7 +79,7 @@ func loopJoin(kinjoin <-chan kinfolk.KinXID) {
 		if !ok {
 			panic("u")
 		}
-		log.Println("Peering server", kinXID.X.Addr(), "joined the circuit")
+		log.Println("Peering server", kinXID.X.Addr(), "joined the circuit.")
 	}
 }
 
@@ -93,7 +95,7 @@ func (locus *Locus) loopLeave(kinleave <-chan kinfolk.KinXID) {
 
 func (locus *Locus) denounce(kinXID kinfolk.KinXID) {
 	peer := &Peer{Kin: kinXID}
-	log.Println("denouncing", peer.Key())
+	log.Println("Denouncing", peer.Key())
 	r := locus.tube.Lookup(peer.Key())
 	if r == nil {
 		return

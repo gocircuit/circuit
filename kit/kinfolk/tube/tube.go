@@ -78,9 +78,9 @@ func (t *Tube) loopJoining() {
 
 func (t *Tube) superscribe(peerXID kinfolk.FolkXID) {
 	log.Printf("tube superscribing %s", peerXID.ID.String())
-	defer func() {
-		log.Printf("tube superscribed %s\n%s", peerXID.ID.String(), t.Dump())
-	}()
+	// defer func() {
+	// 	log.Printf("tube superscribed %s\n%s", peerXID.ID.String(), t.Dump())
+	// }()
 	//
 	t.Lock()
 	defer t.Unlock()
@@ -113,7 +113,7 @@ func (t *Tube) BulkRead() []*Record {
 func (t *Tube) Write(key string, rev Rev, value interface{}) (changed bool) {
 	// log.Printf("tube writing (%s,%d,%v)", key, rev, value)
 	// defer func() {
-	// 	log.Printf("tube wrote, changed=%v\n%s", changed, t.Dump())
+	// 	log.Printf("tube written to, changed=%v\n%s", changed, t.Dump())
 	// }()
 
 	t.Lock()
@@ -189,10 +189,10 @@ func (t *Tube) bulkWriteSync(changed []*Record) {
 }
 
 func (t *Tube) BulkWrite(bulk []*Record) {
-	log.Printf("tube bulk writing")
-	defer func() {
-		log.Printf("tube bulk wrote\n%s", t.Dump())
-	}()
+	// log.Printf("tube bulk writing")
+	// defer func() {
+	// 	log.Printf("tube bulk written to\n%s", t.Dump())
+	// }()
 
 	if len(bulk) == 0 {
 		return
@@ -210,10 +210,10 @@ func (t *Tube) BulkWrite(bulk []*Record) {
 }
 
 func (t *Tube) Forget(key string, notAfterRev Rev, notAfterUpdated time.Time) bool {
-	log.Printf("tube forgetting %s not after rev %v and not after updated %v", key, notAfterRev, notAfterUpdated)
-	defer func() {
-		log.Printf("tube forgot\n%s", t.Dump())
-	}()
+	// log.Printf("tube forgetting %s not after rev %v and not after updated %v", key, notAfterRev, notAfterUpdated)
+	// defer func() {
+	// 	log.Printf("tube forgot\n%s\n", t.Dump())
+	// }()
 	t.Lock()
 	defer t.Unlock()
 	return t.forget(key, notAfterRev, notAfterUpdated)
