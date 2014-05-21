@@ -11,6 +11,8 @@ Some of the target applications of the circuit are:
 * Packaging and distribution of universal distributed binaries
 * Incremental automation of small and large OPS engineering workflows
 
+Dive straight into it with the [Quick Start slide deck](https://docs.google.com/presentation/d/1x6ZqTg6AeVHMGh1ug1oqGZ9kYFLoorjRhDlTs7ytj3o/edit?usp=sharing).
+
 For a conceptual introduction to The Circuit, check out the
 [GopherCon 2014 Video](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures).
 Since this video was recorded, the API-via-file-system approach was abandoned
