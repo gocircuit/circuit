@@ -52,6 +52,7 @@ func mkproc(x *cli.Context) {
 	}
 }
 
+// circuit signal kill /X1234/hola/charlie
 func sgnl(x *cli.Context) {
 	defer func() {
 		if r := recover(); r != nil {
