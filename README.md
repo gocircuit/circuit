@@ -18,6 +18,9 @@ For a conceptual introduction to The Circuit, check out the
 Since this video was recorded, the API-via-file-system approach was abandoned
 in favor of a simpler command-line tool and a Go client library.
 
+Also take a look at the [faux animated illustration](https://docs.google.com/presentation/d/1nazPJAmYeIvJam9oiA-6euEz3Bo9flRLqsgRU7QAlr0/edit?usp=sharing)
+of the [Advanced Tutorial: Virus with a back channel](https://github.com/gocircuit/circuit/tree/master/client/tutorial/virus-with-backchan).
+
 The circuit is a tool for executing and synchronizing UNIX processes across entire clusters
 by means of a command-line tool and a client library.
 
