@@ -127,8 +127,8 @@ To list the entire circuit cluster anchor hierarchy, type in
 
 You get
 
-	---- /X88550014d4c82e4d
-	---- /X938fe923bcdef2390
+	/X88550014d4c82e4d
+	/X938fe923bcdef2390
 
 The two root-level anchors correspond to the two circuit servers.
 
@@ -156,8 +156,8 @@ Here are a few examples. To run a new process on some chosen
 cluster machine, first see what machines are available:
 
 	circuit ls /...
-	---- /X88550014d4c82e4d
-	---- /X938fe923bcdef2390
+	/X88550014d4c82e4d
+	/X938fe923bcdef2390
 
 Run a new `ls` process:
 
@@ -193,8 +193,8 @@ Example: Create a channel
 Again, take a look at what servers are available:
 
 	circuit ls /...
-	---- /X88550014d4c82e4d
-	---- /X938fe923bcdef2390
+	/X88550014d4c82e4d
+	/X938fe923bcdef2390
 
 Pick one. Say `X88550014d4c82e4d`. Now, 
 let's create a channel on `X88550014d4c82e4d`:
