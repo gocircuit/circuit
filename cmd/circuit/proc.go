@@ -63,12 +63,12 @@ func sgnl(x *cli.Context) {
 	if len(args) != 2 {
 		fatalf("signal needs an anchor and a signal name arguments")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args[1])
 	u, ok := c.Walk(w).Get().(client.Proc)
 	if !ok {
 		fatalf("not a process")
 	}
-	if err := u.Signal(args[1]); err != nil {
+	if err := u.Signal(args[0]); err != nil {
 		fatalf("signal error: %v", err)
 	}
 }

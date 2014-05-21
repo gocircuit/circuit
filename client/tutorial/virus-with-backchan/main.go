@@ -53,13 +53,6 @@ func waitFotPayloadDeath(c *client.Client, myAnchor, payloadAnchor string, epoch
 		recov = recover()
 	}()
 
-	// Access the process anchor that started this very process and
-	// remove it to make room for the new one.
-	// Note that scrubbing a process anchor removes the process element,
-	// but in no way affects the underlying OS process.
-	// walkToVirus := client.Split(myAnchor)
-	// c.Walk(client.Split(myAnchor)).Scrub()  XXX // How should process scrub behave?
-
 	// Access the process anchor of the currently-running payload of the virus.
 	t := c.Walk(client.Split(payloadAnchor))
 	// Wait until the payload process exits.
@@ -154,6 +147,7 @@ func spawnPayload(c *client.Client, epoch int) (payloadAnchor string) {
 	service := client.Cmd{
 		Path: "/usr/bin/say", // say is a standard OSX command which speaks, so it's easy to hear the virus in action.
 		Args: []string{"i am a virus"},
+		Scrub: true,
 	}
 	// Randomly choose a circuit server to host the virus payload.
 	a := pickServer(c)
@@ -190,6 +184,7 @@ func spawnNucleus(c *client.Client, backAnchor, payloadAnchor string, epoch int)
 			nucleusAnchor, // anchor of the spawned nucleus itself
 			nucleusEpoch, // epoch
 		},
+		Scrub: true,
 	}
 	pnucleus, err := b.Walk([]string{"virus", "nucleus", nucleusEpoch}).MakeProc(nucleus)
 	if err != nil {

@@ -76,11 +76,15 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 	for n, a := range anchor.View() {
 		e := &entry{n: n, a: a}
 		v := a.Get()
-		switch v.(type) {
+		switch t := v.(type) {
 		case client.Chan:
 			e.k = "chan"
 		case client.Proc:
-			e.k = "proc"
+			if t.GetCmd().Scrub {
+				e.k = "proc:scrub-on-exit"
+			} else {
+				e.k = "proc"
+			}
 		default:
 		}
 		c = append(c, e)
@@ -91,9 +95,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
 		}
 		if long {
-			if e.k != "" || level == 0 {
-				fmt.Printf("%s%s:<%s>\n", prefix, e.n, e.k)
-			}
+			fmt.Printf("%s%s•<%s>\n", prefix, e.n, e.k)
 		} else {
 			fmt.Printf("%s%s\n", prefix, e.n)
 		}
