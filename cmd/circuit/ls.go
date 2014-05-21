@@ -82,9 +82,6 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 		case client.Proc:
 			e.k = "proc"
 		default:
-			if level == 0 {
-				e.k = "nil"
-			}
 		}
 		c = append(c, e)
 	}
@@ -93,12 +90,12 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 		if recurse && depth {
 			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
 		}
-		if e.k != "" {
-			if long {
+		if long {
+			if e.k != "" || level == 0 {
 				fmt.Printf("%s%s:<%s>\n", prefix, e.n, e.k)
-			} else {
-				fmt.Printf("%s%s\n", prefix, e.n)
 			}
+		} else {
+			fmt.Printf("%s%s\n", prefix, e.n)
 		}
 		if recurse && !depth {
 			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)

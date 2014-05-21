@@ -7,8 +7,6 @@
 
 /*
 
-	THIS TUTORIAL IS NOT READY YET.
-
 	Virus is a simple, mildly-resilient to failure mechanism that runs around a cluster
 	and delivers its payload (a process execution), in a self-sustained fashion.
 
@@ -78,8 +76,8 @@ func waitFotPayloadDeath(c *client.Client, myAnchor, payloadAnchor string, epoch
 //	virus DIALIN_CIRCUIT
 // To invoke the virus in the role of a nucleus process:
 // 	virus DIALIN_CIRCUIT BACKCHAN_ANCHOR PAYLOAD_ANCHOR SELF_ANCHOR EPOCH
+//
 func main() {
-
 	// Parse arguments
 	var (
 		err error
@@ -102,11 +100,27 @@ func main() {
 		println("usage: virus circuit://...")
 		os.Exit(1)
 	}
+	println("virus nucleus epoch", epoch, "dialing into", os.Args[1])
 	c := client.Dial(os.Args[1])
 
 	// Create/get back channel
-	var backAnchor string
-	var backChan client.Chan
+	backAnchor, backChan := findBackChan(c, isNucleus)
+
+	// Acquire permission to send to back channel
+	acquireBackChan(c, backChan, epoch)
+
+	// The nucleus role waits for the payload process to die before it proceeds.
+	if isNucleus {
+		waitFotPayloadDeath(c, myAnchor, payloadAnchor, epoch)
+	}
+
+	payloadAnchor = spawnPayload(c, epoch)
+	spawnNucleus(c, backAnchor, payloadAnchor, epoch)
+}
+
+// Create or get back channel
+func findBackChan(c *client.Client, isNucleus bool) (backAnchor string, backChan client.Chan) {
+	var err error
 	if isNucleus {
 		// The nucleus does not proceed with execution until it acquires permission
 		// to send the the virus' back channel.
@@ -122,38 +136,7 @@ func main() {
 		}
 		backAnchor = path.Join("/", backServer.ServerID(), "virus", "back")
 	}
-
-	// Acquire permission to send to back channel
-	backPipe := acquireBackChan(c, backChan, epoch)
-
-	// The nucleus role waits for the payload process to die before it proceeds.
-	if isNucleus {
-		waitFotPayloadDeath(c, myAnchor, payloadAnchor, epoch)
-	}
-
-	// Start the payload process
-	service := client.Cmd{
-		Path: "/usr/bin/say", // say is a standard OSX command which speaks, so it's easy to hear the virus in action.
-		Args: []string{"i am a virus"},
-	}
-	// Randomly choose a circuit server to host the virus payload.
-	a := pickServer(c)
-	// Run the payload
-	pservice, err := a.Walk([]string{"virus", "payload"}).MakeProc(service)
-	if err != nil {
-		println("payload not created:", err.Error())
-		os.Exit(1)
-	}
-	if err := pservice.Peek().Exit; err != nil {
-		println("payload not started:", err.Error())
-		return
-	}
-	// Close the standard input of the payload to indicate no intention to write data.
-	pservice.Stdin().Close()
-	fmt.Fprintf(backPipe, "<%d> started payload\n", epoch)
-
-	payloadAnchor = spawnPayload(c, epoch)
-	spawnNucleus(c, backAnchor, payloadAnchor, epoch)
+	return
 }
 
 func acquireBackChan(c *client.Client, backChan client.Chan, epoch int) io.WriteCloser {
@@ -162,22 +145,6 @@ func acquireBackChan(c *client.Client, backChan client.Chan, epoch int) io.Write
 	if err != nil {
 		panic(err)
 	}
-	go func() {
-		defer func() {
-			recover()
-		}()
-		defer func() {
-			backChan.Close()
-		}()
-		for {
-			rc, err := backChan.Recv()
-			if err != nil {
-				panic(err)
-			}
-			io.Copy(os.Stdout, rc)
-		}
-	}()
-	fmt.Fprintf(backPipe, "<%d>\n", epoch)
 	fmt.Fprintf(backPipe, "<%d> nucleus acquired back channel\n", epoch)
 	return backPipe
 }
@@ -192,13 +159,18 @@ func spawnPayload(c *client.Client, epoch int) (payloadAnchor string) {
 	a := pickServer(c)
 	// Run the payload
 	payloadEpoch := strconv.Itoa(epoch+1)
-	pservice, _ := a.Walk([]string{"virus", "payload", payloadEpoch}).MakeProc(service)
+	pservice, err := a.Walk([]string{"virus", "payload", payloadEpoch}).MakeProc(service)
+	if err != nil {
+		println("payload not created:", err.Error())
+		os.Exit(1)
+	}
 	if err := pservice.Peek().Exit; err != nil {
 		println("payload not started:", err.Error())
-		return
+		os.Exit(1)
 	}
 	// Close the standard input of the payload to indicate no intention to write data.
 	pservice.Stdin().Close()
+	//fmt.Fprintf(backPipe, "<%d> started payload\n", epoch)
 	return path.Join("/", a.ServerID(), "virus", "payload", payloadEpoch)
 }
 
@@ -212,7 +184,7 @@ func spawnNucleus(c *client.Client, backAnchor, payloadAnchor string, epoch int)
 	nucleus := client.Cmd{
 		Path: virus,
 		Args: []string{
-			b.Addr(), "/" + b.ServerID() + "/virus", // dial-in circuit server address
+			b.Addr(), // dial-in circuit server address
 			backAnchor, // virus back channel anchor
 			payloadAnchor, // payload anchor
 			nucleusAnchor, // anchor of the spawned nucleus itself
