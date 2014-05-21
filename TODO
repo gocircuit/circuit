@@ -1,5 +1,3 @@
-Reference client (Go)
-User-supplied JSON circuit-instance attributes 
 Mutex element
 
 OPTIMIZATIONS
@@ -13,6 +11,8 @@ Garbage-collection of elements
 
 PROJECTS
 ========
+
+Suggested HMAC, using shared pub/priv keys to join, separate set of keys for invocation.
 
 add waitjoin
 add docker element

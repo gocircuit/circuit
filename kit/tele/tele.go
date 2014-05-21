@@ -16,10 +16,10 @@ import (
 	"github.com/gocircuit/circuit/kit/tele/trace"
 )
 
-func NewChunkOverTCP() *blend.Transport {
+func NewChunkOverFaithfulTCP() *blend.Transport {
 	f := trace.NewFrame("tele")
 	// Carrier
-	x0 := tcp.Transport
+	x0 := tcp.ChainTransport
 	// Chain
 	x1 := chain.NewTransport(f.Refine("chain"), x0)
 	// Faithful
@@ -30,14 +30,24 @@ func NewChunkOverTCP() *blend.Transport {
 	return blend.NewTransport(f.Refine("blend"), x3)
 }
 
-func NewStructOverTCP() *blend.Transport {
+func NewStructOverFaithfulTCP() *blend.Transport {
 	f := trace.NewFrame("tele")
 	// Carrier
-	x0 := tcp.Transport
+	x0 := tcp.ChainTransport
 	// Chain
 	x1 := chain.NewTransport(f.Refine("chain"), x0)
 	// Faithful
 	x2 := faithful.NewTransport(f.Refine("faithful"), x1)
+	// Codec
+	x3 := codec.NewTransport(x2, codec.GobCodec{})
+	// Blend
+	return blend.NewTransport(f.Refine("blend"), x3)
+}
+
+func NewStructOverTCP() *blend.Transport {
+	f := trace.NewFrame("tele")
+	// Carrier
+	x2 := tcp.CodecTransport
 	// Codec
 	x3 := codec.NewTransport(x2, codec.GobCodec{})
 	// Blend

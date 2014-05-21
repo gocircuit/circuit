@@ -33,7 +33,7 @@ func (c *Conn) RemoteAddr() net.Addr {
 	return c.carrier.RemoteAddr()
 }
 
-func (c *Conn) Write(v interface{}) error {
+func (c *Conn) Write(v interface{}) (err error) {
 	chunk, err := c.enc.Encode(v)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (c *Conn) Write(v interface{}) error {
 	return c.carrier.Write(chunk)
 }
 
-func (c *Conn) Read(v interface{}) error {
+func (c *Conn) Read(v interface{}) (err error) {
 	chunk, err := c.carrier.Read()
 	if err != nil {
 		return err
