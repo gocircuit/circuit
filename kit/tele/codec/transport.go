@@ -41,6 +41,9 @@ func NewTransport(sub CarrierTransport, codec Codec) *Transport {
 // returning a non-nil connection object.
 func (t *Transport) Dial(addr net.Addr) *Conn {
 	conn := t.sub.Dial(addr)
+	if conn == nil {
+		return nil
+	}
 	return NewConn(conn, t.codec)
 }
 
