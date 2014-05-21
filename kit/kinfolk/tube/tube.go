@@ -10,6 +10,7 @@ package tube
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -23,12 +24,12 @@ type Tube struct {
 	permXID kinfolk.FolkXID // XID to this tube
 	folk    *kinfolk.Folk   // Folk interface of this tube to the kin system
 	sync.Mutex
-	lookup     map[string]int
-	table      []*Record
-	downstream *kinfolk.Rotor // Rotor of YTubes
+	lookup     map[string]int // record key => record index
+	table      []*Record // Current state of the record space known to us
+	downstream *kinfolk.Rotor // Rotor of YTubes for downstream updates
 }
 
-// Record
+// Record is the data unit of the tube system.
 type Record struct {
 	Key     string
 	Rev     Rev
@@ -36,7 +37,7 @@ type Record struct {
 	Updated time.Time
 }
 
-//
+// Rev is an increasing revision number of a tube record.
 type Rev uint64
 
 func New(kin *kinfolk.Kin, topic string) *Tube {
@@ -49,7 +50,7 @@ func New(kin *kinfolk.Kin, topic string) *Tube {
 		ID: lang.ComputeReceiverID(t),
 	}
 	t.folk = kin.Attach(topic, t.permXID)
-	go t.loop()
+	go t.loopJoining()
 	return t
 }
 
@@ -68,32 +69,28 @@ func (t *Tube) dump() string {
 	return w.String()
 }
 
-// loop processes joining peers
-func (t *Tube) loop() {
+// loopJoining processes joining kin peers
+func (t *Tube) loopJoining() {
 	for {
 		t.superscribe(t.folk.Replenish()) // Get new upstream node
 	}
 }
 
-// XTube
-type XTube struct {
-	t *Tube
-}
-
-// XID returns an XID pointing to this Tube table
-func (x XTube) XID() kinfolk.FolkXID {
-	return x.t.permXID
-}
-
 func (t *Tube) superscribe(peerXID kinfolk.FolkXID) {
-	// log.Printf("tube superscribing %s", yup.xid.String())
-	// defer func() {
-	// 	log.Printf("tube superscribed %s\n%s", yup.xid.String(), t.Dump())
-	// }()
-
+	log.Printf("tube superscribing %s", peerXID.ID.String())
+	defer func() {
+		log.Printf("tube superscribed %s\n%s", peerXID.ID.String(), t.Dump())
+	}()
+	//
 	t.Lock()
 	defer t.Unlock()
-	yup := YTube{kinfolk.FolkXID(t.downstream.Open(kinfolk.XID(peerXID)))}
+	yup := YTube{
+		kinfolk.FolkXID(
+			t.downstream.Open(
+				kinfolk.XID(peerXID),
+			),
+		),
+	}
 	go t.BulkWrite(yup.Subscribe(t.permXID, t.bulkRead()))
 }
 
@@ -103,29 +100,10 @@ func (t *Tube) bulkRead() []*Record {
 	return r
 }
 
-func (x XTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
-	// log.Printf("xtube subscribing")
-	// defer func() {
-	// 	log.Printf("xtube subscribed\n%s", x.t.Dump())
-	// }()
-
-	if downXID.ID == x.t.permXID.ID {
-		panic("x")
-	}
-	//
-	x.t.Lock()
-	defer x.t.Unlock()
-
-	x.t.downstream.Open(kinfolk.XID(downXID)) // Add peer to downstream list
-	go x.t.BulkWrite(upsync)                  // Catch up to peer after we return (and peer unlocks itself)
-	return x.t.bulkRead()
-}
-
 // BulkRead returns a listing of all elements of the Tube table
 func (t *Tube) BulkRead() []*Record {
 	t.Lock()
 	defer t.Unlock()
-	//
 	return t.bulkRead()
 }
 
@@ -154,18 +132,12 @@ func (t *Tube) Write(key string, rev Rev, value interface{}) (changed bool) {
 	return
 }
 
-func (x XTube) Write(key string, rev Rev, value interface{}) bool {
-	// log.Printf("xtube writing (%s,%d,%v)", key, rev, value)
-	// defer func() {
-	// 	log.Printf("xtube wrote %s\n%s", key, x.t.Dump())
-	// }()
-	return x.t.Write(key, rev, value)
-}
-
 func (t *Tube) writeSync(key string, rev Rev, value interface{}) {
 	var wg sync.WaitGroup
 	for _, downXID := range t.downstream.Opened() {
-		ydown := YTube{kinfolk.FolkXID(downXID)}
+		ydown := YTube{
+			kinfolk.FolkXID(downXID),
+		}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -193,14 +165,12 @@ func (t *Tube) write(r *Record) (changed bool) {
 
 // bulkWrite writes the records in bulk by pointer, without  copying them
 func (t *Tube) bulkWrite(bulk []*Record) {
-	//
 	changed := make([]*Record, 0, len(bulk))
 	for _, r := range bulk {
 		if t.write(r) {
 			changed = append(changed, r)
 		}
 	}
-	//
 	go t.bulkWriteSync(changed)
 }
 
@@ -219,10 +189,10 @@ func (t *Tube) bulkWriteSync(changed []*Record) {
 }
 
 func (t *Tube) BulkWrite(bulk []*Record) {
-	// log.Printf("tube bulk writing")
-	// defer func() {
-	// 	log.Printf("tube bulk wrote\n%s", t.Dump())
-	// }()
+	log.Printf("tube bulk writing")
+	defer func() {
+		log.Printf("tube bulk wrote\n%s", t.Dump())
+	}()
 
 	if len(bulk) == 0 {
 		return
@@ -239,17 +209,13 @@ func (t *Tube) BulkWrite(bulk []*Record) {
 	t.bulkWrite(bulk)
 }
 
-func (x XTube) BulkWrite(bulk []*Record) {
-	if len(bulk) == 0 {
-		return
-	}
-	x.t.BulkWrite(bulk)
-}
-
 func (t *Tube) Forget(key string, notAfterRev Rev, notAfterUpdated time.Time) bool {
+	log.Printf("tube forgetting %s not after rev %v and not after updated %v", key, notAfterRev, notAfterUpdated)
+	defer func() {
+		log.Printf("tube forgot\n%s", t.Dump())
+	}()
 	t.Lock()
 	defer t.Unlock()
-	//
 	return t.forget(key, notAfterRev, notAfterUpdated)
 }
 
@@ -279,7 +245,6 @@ func (t *Tube) forget(key string, notAfterRev Rev, notAfterUpdated time.Time) bo
 func (t *Tube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 	t.Lock()
 	defer t.Unlock()
-	//
 	if t.forget(key, notAfterRev, notAfterUpdated) {
 		go t.scrubSync(key, notAfterRev, notAfterUpdated)
 	}
@@ -288,7 +253,9 @@ func (t *Tube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 func (t *Tube) scrubSync(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 	var wg sync.WaitGroup
 	for _, downXID := range t.downstream.Opened() {
-		ydown := YTube{kinfolk.FolkXID(downXID)}
+		ydown := YTube{
+			kinfolk.FolkXID(downXID),
+		}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -296,10 +263,6 @@ func (t *Tube) scrubSync(key string, notAfterRev Rev, notAfterUpdated time.Time)
 		}()
 	}
 	wg.Wait()
-}
-
-func (x XTube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
-	x.t.Scrub(key, notAfterRev, notAfterUpdated)
 }
 
 func (t *Tube) Lookup(key string) *Record {
@@ -314,51 +277,7 @@ func (t *Tube) Lookup(key string) *Record {
 	return &r
 }
 
-// YTube
-type YTube struct {
-	xid kinfolk.FolkXID
-}
-
-// Lookup and Forget intentionally omitted. To be called only by local tube user.
-
-func (y YTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
-	defer func() {
-		if r := recover(); r != nil {
-			// log.Printf("ytube subscribe panic\n%#v\n", r)
-		}
-	}()
-	return y.xid.X.Call("Subscribe", downXID, upsync)[0].([]*Record)
-}
-
-func (y YTube) Write(key string, rev Rev, value interface{}) bool {
-	defer func() {
-		if r := recover(); r != nil {
-			//log.Printf("ytube write panic\n%#v\n", r)
-		}
-	}()
-	return y.xid.X.Call("Write", key, rev, value)[0].(bool)
-}
-
-func (y YTube) BulkWrite(bulk []*Record) {
-	defer func() {
-		if r := recover(); r != nil {
-			//log.Printf("ytube bulk write panic\n%#v\n", r)
-		}
-	}()
-	y.xid.X.Call("BulkWrite", bulk)
-}
-
-func (y YTube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
-	defer func() {
-		if r := recover(); r != nil {
-			// log.Printf("ytube scrub panic\n%#v\n", r)
-		}
-	}()
-	y.xid.X.Call("Scrub", key, notAfterRev, notAfterUpdated)
-}
-
 // Init
 func init() {
 	circuit.RegisterValue(&Tube{}) // In order to be able to compute receiver ID
-	circuit.RegisterValue(XTube{})
 }

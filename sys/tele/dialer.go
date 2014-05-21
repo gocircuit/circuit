@@ -41,9 +41,12 @@ func (d *Dialer) Dial(addr n.Addr) (conn n.Conn, err error) {
 	s, present := d.open[workerID]
 	if !present {
 		// Make new session to worker if one not present
-		s = d.sub.DialSession(addr.(*Addr).TCP, func() {
+		s, err = d.sub.DialSession(addr.(*Addr).TCP, func() {
 			d.scrub(addr.WorkerID())
 		})
+		if err != nil {
+			return nil, err
+		}
 		if err = d.auth(addr, s.Dial()); err != nil {
 			s.Close()
 			return nil, err

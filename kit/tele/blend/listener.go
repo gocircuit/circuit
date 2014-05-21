@@ -26,7 +26,11 @@ func NewListener(frame trace.Frame, sub *codec.Listener) *Listener {
 }
 
 func (l *Listener) AcceptSession() *AcceptSession {
-	return newAcceptSession(l.frame.Refine("accept"), l.sub.Accept())
+	sub := l.sub.Accept()
+	if sub == nil {
+		panic("accepted nil conn")
+	}
+	return newAcceptSession(l.frame.Refine("accept"), sub)
 }
 
 func (l *Listener) Addr() net.Addr {

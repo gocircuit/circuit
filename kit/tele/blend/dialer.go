@@ -25,6 +25,10 @@ func NewDialer(frame trace.Frame, sub *codec.Transport) *Dialer {
 	return d
 }
 
-func (d *Dialer) DialSession(addr net.Addr, scrb func()) *DialSession {
-	return newDialSession(d.frame.Refine("dial"), d.sub.Dial(addr), scrb) // codec.Dial always returns instantaneously
+func (d *Dialer) DialSession(addr net.Addr, scrb func()) (*DialSession, error) {
+	sub, err := d.sub.Dial(addr)
+	if err != nil {
+		return nil, err
+	}
+	return newDialSession(d.frame.Refine("dial"), sub, scrb), nil // codec.Dial always returns instantaneously
 }

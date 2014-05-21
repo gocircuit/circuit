@@ -13,7 +13,7 @@ import (
 
 type CarrierTransport interface {
 	Listen(addr net.Addr) CarrierListener
-	Dial(addr net.Addr) CarrierConn
+	Dial(addr net.Addr) (CarrierConn, error)
 }
 
 type CarrierListener interface {
@@ -39,12 +39,12 @@ func NewTransport(sub CarrierTransport, codec Codec) *Transport {
 
 // Dial returns instanteneously (it does not wait on I/O operations) and always succeeds,
 // returning a non-nil connection object.
-func (t *Transport) Dial(addr net.Addr) *Conn {
-	conn := t.sub.Dial(addr)
-	if conn == nil {
-		return nil
+func (t *Transport) Dial(addr net.Addr) (*Conn, error) {
+	conn, err := t.sub.Dial(addr)
+	if err != nil {
+		return nil, err
 	}
-	return NewConn(conn, t.codec)
+	return NewConn(conn, t.codec), nil
 }
 
 func (t *Transport) Listen(addr net.Addr) *Listener {
@@ -60,7 +60,13 @@ type Listener struct {
 }
 
 func (l *Listener) Accept() *Conn {
-	return NewConn(l.CarrierListener.Accept(), l.codec)
+	for {
+		conn := l.CarrierListener.Accept()
+		if conn == nil {
+			continue
+		}
+		return NewConn(conn, l.codec)
+	}
 }
 
 func (l *Listener) Addr() net.Addr {

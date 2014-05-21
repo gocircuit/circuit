@@ -11,6 +11,7 @@ package tcp
 import (
 	"bufio"
 	"encoding/binary"
+	"log"
 	"net"
 	"strings"
 
@@ -37,12 +38,12 @@ func (codecTransport) Listen(addr net.Addr) codec.CarrierListener {
 	return codecListener{l}
 }
 
-func (codecTransport) Dial(addr net.Addr) (codec.CarrierConn) {
+func (codecTransport) Dial(addr net.Addr) (codec.CarrierConn, error) {
 	c, err := net.Dial("tcp", addr.String())
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return newCodecConn(trace.NewFrame("tcp", "dial"), c.(*net.TCPConn))
+	return newCodecConn(trace.NewFrame("tcp", "dial"), c.(*net.TCPConn)), nil
 }
 
 type codecListener struct {
@@ -56,6 +57,7 @@ func (l codecListener) Addr() net.Addr {
 func (l codecListener) Accept() (codec.CarrierConn) {
 	c, err := l.Listener.Accept()
 	if err != nil {
+		log.Printf("error accepting tcp connection: %v", err)
 		return nil
 	}
 	return newCodecConn(trace.NewFrame("tcp", "acpt"), c.(*net.TCPConn))

@@ -249,11 +249,15 @@ Be creative
 -------------
 
 The circuit allows for unusual flexibilities in process orchestration.
-Take a look, for instance, at the “virus” tutorial which demonstrates
+Take a look, for instance, at the two “virus” tutorials which demonstrate
 how to implement a semi-resilient self-sustained mechanism within 
-a cluster. Find it in
+a cluster. Find the simpler one here
 
-	github.com/gocircuit/circuit/client/tutorial/3-virus
+	github.com/gocircuit/circuit/client/tutorial/virus
+
+And the more elaborate one, which demonstrate use of channels, here
+
+	github.com/gocircuit/circuit/client/tutorial/virus-with-backchan
 
 Learn more
 ----------

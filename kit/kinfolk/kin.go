@@ -54,12 +54,12 @@ func NewKin(join circuit.PermX) (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
 	// Join peer
 	defer func() {
 		if r := recover(); r != nil {
-			log.Fatalf("joining (%s)", r)
+			log.Fatalf("error joining (%s)", r)
 		}
 	}()
 	var w bytes.Buffer
 	for _, peer := range (YKin{ KinXID{ X: join }}).Join() {
-		k.open(peer)
+		peer = k.open(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')
 	}
@@ -91,6 +91,7 @@ func (k *Kin) replenish() {
 	kinXID = k.open(kinXID)
 
 	// Send new peer to all folk
+	log.Printf("replenishing kinfolk system with a freshly chosen random kin %s", kinXID.ID.String())
 	for _, folk := range k.snapfolk() {
 		folk.supply(YKin{kinXID}.Attach(folk.Topic))
 	}
@@ -109,6 +110,7 @@ func (k *Kin) scrub(kinXID KinXID) {
 	if k.rtr.Scrub(kinXID.X).IsNil() {
 		return
 	}
+	log.Printf("kinfolk system scrubbing kin %s", kinXID.ID.String())
 	k.replenish()
 	k.dch <- kinXID
 }
