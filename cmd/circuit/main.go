@@ -36,6 +36,8 @@ func main() {
 			Action: ls,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.BoolFlag{"long, l", "show detailed anchor information"},
+				cli.BoolFlag{"depth, de", "traverse anchors in depth-first order (leaves first)"},
 			},
 		},
 		// channel-specific

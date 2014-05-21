@@ -64,10 +64,10 @@ func ls(x *cli.Context) {
 		os.Exit(1)
 	}
 	w, ellipses := parseGlob(args[0])
-	list(0, "/", c.Walk(w), ellipses)
+	list(0, "/", c.Walk(w), ellipses, x.Bool("long"), x.Bool("depth"))
 }
 
-func list(level int, prefix string, anchor client.Anchor, recurse bool) {
+func list(level int, prefix string, anchor client.Anchor, recurse, long, depth bool) {
 	if anchor == nil {
 		return
 	}
@@ -83,18 +83,25 @@ func list(level int, prefix string, anchor client.Anchor, recurse bool) {
 			e.k = "proc"
 		default:
 			if level == 0 {
-				e.k = "----"
+				e.k = "nil"
 			}
 		}
 		c = append(c, e)
 	}
 	sort.Sort(c)
 	for _, e := range c {
-		if e.k != "" {
-			fmt.Printf("%4s %s%s\n", e.k, prefix, e.n)
+		if recurse && depth {
+			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
 		}
-		if recurse {
-			list(level + 1, prefix + e.n + "/", e.a, true)
+		if e.k != "" {
+			if long {
+				fmt.Printf("%s%s:<%s>\n", prefix, e.n, e.k)
+			} else {
+				fmt.Printf("%s%s\n", prefix, e.n)
+			}
+		}
+		if recurse && !depth {
+			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
 		}
 	}
 }

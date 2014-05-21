@@ -29,6 +29,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"path"
 	"path/filepath"
 	"os"
@@ -116,13 +117,14 @@ func main() {
 		backServer := pickServer(c)
 		backChan, err = backServer.Walk([]string{"virus", "back"}).MakeChan(2)
 		if err != nil {
-			panic(err)
+			println(err.Error())
+			os.Exit(1)
 		}
 		backAnchor = path.Join("/", backServer.ServerID(), "virus", "back")
 	}
 
 	// Acquire permission to send to back channel
-	backPipe := acquireBackChan(c, backChan)
+	backPipe := acquireBackChan(c, backChan, epoch)
 
 	// The nucleus role waits for the payload process to die before it proceeds.
 	if isNucleus {
@@ -137,31 +139,38 @@ func main() {
 	// Randomly choose a circuit server to host the virus payload.
 	a := pickServer(c)
 	// Run the payload
-	pservice, _ := a.Walk([]string{"virus", "payload"}).MakeProc(service)
+	pservice, err := a.Walk([]string{"virus", "payload"}).MakeProc(service)
+	if err != nil {
+		println("payload not created:", err.Error())
+		os.Exit(1)
+	}
 	if err := pservice.Peek().Exit; err != nil {
 		println("payload not started:", err.Error())
 		return
 	}
 	// Close the standard input of the payload to indicate no intention to write data.
 	pservice.Stdin().Close()
+	fmt.Fprintf(backPipe, "<%d> started payload\n", epoch)
 
 	payloadAnchor = spawnPayload(c, epoch)
 	spawnNucleus(c, backAnchor, payloadAnchor, epoch)
 }
 
-func acquireBackChan(c *client.Client, backChan client.Chan) io.ReadCloser {
+func acquireBackChan(c *client.Client, backChan client.Chan, epoch int) io.WriteCloser {
 	// Acquire permission to send to back channel
 	backPipe, err := backChan.Send()
 	if err != nil {
 		panic(err)
 	}
 	go func() {
-		defer backPipe.Close()
 		defer func() {
 			recover()
 		}()
+		defer func() {
+			backChan.Close()
+		}()
 		for {
-			rc, err := backPipe.Recv()
+			rc, err := backChan.Recv()
 			if err != nil {
 				panic(err)
 			}
@@ -169,7 +178,7 @@ func acquireBackChan(c *client.Client, backChan client.Chan) io.ReadCloser {
 		}
 	}()
 	fmt.Fprintf(backPipe, "<%d>\n", epoch)
-	fmt.Fprintf(backPipe, "nucleus epoch %d acquired back channel\n", epoch)
+	fmt.Fprintf(backPipe, "<%d> nucleus acquired back channel\n", epoch)
 	return backPipe
 }
 
@@ -210,10 +219,14 @@ func spawnNucleus(c *client.Client, backAnchor, payloadAnchor string, epoch int)
 			nucleusEpoch, // epoch
 		},
 	}
-	pnucleus, _ := b.Walk([]string{"virus", "nucleus", nucleusEpoch}).MakeProc(nucleus)
+	pnucleus, err := b.Walk([]string{"virus", "nucleus", nucleusEpoch}).MakeProc(nucleus)
+	if err != nil {
+		println("nucleus not created:", err.Error())
+		os.Exit(1)
+	}
 	if err := pnucleus.Peek().Exit; err != nil {
 		println("nucleus not started:", err.Error())
-		return
+		os.Exit(1)
 	}
 	pnucleus.Stdin().Close()
 }

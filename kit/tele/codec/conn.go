@@ -8,6 +8,7 @@
 package codec
 
 import (
+	//"fmt"
 	"net"
 )
 
@@ -37,6 +38,7 @@ func (c *Conn) RemoteAddr() net.Addr {
 }
 
 func (c *Conn) Write(v interface{}) (err error) {
+	//println(fmt.Sprintf("value=%v", v))
 	chunk, err := c.enc.Encode(v)
 	if err != nil {
 		return err
