@@ -86,7 +86,9 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 			defer func() {
 				recover()
 			}()
-			// defer t.Scrub()
+			if cmd.Scrub {
+				defer t.Scrub()
+			}
 			u.elem.(proc.Proc).Wait()
 		}()
 		return u.elem, nil
