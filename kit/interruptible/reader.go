@@ -9,6 +9,7 @@ package interruptible
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"sync"
 )
@@ -75,7 +76,7 @@ func (r *reader) ReadIntr(p []byte, intr Intr) (n int, err error) {
 		return r.r.buf.Read(p)
 	case <-intr:
 		// Next message is not extracted
-		return 0, io.ErrNoProgress
+		return 0, errors.New("no progress") // io.ErrNoProgress
 	}
 }
 

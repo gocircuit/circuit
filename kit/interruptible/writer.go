@@ -8,6 +8,7 @@
 package interruptible
 
 import (
+	"errors"
 	"io"
 	"sync"
 )
@@ -58,7 +59,7 @@ func (w *writer) WriteIntr(p []byte, intr Intr) (n int, err error) {
 		w.s.n += int64(len(p))
 		return len(p), nil
 	case <-intr:
-		return 0, io.ErrNoProgress
+		return 0, errors.New("no progress") // io.ErrNoProgress
 	case <-w.w.abort: // If we receive an abort during write, close out channel here
 		close(w.w.ch)
 		w.w.ch = nil
