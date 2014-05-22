@@ -25,10 +25,16 @@ func main() {
 			Usage: "Run a circuit worker on this machine",
 			Action: server,
 			Flags: []cli.Flag{
-				cli.StringFlag{"addr, a", "", "address of circuit server"},
-				cli.StringFlag{"mutex, m", "", "directory to use as a circuit instance mutex lock"},
-				cli.StringFlag{"join, j", "", "join a circuit through a current member by url"},
+				cli.StringFlag{"addr, a", "", "Address of circuit server."},
+				cli.StringFlag{"mutex, m", "", "Directory to use as a circuit instance mutex lock."},
+				cli.StringFlag{"join, j", "", "Join a circuit through a current member by address."},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
+	 	},
+		{
+			Name: "keygen",
+			Usage: "Generate a new random HMAC key",
+			Action: keygen,
 	 	},
 		{
 			Name: "ls",
@@ -38,6 +44,7 @@ func main() {
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 				cli.BoolFlag{"long, l", "show detailed anchor information"},
 				cli.BoolFlag{"depth, de", "traverse anchors in depth-first order (leaves first)"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		// channel-specific
@@ -47,6 +54,7 @@ func main() {
 			Action: mkchan,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -55,6 +63,7 @@ func main() {
 			Action: send,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -63,6 +72,7 @@ func main() {
 			Action: recv,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -71,6 +81,7 @@ func main() {
 			Action: clos,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		// common
@@ -80,6 +91,7 @@ func main() {
 			Action: scrb,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -88,6 +100,7 @@ func main() {
 			Action: peek,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		// proc-specific
@@ -98,6 +111,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 				cli.BoolFlag{"scrub", "scrub the process anchor automatically on exit"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -106,6 +120,7 @@ func main() {
 			Action: sgnl,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -114,6 +129,7 @@ func main() {
 			Action: wait,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		// stdin, stdout, stderr
@@ -123,6 +139,7 @@ func main() {
 			Action: stdin,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -131,6 +148,7 @@ func main() {
 			Action: stdout,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 		{
@@ -139,6 +157,7 @@ func main() {
 			Action: stderr,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
 	}
