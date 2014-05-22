@@ -10,8 +10,8 @@ package anchor
 import (
 	"errors"
 
-	"github.com/gocircuit/circuit/kit/element/proc"
-	"github.com/gocircuit/circuit/kit/element/valve"
+	"github.com/gocircuit/circuit/element/proc"
+	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/use/circuit"
 	xerrors "github.com/gocircuit/circuit/use/errors"
 )

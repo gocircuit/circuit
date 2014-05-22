@@ -9,8 +9,8 @@ package client
 
 import (
 	"github.com/gocircuit/circuit/kit/anchor"
-	"github.com/gocircuit/circuit/kit/element/proc"
-	"github.com/gocircuit/circuit/kit/element/valve"
+	"github.com/gocircuit/circuit/element/proc"
+	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/kinfolk"
 )
 

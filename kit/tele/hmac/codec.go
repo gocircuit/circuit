@@ -86,7 +86,6 @@ type codecConn struct {
 	tcp *net.TCPConn
 	key  []byte // shared private key for authentication
 	r *rc4Reader
-	br *bufio.Reader
 	w *rc4Writer
 }
 
@@ -102,6 +101,7 @@ func newCodecConn(f trace.Frame, tcp *net.TCPConn, key []byte) (*codecConn, erro
 	if err := c.auth(); err != nil {
 		return nil, err
 	}
+	println("authenticated")
 	return c, nil
 }
 
@@ -135,9 +135,11 @@ func (c *codecConn) auth() error {
 	if err = p.Write(c.tcp); err != nil {
 		return err
 	}
+	// Prepare reader
+	br := bufio.NewReader(c.tcp)
 	// Receive the reciprocal authentication message
 	q := &authMsg{}
-	if err = q.Read(c.tcp); err != nil {
+	if err = q.Read(br); err != nil {
 		return err
 	}
 	// Decipher yang
@@ -154,8 +156,7 @@ func (c *codecConn) auth() error {
 		return errors.New("authentication error")
 	}
 	// Create encryption streams
-	c.r = newRC4Reader(c.tcp, append(ying, yang...)) 
-	c.br = bufio.NewReader(c.r)
+	c.r = newRC4Reader(br, append(ying, yang...)) 
 	c.w = newRC4Writer(c.tcp, append(yang, ying...))
 	return nil
 }
@@ -166,7 +167,16 @@ type authMsg struct {
 }
 
 func (m *authMsg) Write(w io.Writer) (err error) {
+	buf := make([]byte, 8)
+	n := binary.PutUvarint(buf, uint64(len(m.Sign)))
+	if _, err = w.Write(buf[:n]); err != nil {
+		return err
+	}
 	if err = binary.Write(w, binary.LittleEndian, m.Sign); err != nil {
+		return err
+	}
+	n = binary.PutUvarint(buf, uint64(len(m.Yang)))
+	if _, err = w.Write(buf[:n]); err != nil {
 		return err
 	}
 	if err = binary.Write(w, binary.LittleEndian, m.Yang); err != nil {
@@ -175,11 +185,20 @@ func (m *authMsg) Write(w io.Writer) (err error) {
 	return nil
 }
 
-func (m *authMsg) Read(r io.Reader) (err error) {
-	if err = binary.Read(r, binary.LittleEndian, &m.Sign); err != nil {
+func (m *authMsg) Read(r *bufio.Reader) (err error) {
+	var k uint64
+	if k, err = binary.ReadUvarint(r); err != nil {
 		return err
 	}
-	if err = binary.Read(r, binary.LittleEndian, &m.Yang); err != nil {
+	m.Sign = make([]byte, k)
+	if err = binary.Read(r, binary.LittleEndian, m.Sign); err != nil {
+		return err
+	}
+	if k, err = binary.ReadUvarint(r); err != nil {
+		return err
+	}
+	m.Yang = make([]byte, k)
+	if err = binary.Read(r, binary.LittleEndian, m.Yang); err != nil {
 		return err
 	}
 	return nil
@@ -199,12 +218,12 @@ func (c *codecConn) RemoteAddr() net.Addr {
 }
 
 func (c *codecConn) Read() (chunk []byte, err error) {
-	k, err := binary.ReadUvarint(c.br)
+	k, err := binary.ReadUvarint(c.r)
 	if err != nil {
 		return nil, err
 	}
 	q := make([]byte, k)
-	n, err := c.br.Read(q)
+	n, err := c.r.Read(q)
 	return q[:n], err
 }
 
@@ -217,6 +236,7 @@ func (c *codecConn) Write(chunk []byte) (err error) {
 }
 
 func (c *codecConn) Close() (err error) {
+	println("clooose")
 	return c.tcp.Close()
 }
 
@@ -237,16 +257,19 @@ func newRC4Writer(w io.Writer, key []byte) *rc4Writer {
 }
 
 func (w *rc4Writer) Write(p []byte) (n int, err error) {
+	defer func() {
+		println("wrote", n, err)
+	}()
 	w.cipher.XORKeyStream(p, p)
 	return w.w.Write(p)
 }
 
 type rc4Reader struct {
 	cipher *rc4.Cipher
-	r io.Reader
+	r *bufio.Reader
 }
 
-func newRC4Reader(r io.Reader, key []byte) *rc4Reader {
+func newRC4Reader(r *bufio.Reader, key []byte) *rc4Reader {
 	cipher, err := rc4.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -258,7 +281,22 @@ func newRC4Reader(r io.Reader, key []byte) *rc4Reader {
 }
 
 func (r *rc4Reader) Read(p []byte) (n int, err error) {
+	defer func() {
+		println("read", n, err)
+	}()
 	n, err = r.r.Read(p)
 	r.cipher.XORKeyStream(p[:n], p[:n])
 	return
+}
+
+func (r *rc4Reader) ReadByte() (c byte, err error) {
+	defer func() {
+		println("readbyte", c, err)
+	}()
+	if c, err = r.r.ReadByte(); err != nil {
+		return
+	}
+	s := []byte{c}
+	r.cipher.XORKeyStream(s, s)
+	return s[0], nil
 }

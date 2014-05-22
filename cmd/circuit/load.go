@@ -31,7 +31,7 @@ import (
 	"github.com/gocircuit/circuit/use/n"
 )
 
-func load(addr, mutex string) {
+func load(addr, mutex string, key []byte) {
 	//debug.InstallCtrlCPanic()
 
 	// Randomize execution
@@ -66,7 +66,7 @@ func load(addr, mutex string) {
 	if len(bindaddr.IP) == 0 {
 		bindaddr.IP = net.IPv4zero
 	}
-	t := n.NewTransport(id, bindaddr)
+	t := n.NewTransport(id, bindaddr, key)
 	fmt.Println(t.Addr().String())
 
 	// Initialize language runtime

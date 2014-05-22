@@ -46,7 +46,7 @@ func server(c *cli.Context) {
 	}
 
 	// start circuit runtime
-	load(c.String("addr"), mutexDir)
+	load(c.String("addr"), mutexDir, readkey(c))
 
 	// kinfolk join
 	var xjoin circuit.PermX

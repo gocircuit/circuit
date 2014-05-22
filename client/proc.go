@@ -10,7 +10,7 @@ package client
 import (
 	"io"
 	
-	"github.com/gocircuit/circuit/kit/element/proc"
+	"github.com/gocircuit/circuit/element/proc"
 )
 
 // Cmd describes the execution parameters for an OS process.

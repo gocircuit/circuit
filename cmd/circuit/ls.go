@@ -9,7 +9,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -17,37 +16,6 @@ import (
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
-
-func fatalf(format string, arg ...interface{}) {
-	println(fmt.Sprintf(format, arg...))
-	os.Exit(1)
-}
-
-func dial(x *cli.Context) *client.Client {
-	var dialAddr string
-	switch {
-	case x.IsSet("dial"):
-		dialAddr = x.String("dial")
-	case os.Getenv("CIRCUIT") != "":
-		buf, err := ioutil.ReadFile(os.Getenv("CIRCUIT"))
-		if err != nil {
-			fatalf("circuit environment file %s is not readable: %v", os.Getenv("CIRCUIT"), err)
-		}
-		dialAddr = strings.TrimSpace(string(buf))
-	default:
-		buf, err := ioutil.ReadFile(".circuit")
-		if err != nil {
-			fatalf("no dial address available; use flag -d or set CIRCUIT to a file name")
-		}
-		dialAddr = strings.TrimSpace(string(buf))
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			fatalf("addressed server is gone or a newer one is in place")
-		}
-	}()
-	return client.Dial(dialAddr)
-}
 
 // circuit ls /Q123/apps/charlie
 // circuit ls /...
