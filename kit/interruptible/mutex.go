@@ -37,6 +37,7 @@ func (m *Mutex) Lock(intr Intr) *Unlocker {
 	case <-intr:
 		return nil
 	}
+	panic(0)
 }
 
 func (m *Mutex) TryLock() *Unlocker {
@@ -47,6 +48,7 @@ func (m *Mutex) TryLock() *Unlocker {
 	default:
 		return nil
 	}
+	panic(0)
 }
 
 type Unlocker struct {

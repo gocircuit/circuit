@@ -78,6 +78,7 @@ func (r *reader) ReadIntr(p []byte, intr Intr) (n int, err error) {
 		// Next message is not extracted
 		return 0, errors.New("no progress") // io.ErrNoProgress
 	}
+	panic(0)
 }
 
 func (r *reader) Close() error {

@@ -66,6 +66,7 @@ func (w *writer) WriteIntr(p []byte, intr Intr) (n int, err error) {
 		w.close()
 		return 0, io.ErrUnexpectedEOF
 	}
+	panic(0)
 }
 
 func (w *writer) stop() {

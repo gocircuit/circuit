@@ -67,6 +67,7 @@ func (l *Listener) Accept() *Conn {
 		}
 		return NewConn(conn, l.codec)
 	}
+	panic(0)
 }
 
 func (l *Listener) Addr() net.Addr {
