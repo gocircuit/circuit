@@ -25,13 +25,11 @@ import (
 	"github.com/gocircuit/circuit/kit/tele/trace"
 )
 
-// CodecTransport is a codec.Carrier over TCP.
-var CodecTransport = codecTransport{
-	Frame: trace.NewFrame("hmac"),
-}
-
-func SetHMAC(key []byte) {
-	CodecTransport.key = key
+func NewTransport(key []byte) codec.CarrierTransport {
+	return &codecTransport {
+		Frame: trace.NewFrame("hmac"),
+		key: key,
+	}
 }
 
 type codecTransport struct {
@@ -39,7 +37,7 @@ type codecTransport struct {
 	key []byte
 }
 
-func (codecTransport) Listen(addr net.Addr) codec.CarrierListener {
+func (ct *codecTransport) Listen(addr net.Addr) codec.CarrierListener {
 	t := addr.String()
 	if strings.Index(t, ":") < 0 {
 		t = t + ":0"
@@ -48,33 +46,34 @@ func (codecTransport) Listen(addr net.Addr) codec.CarrierListener {
 	if err != nil {
 		return nil
 	}
-	return codecListener{l}
+	return &codecListener{ct.key, l}
 }
 
-func (codecTransport) Dial(addr net.Addr) (codec.CarrierConn, error) {
+func (ct *codecTransport) Dial(addr net.Addr) (codec.CarrierConn, error) {
 	c, err := net.Dial("tcp", addr.String())
 	if err != nil {
 		return nil, err
 	}
-	return newCodecConn(trace.NewFrame("hmac", "dial"), c.(*net.TCPConn), CodecTransport.key)
+	return newCodecConn(trace.NewFrame("hmac", "dial"), c.(*net.TCPConn), ct.key)
 }
 
 type codecListener struct {
+	key []byte
 	net.Listener
 }
 
-func (l codecListener) Addr() net.Addr {
+func (l *codecListener) Addr() net.Addr {
 	return l.Listener.Addr()
 }
 
-func (l codecListener) Accept() (codec.CarrierConn) {
+func (l *codecListener) Accept() (codec.CarrierConn) {
 	for {
 		c, err := l.Listener.Accept()
 		if err != nil {
 			log.Printf("error accepting tcp connection: %v", err)
 			return nil
 		}
-		cc, err := newCodecConn(trace.NewFrame("hmac", "acpt"), c.(*net.TCPConn), CodecTransport.key)
+		cc, err := newCodecConn(trace.NewFrame("hmac", "acpt"), c.(*net.TCPConn), l.key)
 		if err != nil {
 			continue
 		}

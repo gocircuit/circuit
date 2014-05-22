@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/gocircuit/circuit/kit/tele"
+	"github.com/gocircuit/circuit/kit/tele/blend"
 	"github.com/gocircuit/circuit/use/n"
 )
 
@@ -20,8 +21,13 @@ type System struct{}
 
 // workerID is the ID for this transport endpoint.
 // addr is the networking address to listen to.
-func (s *System) NewTransport(workerID n.WorkerID, addr net.Addr) n.Transport {
-	u := tele.NewStructOverTCP()
+func (s *System) NewTransport(workerID n.WorkerID, addr net.Addr, key []byte) n.Transport {
+	var u *blend.Transport
+	if len(key) == 0 {
+		u = tele.NewStructOverTCP()
+	} else {
+		u = tele.NewStructOverTCPWithHMAC(key)
+	}
 	l := newListener(workerID, os.Getpid(), u.Listen(addr))
 	return &Transport{
 		WorkerID: workerID,

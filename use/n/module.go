@@ -29,8 +29,8 @@ func WorkerAddr() Addr {
 }
 
 // NewTransport creates a new transport framework for the given local address.
-func NewTransport(workerID WorkerID, addr net.Addr) Transport {
-	t := get().NewTransport(workerID, addr)
+func NewTransport(workerID WorkerID, addr net.Addr, key []byte) Transport {
+	t := get().NewTransport(workerID, addr, key)
 	workeraddr = t.Addr()
 	return t
 }

@@ -108,7 +108,7 @@ type Transport interface {
 
 // System creates a new transport framework for the given local address
 type System interface {
-	NewTransport(workerID WorkerID, addr net.Addr) Transport
+	NewTransport(workerID WorkerID, addr net.Addr, key []byte) Transport
 	ParseNetAddr(s string) (net.Addr, error)
 	ParseAddr(s string) (Addr, error)
 }

@@ -14,5 +14,5 @@ func (a Addr) String() string {
 }
 
 func (a Addr) Network() string {
-	return "tcp"
+	return "hmac/tcp"
 }

@@ -31,9 +31,9 @@ import (
 )
 
 var _once sync.Once
-func _init() {
+func _init(key []byte) {
 	rand.Seed(time.Now().UnixNano())
-	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{})
+	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{}, key)
 	//fmt.Println(t.Addr().String())
 	circuit.Bind(lang.New(t))
 }
@@ -46,10 +46,17 @@ type Client struct {
 // Dial establishes a connection to a circuit server specified by a circuit address.
 // Circuit addresses are printed to standard output when a server is started with the 
 // "circuit start …" command.
+//
+// If key is non-nil it is used as a private key and all communications are
+// secured by HMAC authentication and RC4 symmetric encryption;
+// otherwise transmissions are in plaintext.
+//
 // Errors in communication, such as a missing server, or invalid URL format
 // are reported through panics.
-func Dial(addr string) *Client {
-	_once.Do(_init)
+func Dial(addr string, key []byte) *Client {
+	_once.Do(func() {
+		_init(key)
+	})
 	c := &Client{}
 	w, err := n.ParseAddr(addr)
 	if err != nil {
