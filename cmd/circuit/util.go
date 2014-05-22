@@ -11,7 +11,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
@@ -25,18 +24,21 @@ func fatalf(format string, arg ...interface{}) {
 }
 
 func readkey(x *cli.Context) (key []byte) {
-	if !x.IsSet("hmac") {
+	var hmac string
+	switch {
+	case x.IsSet("hmac"):
+		hmac = x.String("hmac")
+	case os.Getenv("CIRCUIT_HMAC") != "":
+		hmac = os.Getenv("CIRCUIT_HMAC")
+	default:
 		return nil
 	}
-	b64, err := ioutil.ReadFile(x.String("hmac"))
+	b64, err := ioutil.ReadFile(hmac)
 	if err != nil {
-		fatalf("problem reading private key file: %v", err)
+		fatalf("problem reading private key file (%s): %v", hmac, err)
 	}
 	if key, err = base64.StdEncoding.DecodeString(string(b64)); err != nil {
 		fatalf("problem decoding base64 private key: %v", err)
-	}
-	if len(key) > 0 {
-		log.Println("Using symmetric HMAC authentication and RC4 encryption.")
 	}
 	return
 }
@@ -61,7 +63,7 @@ func dial(x *cli.Context) *client.Client {
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("addressed server is gone or a newer one is in place")
+			fatalf("addressed server is gone or authentication failed")
 		}
 	}()
 	return client.Dial(dialAddr, readkey(x))

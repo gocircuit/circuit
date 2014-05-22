@@ -94,7 +94,7 @@ func main() {
 		os.Exit(1)
 	}
 	println("virus nucleus epoch", epoch, "dialing into", os.Args[1])
-	c := client.Dial(os.Args[1])
+	c := client.Dial(os.Args[1], nil)
 
 	// Create/get back channel
 	backAnchor, backChan := findBackChan(c, isNucleus)

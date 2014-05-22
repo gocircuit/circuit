@@ -13,12 +13,16 @@ import (
 	"crypto/hmac"
 	"crypto/rc4"
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"math/rand"
 	"net"
+	//"runtime/debug"
 	"strings"
 
 	"github.com/gocircuit/circuit/kit/tele/codec"
@@ -101,7 +105,6 @@ func newCodecConn(f trace.Frame, tcp *net.TCPConn, key []byte) (*codecConn, erro
 	if err := c.auth(); err != nil {
 		return nil, err
 	}
-	println("authenticated")
 	return c, nil
 }
 
@@ -148,11 +151,11 @@ func (c *codecConn) auth() error {
 		panic(err)
 	}
 	yang := make([]byte, len(q.Yang))
-	authcipher.XORKeyStream(ying, q.Yang)
+	authcipher.XORKeyStream(yang, q.Yang)
 	// Verify MAC
 	yangmac := hmac.New(sha512.New, c.key)
 	yangmac.Write(yang)
-	if hmac.Equal(q.Sign, yangmac.Sum(nil)) {
+	if !hmac.Equal(q.Sign, yangmac.Sum(nil)) {
 		return errors.New("authentication error")
 	}
 	// Create encryption streams
@@ -162,46 +165,32 @@ func (c *codecConn) auth() error {
 }
 
 type authMsg struct {
-	Sign []byte
-	Yang []byte
+	Sign []byte `json:"hmac"`
+	Yang []byte `json:"pad"`
+}
+
+func (m *authMsg) String() string {
+	return fmt.Sprintf("hmac=%s\npad=%s", 
+		base64.StdEncoding.EncodeToString(m.Sign),
+		base64.StdEncoding.EncodeToString(m.Yang),
+	)
+}
+
+func marshal(v interface{}) []byte {
+	r, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return r
 }
 
 func (m *authMsg) Write(w io.Writer) (err error) {
-	buf := make([]byte, 8)
-	n := binary.PutUvarint(buf, uint64(len(m.Sign)))
-	if _, err = w.Write(buf[:n]); err != nil {
-		return err
-	}
-	if err = binary.Write(w, binary.LittleEndian, m.Sign); err != nil {
-		return err
-	}
-	n = binary.PutUvarint(buf, uint64(len(m.Yang)))
-	if _, err = w.Write(buf[:n]); err != nil {
-		return err
-	}
-	if err = binary.Write(w, binary.LittleEndian, m.Yang); err != nil {
-		return err
-	}
-	return nil
+	_, err = w.Write(marshal(m))
+	return
 }
 
 func (m *authMsg) Read(r *bufio.Reader) (err error) {
-	var k uint64
-	if k, err = binary.ReadUvarint(r); err != nil {
-		return err
-	}
-	m.Sign = make([]byte, k)
-	if err = binary.Read(r, binary.LittleEndian, m.Sign); err != nil {
-		return err
-	}
-	if k, err = binary.ReadUvarint(r); err != nil {
-		return err
-	}
-	m.Yang = make([]byte, k)
-	if err = binary.Read(r, binary.LittleEndian, m.Yang); err != nil {
-		return err
-	}
-	return nil
+	return json.NewDecoder(r).Decode(m)
 }
 
 func pickHalfKey() []byte {
@@ -236,7 +225,6 @@ func (c *codecConn) Write(chunk []byte) (err error) {
 }
 
 func (c *codecConn) Close() (err error) {
-	println("clooose")
 	return c.tcp.Close()
 }
 
@@ -257,9 +245,6 @@ func newRC4Writer(w io.Writer, key []byte) *rc4Writer {
 }
 
 func (w *rc4Writer) Write(p []byte) (n int, err error) {
-	defer func() {
-		println("wrote", n, err)
-	}()
 	w.cipher.XORKeyStream(p, p)
 	return w.w.Write(p)
 }
@@ -281,18 +266,12 @@ func newRC4Reader(r *bufio.Reader, key []byte) *rc4Reader {
 }
 
 func (r *rc4Reader) Read(p []byte) (n int, err error) {
-	defer func() {
-		println("read", n, err)
-	}()
 	n, err = r.r.Read(p)
 	r.cipher.XORKeyStream(p[:n], p[:n])
 	return
 }
 
 func (r *rc4Reader) ReadByte() (c byte, err error) {
-	defer func() {
-		println("readbyte", c, err)
-	}()
 	if c, err = r.r.ReadByte(); err != nil {
 		return
 	}

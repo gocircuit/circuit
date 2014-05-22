@@ -28,7 +28,7 @@ func pickServer(c *client.Client) client.Anchor {
 func main() {
 
 	// The first argument is the circuit server address that this execution will use.
-	c := client.Dial(os.Args[1])
+	c := client.Dial(os.Args[1], nil)
 
 	// Fire-off n payload processes.
 	ch := make(chan int)

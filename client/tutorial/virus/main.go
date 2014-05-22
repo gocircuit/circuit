@@ -72,7 +72,7 @@ func main() {
 		os.Exit(1)
 	}
 	println("virus dialing into", os.Args[1])
-	c := client.Dial(os.Args[1])
+	c := client.Dial(os.Args[1], nil)
 
 	// The nucleus role waits for the payload process to die before it proceeds.
 	if nucleusAnchor != "" {

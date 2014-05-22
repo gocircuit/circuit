@@ -66,6 +66,9 @@ func load(addr, mutex string, key []byte) {
 	if len(bindaddr.IP) == 0 {
 		bindaddr.IP = net.IPv4zero
 	}
+	if len(key) > 0 {
+		log.Println("Using symmetric HMAC authentication and RC4 encryption.")
+	}	
 	t := n.NewTransport(id, bindaddr, key)
 	fmt.Println(t.Addr().String())
 
