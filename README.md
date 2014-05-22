@@ -259,6 +259,30 @@ And the more elaborate one, which demonstrate use of channels, here
 
 	github.com/gocircuit/circuit/client/tutorial/virus-with-backchan
 
+Security
+--------
+
+By default, circuit servers and clients communicate over plaintext TCP.
+A HMAC-based symmetric authentication, followed by an asymmetric
+RC4 stream cipher is supported.
+
+To enable encryption, use the `-hmac` command-line option to point
+the circuit executable to a file containing the private key for your circuit.
+For instance:
+
+	circuit start -a 10.0.0.1 -hmac .hmac
+
+Or, if you are invoking the tool:
+
+	circuit ls -hmac .hmac /...
+
+Alternatively, you can set the environment `CIRCUIT_HMAC` to
+point to the private key file.
+
+To generate a new private key for your circuit, use the command
+
+	circuit keygen
+
 Learn more
 ----------
 
