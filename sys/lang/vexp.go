@@ -70,7 +70,7 @@ func (r *Runtime) exportRewrite(src, dst reflect.Value, importer n.Addr, eg *exp
 func (r *Runtime) exportPtr(v interface{}, importer n.Addr) interface{} {
 	// Add exported value to export table
 	exph := r.exp.Add(v, importer)
-	log.Printf("exporting %T with handle %s for importer %v", v, exph.ID.String(), importer)
+	// log.Printf("exporting %T with handle %s for importer %v", v, exph.ID.String(), importer)
 
 	if importer == nil {
 		return &permPtrMsg{ID: exph.ID, TypeID: exph.Type.ID}

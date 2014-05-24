@@ -5,6 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
+// Package tele implements the circuit/use/n networking module using Teleport Transport
 package tele
 
 import (
@@ -15,6 +16,10 @@ import (
 	"github.com/gocircuit/circuit/kit/tele/blend"
 	"github.com/gocircuit/circuit/use/n"
 )
+
+func init() {
+	n.Bind(&System{})
+}
 
 // System is the high-level type that encloses a monolithic networking functionality
 type System struct{}

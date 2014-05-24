@@ -76,7 +76,7 @@ func (a *Addr) FileName() string {
 	return a.ID.String()
 }
 
-// SCHEME://123.3.45.0:3456/2345/R1122334455667788
+// circuit://123.3.45.0:3456/2345/R1122334455667788
 func ParseAddr(s string) (*Addr, error) {
 	u, err := url.Parse(s)
 	if err != nil {

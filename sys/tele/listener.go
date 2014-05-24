@@ -10,6 +10,7 @@ package tele
 import (
 	"encoding/gob"
 	"log"
+	"net"
 	"os"
 	"sync"
 
@@ -91,6 +92,7 @@ func (l *Listener) handshake(conn *blend.Conn) (sourceAddr *Addr, err error) {
 		log.Println("rejecting", conn.RemoteAddr().String(), "unknown source address type")
 		return nil, errors.NewError("rejecting unknown source address type")
 	}
+	reverseAddr(da, conn.RemoteAddr())
 	la, ok := hello.TargetAddr.(*Addr)
 	if !ok {
 		log.Println("rejecting ", conn.RemoteAddr().String(), "unknown target address type")
@@ -105,6 +107,15 @@ func (l *Listener) handshake(conn *blend.Conn) (sourceAddr *Addr, err error) {
 		return nil, errors.NewError("rejecting worker PID mismatch, looks for %d, got %d", la.PID, os.Getpid())
 	}
 	return da, nil
+}
+
+func reverseAddr(bound *Addr, seen net.Addr) {
+	var saved = bound.String()
+	if !bound.TCP.IP.IsUnspecified() {
+		return
+	}
+	bound.TCP.IP = seen.(*net.TCPAddr).IP
+	log.Printf("Reverse dial address auto-completed: %s => %s", saved, bound.String())
 }
 
 func (l *Listener) Accept() n.Conn {
