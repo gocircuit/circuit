@@ -75,6 +75,7 @@ func (r *Runtime) serveCall(req *callMsg, conn n.Conn) {
 
 	h := r.exp.Lookup(req.ReceiverID)
 	if h == nil {
+		log.Printf("exported handle %v not found", req.ReceiverID.String())
 		if err := conn.Write(&returnMsg{Err: NewError("reply: no exp handle")}); err != nil {
 			// We need to distinguish between I/O errors and encoding errors.
 			// An encoding error implies bad code (e.g. forgot to register a

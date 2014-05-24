@@ -39,7 +39,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 	if anchor == nil {
 		return
 	}
-	//println(fmt.Sprintf("prefix=%v a=%v/%T r=%v", prefix, anchor, anchor, recurse))
+	// println(fmt.Sprintf("prefix=%v a=%v/%T r=%v", prefix, anchor, anchor, recurse))
 	var c children
 	for n, a := range anchor.View() {
 		e := &entry{n: n, a: a}

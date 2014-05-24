@@ -122,7 +122,7 @@ func findBackChan(c *client.Client, isNucleus bool) (backAnchor string, backChan
 	} else {
 		// Make the back channel
 		backServer := pickServer(c)
-		backChan, err = backServer.Walk([]string{"virus", "back"}).MakeChan(2)
+		backChan, err = backServer.Walk([]string{"virus", "back"}).MakeChan(3)
 		if err != nil {
 			println(err.Error())
 			os.Exit(1)

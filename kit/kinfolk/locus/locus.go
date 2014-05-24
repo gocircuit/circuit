@@ -11,7 +11,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gocircuit/circuit/kit/anchor"
+	"github.com/gocircuit/circuit/anchor"
 	"github.com/gocircuit/circuit/kit/kinfolk"
 	"github.com/gocircuit/circuit/kit/kinfolk/tube"
 )
