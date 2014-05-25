@@ -143,11 +143,18 @@ one circuit server for us a _dial-in_ point.
 
 There are two ways to provide the dial-in server address to the tool:
 
-1. With the command-line option `-d`, or 
-2. By setting the environment variable `CIRCUIT` to point to a file
-whose contents is the desired dial-in address.
+1. With the command-line option `-d`, like e.g.
 
-A list of available tool commands is displayed by the command
+	circuit ls -d circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d /
+
+2. By setting the environment variable `CIRCUIT` to point to a file
+whose contents is the desired dial-in address. For example, (in bash):
+
+	echo circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d > ~/.circuit
+	export CIRCUIT="~/.circuit"
+	circuit ls /
+
+A list of available tool commands is shown on the help screen
 
 	circuit help
 
