@@ -112,25 +112,27 @@ their anchor.
 Use
 ---
 
-Once the circuit servers are started, one can create, observe and control
-circuit elements (i) interactively using the circuit binary which doubles as a command-line client,
-as well as (ii) programmatically using the circuit Go client package `github.com/gocircuit/circuit/client`.
-In fact, the circuit command-line tool is merely a front for a subset the Go client library,
-and is a circuit client itself.
+Once the circuit servers are started, you can create, observe and control
+circuit elements (i) interactively—using the circuit binary which doubles as a command-line client—as
+well as (ii) programmatically—using the circuit Go client package `github.com/gocircuit/circuit/client`.
+In fact, the circuit command-line tool is simply a front-end for the Go client library.
 
-Clients (the tool or your own) connect into a circuit server and perform
-operations via this server. Which server a client connects to is called
-the _dial-in_ server. In general, it does not matter which server you
-connect your client to. They are all equally good. And they all can control
-the whole system.
+Clients (the tool or your own) _dial into_ a circuit server in order to
+interact with the entire system. All servers are equal citizens in every respect and,
+in particular, any one can be used as a choice for dial-in.
 
 ![Circuit client connected to a server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/client.png)
 
-To list the entire circuit cluster anchor hierarchy, type in
+The tool (described in more detail later) is essentially a set of commands that
+allow you to traverse the global hierarchical namespace of circuit elements,
+and interact with them, somewhat similarly to how one uses the Zookeeper
+namespace.
 
-	circuit ls /...
+For example, to list the entire circuit cluster anchor hierarchy, type in
 
-You get
+	circuit ls /
+
+So, you might get something like this in response
 
 	/X88550014d4c82e4d
 	/X938fe923bcdef2390
@@ -139,20 +141,24 @@ The two root-level anchors correspond to the two circuit servers.
 
 ![Circuit servers correspond to root-level anchors](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/serveranchor.png)
 
-Before this command can work, however, you need to give it the address of
-any one of the circuit servers as a _dial-in_ point. The choice of dial-in
-server does not matter at all. All circuit servers are equally good for this job.
+Pointing the tool to your circuit cluster
+----------------------------------------------
 
-There are two ways to provide the dial-in address to the tool: with
-the command-line option -d or by setting the environment variable `CIRCUIT`
-to point to a file whose contents in the desired dial-in address.
+Before you can use the `circuit` tool, you need to tell it how to locate
+one circuit server for us a _dial-in_ point.
 
-The rest of the tool's commands can be seen by typing
+There are two ways to provide the dial-in server address to the tool:
+
+(1) With the command-line option `-d`, or 
+(2) By setting the environment variable `CIRCUIT` to point to a file
+whose contents is the desired dial-in address.
+
+A list of available tool commands is displayed by the command
 
 	circuit help
 
-They exactly correspond to the API of the `github.com/gocircuit/client` package,
-which has a more detailed documentation and a set of tutorials.
+A more detailed explanation of their meaning and function can be found
+in the documentation of the client package, `github.com/gocircuit/client`.
 
 Example: Make a process
 -----------------------
@@ -282,6 +288,17 @@ point to the private key file.
 To generate a new private key for your circuit, use the command
 
 	circuit keygen
+
+Networking
+-------------
+
+From a newtworking and protocol standpoint, circuit servers and
+clients are peers: All communications (server-server and server-client)
+use a common RPC framework which often entails a server
+being able to reverse-dial into a client.
+
+For this reason, circuit clients (the circuit tool or your apps) CANNOT
+be behind a firewall with respect to the servers they are dialing into.
 
 Learn more
 ----------

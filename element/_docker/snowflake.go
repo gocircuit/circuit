@@ -25,7 +25,6 @@ import (
 // Parent loci spin child loci (docker contains) here.
 // The child logic is invoked by circuit/cmd/circuit/load.go, and implemented in child.go
 
-// The Snowflake structure manages a circuit's dockerized subordinate circuits.
 type Snowflake struct {
 	Config       Config
 	ParentDir    string // Local directory holding parent circuit's binaries

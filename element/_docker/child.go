@@ -17,21 +17,6 @@ import (
 	"strings"
 )
 
-func SnowflakeInit() {
-	// ???
-}
-
-func InitChild(mountdir string) error {
-	// Make /circuit dir
-	if err = os.MkdirAll(mountdir, perm); err != nil {
-		return err
-	}
-	if err = exec.Command("apt-get", "-y", "update").Run(); err != nil {
-		return err
-	}
-	exec.Command("apt-get", "-y", "install", "fuse").Run() // This should return an error. That's ok, it's a hack.
-}
-
 // GetLinkAddr returns the default external IP address of this machine.
 //
 // To compute it, GetLinkAddr picks out the first default IP address from
