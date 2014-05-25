@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package tube
+package lossyring
 
 import (
 	"sync"
@@ -26,15 +26,14 @@ type Loss struct {
 
 // MakeLossyRing
 func MakeLossyRing(capacity int) *LossyRing {
-	return &LossyRing{
-		head: 0,
-		tail: 0,
-		cyc:  make([]interface{}, capacity),
-	}
+	return (&LossyRing{}).Clear(capacity)
 }
 
 // Clear
-func (s *LossyRing) Clear(length, capacity int) *LossyRing {
+func (s *LossyRing) Clear(capacity int) *LossyRing {
+	if capacity < 3 {
+		panic("too small")
+	}
 	s.head, s.tail = 0, 0
 	s.cyc = make([]interface{}, capacity)
 	return s
@@ -46,34 +45,31 @@ func (s *LossyRing) Len() int {
 	return s.tail - s.head
 }
 
-func (s *LossyRing) Send(v interface{}) {
+// Send returns true if and only if the message was stored in the ring.
+func (s *LossyRing) Send(v interface{}) (noloss bool) {
 	s.Lock()
 	defer s.Unlock()
-	switch {
-	case s.head-s.tail < len(s.cyc):
-		s.cyc[s.head%len(s.cyc)] = v
-		s.head++
-		return
-	case s.head-s.tail == len(s.cyc):
-		if loss, ok := s.cyc[s.tail%len(s.cyc)].(Loss); ok { // The next message to be received is a loss
+	noloss = true
+	if s.head-s.tail == len(s.cyc) {
+		if loss, ok := s.cyc[s.tail%len(s.cyc)].(Loss); ok {
 			s.cyc[(s.tail+1)%len(s.cyc)] = Loss{loss.Count + 1}
-		} else { // The next message to be received is not a loss
+		} else {
 			s.cyc[(s.tail+1)%len(s.cyc)] = Loss{2}
 		}
-		s.cyc[s.tail%len(s.cyc)] = v
-		s.head++
 		s.tail++
-		return
+		noloss = false
 	}
-	panic("x")
+	s.cyc[s.head%len(s.cyc)] = v
+	s.head++
+	return
 }
 
-func (s *LossyRing) Recv() (interface{}, bool) {
+func (s *LossyRing) Recv() (v interface{}, ok bool) {
 	s.Lock()
 	defer s.Unlock()
-	if s.tail > s.head {
-		s.tail++
-		return s.cyc[(s.tail-1)%len(s.cyc)], true
+	if s.tail == s.head {
+		return nil, false
 	}
-	return nil, false
+	s.tail++
+	return s.cyc[(s.tail-1)%len(s.cyc)], true
 }
