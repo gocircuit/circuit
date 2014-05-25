@@ -1,5 +1,4 @@
-The Circuit
-===========
+# The Circuit #
 
 The circuit is a tiny server process which runs instances on a cluster of
 machines to form a network, which enables distributed process orchestration
@@ -27,8 +26,7 @@ by means of a command-line tool and a client library.
 The circuit comes as one binary, which serves the purpose of a server
 and a command-line client.
 
-Build
------
+## Build ##
 
 The Circuit comprises one small binary. It can be built for Linux and Darwin.
 
@@ -37,8 +35,7 @@ you can build and install the circuit binary with one line:
 
 	go get github.com/gocircuit/circuit/cmd/circuit
 
-Run the servers
----------------
+## Run the servers ##
 
 To run the circuit server on the first machine, pick a public IP address and port for it to
 listen on, and start it like so
@@ -70,8 +67,7 @@ presence awareness and ordered communication, which is genuinely distributed;
 It uses communication and connectivity sparingly, hardly leaving a footprint
 when idle.
 
-Programming metaphor
--------
+## Programming metaphor ##
 
 The purpose of each circuit server is to host a collection of control
 primitives, called _elements_, on behalf of the user. On each server the
@@ -109,8 +105,7 @@ whose send and receive sides are accessible from any location in the
 circuit cluster, while their data structure lives on the circuit server hosting
 their anchor.
 
-Use
----
+## Use ##
 
 Once the circuit servers are started, you can create, observe and control
 circuit elements (i) interactively—using the circuit binary which doubles as a command-line client—as
@@ -141,16 +136,15 @@ The two root-level anchors correspond to the two circuit servers.
 
 ![Circuit servers correspond to root-level anchors](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/serveranchor.png)
 
-Pointing the tool to your circuit cluster
-----------------------------------------------
+### Pointing the tool to your circuit cluster ###
 
 Before you can use the `circuit` tool, you need to tell it how to locate
 one circuit server for us a _dial-in_ point.
 
 There are two ways to provide the dial-in server address to the tool:
 
-(1) With the command-line option `-d`, or 
-(2) By setting the environment variable `CIRCUIT` to point to a file
+1. With the command-line option `-d`, or 
+2. By setting the environment variable `CIRCUIT` to point to a file
 whose contents is the desired dial-in address.
 
 A list of available tool commands is displayed by the command
@@ -160,8 +154,7 @@ A list of available tool commands is displayed by the command
 A more detailed explanation of their meaning and function can be found
 in the documentation of the client package, `github.com/gocircuit/client`.
 
-Example: Make a process
------------------------
+### Example: Make a process ###
 
 Here are a few examples. To run a new process on some chosen
 cluster machine, first see what machines are available:
@@ -198,8 +191,7 @@ Remove the process element from the anchor hierarchy
 
 	circuit scrub /X88550014d4c82e4d/pippi
 
-Example: Create a channel
--------------------------
+### Example: Create a channel ###
 
 Again, take a look at what servers are available:
 
@@ -251,8 +243,7 @@ Receiving is accomplished with the command
 The received message will be produced on the standard output of 
 the command above.
 
-Be creative
--------------
+## Be creative ##
 
 The circuit allows for unusual flexibilities in process orchestration.
 Take a look, for instance, at the two “virus” tutorials which demonstrate
@@ -265,8 +256,7 @@ And the more elaborate one, which demonstrate use of channels, here
 
 	github.com/gocircuit/circuit/client/tutorial/virus-with-backchan
 
-Security
---------
+## Security ##
 
 By default, circuit servers and clients communicate over plaintext TCP.
 A HMAC-based symmetric authentication, followed by an asymmetric
@@ -289,8 +279,7 @@ To generate a new private key for your circuit, use the command
 
 	circuit keygen
 
-Networking
--------------
+## Networking ##
 
 From a newtworking and protocol standpoint, circuit servers and
 clients are peers: All communications (server-server and server-client)
@@ -300,8 +289,7 @@ being able to reverse-dial into a client.
 For this reason, circuit clients (the circuit tool or your apps) CANNOT
 be behind a firewall with respect to the servers they are dialing into.
 
-Learn more
-----------
+# Learn more #
 
 The Go client for writing circuit apps is package
 
@@ -324,8 +312,7 @@ To stay up to date with new developments, documentation and articles, follow
 The Circuit Project on Twitter [@gocircuit](https://twitter.com/gocircuit) or
 me [@maymounkov](https://twitter.com/maymounkov).
 
-Donate with a tweet
-----
+## Donate with a tweet ##
 
 Please, tweet about the circuit (mention [@gocircuit](https://twitter.com/gocircuit)).
 Tweets are a much appreciated donation and they help us and our funders
