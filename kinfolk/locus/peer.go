@@ -10,7 +10,7 @@ package locus
 import (
 	"encoding/gob"
 
-	"github.com/gocircuit/circuit/kit/kinfolk"
+	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kit/lang"
 	"github.com/gocircuit/circuit/use/circuit"
 )

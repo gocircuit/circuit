@@ -11,7 +11,7 @@ import (
 	"github.com/gocircuit/circuit/anchor"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
-	"github.com/gocircuit/circuit/kit/kinfolk"
+	"github.com/gocircuit/circuit/kinfolk"
 )
 
 // An Anchor represents a location in the global anchor namespace of a circuit

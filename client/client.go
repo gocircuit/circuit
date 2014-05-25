@@ -26,8 +26,8 @@ import (
 	"github.com/gocircuit/circuit/use/n"
 
 	"github.com/gocircuit/circuit/anchor"
-	"github.com/gocircuit/circuit/kit/kinfolk"
-	"github.com/gocircuit/circuit/kit/kinfolk/locus"
+	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/kinfolk/locus"
 )
 
 var _once sync.Once

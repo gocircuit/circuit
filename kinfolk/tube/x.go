@@ -10,7 +10,7 @@ package tube
 import (
 	"time"
 
-	"github.com/gocircuit/circuit/kit/kinfolk"
+	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 

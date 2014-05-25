@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/gocircuit/circuit/anchor"
-	"github.com/gocircuit/circuit/kit/kinfolk"
-	"github.com/gocircuit/circuit/kit/kinfolk/tube"
+	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/kinfolk/tube"
 )
 
 // Locus is a device that listens to the join/leave events reported by the kinfolk social

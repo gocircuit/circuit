@@ -14,8 +14,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/gocircuit/circuit/kit/kinfolk"
-	"github.com/gocircuit/circuit/kit/kinfolk/locus"
+	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/kinfolk/locus"
 
 	// "github.com/gocircuit/circuit/kit/shell"
 	"github.com/gocircuit/circuit/use/circuit"
