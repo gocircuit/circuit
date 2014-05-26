@@ -26,7 +26,7 @@ type Locus struct {
 // NewLocus creates a new locus device.
 func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus {
 	locus := &Locus{
-		tube: tube.New(kin, "locus"),
+		tube: tube.NewTube(kin, "locus"),
 		Peer: &Peer{
 			// It is crucial to use permanent cross-references, and not
 			// "plain" ones within values stored inside the tube table. If

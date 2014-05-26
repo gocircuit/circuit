@@ -110,12 +110,12 @@ func (l *Listener) handshake(conn *blend.Conn) (sourceAddr *Addr, err error) {
 }
 
 func reverseAddr(bound *Addr, seen net.Addr) {
-	var saved = bound.String()
+	// var saved = bound.String()
 	if !bound.TCP.IP.IsUnspecified() {
 		return
 	}
 	bound.TCP.IP = seen.(*net.TCPAddr).IP
-	log.Printf("Reverse dial address auto-completed: %s => %s", saved, bound.String())
+	// log.Printf("Reverse dial address auto-completed: %s => %s", saved, bound.String())
 }
 
 func (l *Listener) Accept() n.Conn {
