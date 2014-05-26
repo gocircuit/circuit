@@ -11,6 +11,8 @@ import (
 	"container/list"
 	"runtime"
 	"sync"
+	
+	"github.com/gocircuit/circuit/use/circuit"
 )
 
 // PubSub…
@@ -193,4 +195,20 @@ func (q *queue) Consume() (v interface{}, ok bool) {
 // Subscription is the user's interface to consuming messages from a topic.
 type Subscription struct {
 	*queue // Consume(), Stat()
+}
+
+func init() {
+	circuit.RegisterValue(&Subscription{})
+}
+
+func (s *Subscription) X() circuit.X {
+	return circuit.Ref(s)
+}
+
+func (s *Subscription) Stat() Stat {
+	return s.queue.Stat()
+}
+
+func (s *Subscription) Consume() (interface{}, bool) {
+	return s.queue.Consume()
 }
