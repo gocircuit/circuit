@@ -54,6 +54,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 				e.k = "proc"
 			}
 		default:
+			e.k = "·"
 		}
 		c = append(c, e)
 	}
@@ -63,7 +64,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
 		}
 		if long {
-			fmt.Printf("%s%s•<%s>\n", prefix, e.n, e.k)
+			fmt.Printf("% 10s %s%s\n", e.k, prefix, e.n)
 		} else {
 			fmt.Printf("%s%s\n", prefix, e.n)
 		}

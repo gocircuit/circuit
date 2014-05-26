@@ -21,35 +21,23 @@ import (
 
 // Tube is a folk data structure that maintains a key-value set sorted by key
 type Tube struct {
-	permXID kinfolk.FolkXID // XID to this tube
-	folk    *kinfolk.Folk   // Folk interface of this tube to the kin system
+	xid     kinfolk.FolkXID // XID to this tube
+	folk   *kinfolk.Folk   // Folk interface of this tube to the kin system
 	sync.Mutex
-	lookup     map[string]int // record key => record index
-	table      []*Record // Current state of the record space known to us
-	downstream *kinfolk.Rotor // Rotor of YTubes for downstream updates
+	view  *View
+	down *kinfolk.Rotor // Rotor of YTubes for downstream updates
 }
 
-// Record is the data unit of the tube system.
-type Record struct {
-	Key     string
-	Rev     Rev
-	Value   interface{}
-	Updated time.Time
-}
-
-// Rev is an increasing revision number of a tube record.
-type Rev uint64
-
-func New(kin *kinfolk.Kin, topic string) *Tube {
+func NewTube(kin *kinfolk.Kin, topic string) *Tube {
 	t := &Tube{
 		lookup:     make(map[string]int),
-		downstream: kinfolk.NewRotor(),
+		down: kinfolk.NewRotor(),
 	}
-	t.permXID = kinfolk.FolkXID{
+	t.xid = kinfolk.FolkXID{
 		X:  circuit.PermRef(XTube{t}),
 		ID: lang.ComputeReceiverID(t),
 	}
-	t.folk = kin.Attach(topic, t.permXID)
+	t.folk = kin.Attach(topic, t.xid)
 	go t.loopJoining()
 	return t
 }
@@ -86,12 +74,12 @@ func (t *Tube) superscribe(peerXID kinfolk.FolkXID) {
 	defer t.Unlock()
 	yup := YTube{
 		kinfolk.FolkXID(
-			t.downstream.Open(
+			t.down.Open(
 				kinfolk.XID(peerXID),
 			),
 		),
 	}
-	go t.BulkWrite(yup.Subscribe(t.permXID, t.bulkRead()))
+	go t.BulkWrite(yup.Subscribe(t.xid, t.bulkRead()))
 }
 
 func (t *Tube) bulkRead() []*Record {
@@ -134,7 +122,7 @@ func (t *Tube) Write(key string, rev Rev, value interface{}) (changed bool) {
 
 func (t *Tube) writeSync(key string, rev Rev, value interface{}) {
 	var wg sync.WaitGroup
-	for _, downXID := range t.downstream.Opened() {
+	for _, downXID := range t.down.Opened() {
 		ydown := YTube{
 			kinfolk.FolkXID(downXID),
 		}
@@ -177,7 +165,7 @@ func (t *Tube) bulkWrite(bulk []*Record) {
 func (t *Tube) bulkWriteSync(changed []*Record) {
 	// Records exchanged within and across tubes are immutable, so no lock is necessary
 	var wg sync.WaitGroup
-	for _, downXID := range t.downstream.Opened() {
+	for _, downXID := range t.down.Opened() {
 		ydown := YTube{kinfolk.FolkXID(downXID)}
 		wg.Add(1)
 		go func() {
@@ -252,7 +240,7 @@ func (t *Tube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 
 func (t *Tube) scrubSync(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 	var wg sync.WaitGroup
-	for _, downXID := range t.downstream.Opened() {
+	for _, downXID := range t.down.Opened() {
 		ydown := YTube{
 			kinfolk.FolkXID(downXID),
 		}

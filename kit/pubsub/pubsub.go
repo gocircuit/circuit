@@ -33,7 +33,7 @@ type PubSub struct {
 // for subscribers joining now.
 type Summarize func() []interface{}
 
-func NewPubSub(sum Summarize) (ps *PubSub) {
+func New(sum Summarize) (ps *PubSub) {
 	src := make(chan interface{})
 	ps = &PubSub{}
 	ps.up.src = src
@@ -104,8 +104,10 @@ func (ps *PubSub) Subscribe() *Subscription {
 	ps.down.member[q.id] = q
 	ps.down.n++
 	// Prefix subscription's input stream with a summary of all history until now
-	for _, v := range ps.down.sum() {
-		q.distribute(v)
+	if ps.down.sum != nil {
+		for _, v := range ps.down.sum() {
+			q.distribute(v)
+		}
 	}
 	return q.use()
 }
