@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package lossyring
+package pubsub
 
 import (
 	"sync"
