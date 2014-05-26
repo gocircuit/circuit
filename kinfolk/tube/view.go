@@ -10,13 +10,10 @@ package tube
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
-	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kit/pubsub"
-	"github.com/gocircuit/circuit/use/circuit"
 )
 
 // View is a folk data structure that maintains a key-value set sorted by key
@@ -37,28 +34,24 @@ func NewView() (v *View) {
 	return
 }
 
-func (v *View) NewArriveSubscription() *pubsub.Subscription {
+// NewArrivals returns a subscription for the stream of arriving peer identities.
+func (v *View) NewArrivals() *pubsub.Subscription {
 	return v.arrive.Subscribe()
 }
 
-func (v *View) NewDepartSubscription() *pubsub.Subscription {
+// NewDepartures returns a subscription for the stream of departing peer identities.
+func (v *View) NewDepartures() *pubsub.Subscription {
 	return v.depart.Subscribe()
 }
 
-// Dump returns a textual representation of the contents of this Tube img
-// func (v *View) Dump() string {
-// 	t.Lock()
-// 	defer t.Unlock()
-// 	return t.dump()
-// }
-
-// func (v *View) dump() string {
-// 	var w bytes.Buffer
-// 	for _, r := range t.img {
-// 		fmt.Fprintf(&w, "%s––(%d)––>%v\n", r.Key, r.Rev, r.Value)
-// 	}
-// 	return w.String()
-// }
+// Dump returns a textual representation of the contents of this view
+func (v *View) Dump() string {
+	var w bytes.Buffer
+	for _, r := range v.Peek() {
+		fmt.Fprintf(&w, "%s––(%d)––>%v\n", r.Key, r.Rev, r.Value)
+	}
+	return w.String()
+}
 
 // Peek returns a copy of the current state of the view.
 func (v *View) Peek() []*Record {
@@ -81,10 +74,9 @@ func (v *View) peek() []interface{} {
 	return r
 }
 
-// The first write must have revision bigger than 0. Otherwise it won't take effect.
-// Write will block until the diffusion of the write operation reaches its terminal nodes.
-// This simple form of backpressure ensures self-inflicted DDoS in the presence of software bugs.
-
+// Update updates the state of the view at key r.Key.
+// The first update to a key must have revision bigger than zero, otherwise it won't take effect.
+// The returned value reflects whether an actual change took place in the view.
 func (v *View) Update(r *Record) (changed bool) {
 	v.Lock()
 	defer v.Unlock()

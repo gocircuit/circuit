@@ -14,7 +14,7 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
-// XTube
+// XTube is the interface to a tube, given to the tube's upstream (cross-circiuit) peering tubes.
 type XTube struct {
 	t *Tube
 }
@@ -23,29 +23,28 @@ func init() {
 	circuit.RegisterValue(XTube{})
 }
 
-// XID returns an XID pointing to this Tube table
+// XID returns an XID pointing to this tube
 func (x XTube) XID() kinfolk.FolkXID {
-	return x.t.permXID
+	return x.t.xid
 }
 
+// Subscribe…
 func (x XTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
 	// log.Printf("xtube subscribing")
 	// defer func() {
 	// 	log.Printf("xtube subscribed\n%s", x.t.Dump())
 	// }()
-
-	if downXID.ID == x.t.permXID.ID {
+	if downXID.ID == x.t.xid.ID {
 		panic("x")
 	}
-	//
 	x.t.Lock()
 	defer x.t.Unlock()
-
-	x.t.downstream.Open(kinfolk.XID(downXID)) // Add peer to downstream list
-	go x.t.BulkWrite(upsync)                  // Catch up to peer after we return (and peer unlocks itself)
-	return x.t.bulkRead()
+	x.t.down.Open(kinfolk.XID(downXID)) // Add peer to downstream list
+	go x.t.BulkWrite(upsync) // Catch up to peer, after we return (and peer unlocks itself)
+	return x.t.view.Peek()
 }
 
+// Write…
 func (x XTube) Write(key string, rev Rev, value interface{}) bool {
 	// log.Printf("xtube writing (%s,%d,%v)", key, rev, value)
 	// defer func() {
@@ -55,9 +54,6 @@ func (x XTube) Write(key string, rev Rev, value interface{}) bool {
 }
 
 func (x XTube) BulkWrite(bulk []*Record) {
-	if len(bulk) == 0 {
-		return
-	}
 	x.t.BulkWrite(bulk)
 }
 
