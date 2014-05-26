@@ -17,55 +17,109 @@ import (
 
 // PubSub…
 type PubSub struct {
-	sync.Mutex
-	member map[int]*queue
-	n int
-}
-
-func NewPubSub(src <-chan interface{}) *PubSub {
-	ps := &PubSub{
-		member: make(map[int]*queue),
+	up struct {
+		sync.Mutex
+		src chan<- interface{}
 	}
-	go ps.loop(src)
-	return ps
+	down struct {
+		sum Summarize
+		sync.Mutex
+		member map[int]*queue
+		n int
+	}
 }
 
+// Summarize returns a list of items meant to summarize the history of the stream so far
+// for subscribers joining now.
+type Summarize func() []interface{}
+
+func NewPubSub(sum Summarize) (ps *PubSub) {
+	src := make(chan interface{})
+	ps = &PubSub{}
+	ps.up.src = src
+	ps.down.sum = sum
+	ps.down.member = make(map[int]*queue)
+	go ps.loop(src)
+	return
+}
+
+// Publish appends a value onto the infinite update stream.
+func (ps *PubSub) Publish(v interface{}) {
+	ps.up.Lock()
+	defer ps.up.Unlock()
+	if ps.up.src == nil {
+		panic("publish after close")
+	}
+	ps.up.src <- v
+}
+
+// Close terminates, paradoxically, the infinite update stream.
+func (ps *PubSub) Close() {
+	ps.up.Lock()
+	defer ps.up.Unlock()
+	if ps.up.src == nil {
+		return
+	}
+	close(ps.up.src)
+	ps.up.src = nil
+}
+
+// loop churns messages between the publishing entity, using Publish(), 
+// and the multiple registered subscriber entities.
 func (ps *PubSub) loop(src <-chan interface{}) {
 	for {
 		v, ok := <-src
 		if !ok {
-			ps.Lock()
-			for _, q := range ps.member {
-				q.clunk()
-			}
-			ps.Unlock()
+			ps.clunk()
 			return
 		}
-		ps.Lock()
-		for _, q := range ps.member {
-			q.distribute(v)
-		}
-		ps.Unlock()
+		ps.distribute(v)
 	}
 }
 
+func (ps *PubSub) distribute(v interface{}) {
+	ps.down.Lock()
+	defer ps.down.Unlock()
+	for _, q := range ps.down.member {
+		q.distribute(v)
+	}
+}
+
+func (ps *PubSub) clunk() {
+	ps.down.Lock()
+	defer ps.down.Unlock()
+	for _, q := range ps.down.member {
+		q.clunk()
+	}
+}
+
+// Subscribe creates a new subscription object, whose interface embodies reading from an infinite stream.
+// New subscription can join at any time. The input stream of each individual subscription is pre-loaded
+// with a sequence of values summarizing all past history. Subsequent values come from the pubish stream.
+// Subscriptions are abandoned on garbage-collection.
 func (ps *PubSub) Subscribe() *Subscription {
-	ps.Lock()
-	defer ps.Unlock()
-	q := newQueue(ps, ps.n)
-	ps.member[q.id] = q
-	ps.n++
+	ps.down.Lock()
+	defer ps.down.Unlock()
+	q := newQueue(ps, ps.down.n)
+	ps.down.member[q.id] = q
+	ps.down.n++
+	// Prefix subscription's input stream with a summary of all history until now
+	for _, v := range ps.down.sum() {
+		q.distribute(v)
+	}
 	return q.use()
 }
 
+// scrub removes a subscription queue from the member table, only if 
+// all Subscription handles referring to it have been collected.
 func (ps *PubSub) scrub(id int) {
-	ps.Lock()
-	defer ps.Unlock()
-	s, ok := ps.member[id]
-	if !ok || s.isBusy() {
+	ps.down.Lock()
+	defer ps.down.Unlock()
+	q, ok := ps.down.member[id]
+	if !ok || q.isBusy() {
 		return
 	}
-	delete(ps.member, id)
+	delete(ps.down.member, id)
 }
 
 // queue…
@@ -99,6 +153,12 @@ func (q *queue) addPend(d int) {
 	q.pend += d
 }
 
+func (q *queue) setClosed(v bool) {
+	q.Lock()
+	defer q.Unlock()
+	q.closed = v
+}
+
 type Stat struct {
 	Pending int
 	Closed bool
@@ -121,16 +181,18 @@ func (q *queue) distribute(v interface{}) {
 	q.ch1 <- v
 }
 
+// loop churns messages from the main loop onto the internal buffer of this subscription,
+// and from there out to the consumer, as requested by calls to Consume.
 func (q *queue) loop(ch1 <-chan interface{}, ch2 chan<- interface{}) {
 	var l list.List
-__F1:
+__preclose:
 	for {
 		if w := l.Back(); w != nil {
 			select {
 			case v, ok := <-ch1: // distribute
 				if !ok {
-					q.closed = true
-					break __F1
+					q.setClosed(true)
+					break __preclose
 				}
 				l.PushFront(v)
 				q.addPend(1)
@@ -141,7 +203,8 @@ __F1:
 		} else {
 			v, ok := <- ch1
 			if !ok {
-				break __F1
+				q.setClosed(true)
+				break __preclose
 			}
 			l.PushFront(v)
 			q.addPend(1)
@@ -176,6 +239,7 @@ func (q *queue) recycle() {
 	go q.ps.scrub(q.id)
 }
 
+// use returns a new subscription, which is effectively a handle for this queue.
 func (q *queue) use() *Subscription {
 	q.Lock()
 	defer q.Unlock()
