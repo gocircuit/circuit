@@ -12,6 +12,7 @@ import (
 
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
+	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
 	xerrors "github.com/gocircuit/circuit/use/errors"
 )
@@ -60,6 +61,7 @@ func (x XTerminal) Scrub() {
 	x.t.Scrub()
 }
 
+// YTerminal…
 type YTerminal struct {
 	X circuit.X
 }
@@ -89,6 +91,10 @@ func (y YTerminal) Make(kind string, arg interface{}) (yelm interface{}, err err
 		return valve.YValve{r[0].(circuit.X)}, nil
 	case Proc:
 		return proc.YProc{r[0].(circuit.X)}, nil
+	case OnJoin:
+		return pubsub.YSubscription{r[0].(circuit.X)}, nil
+	case OnLeave:
+		return pubsub.YSubscription{r[0].(circuit.X)}, nil
 	}
 	return nil, errors.New("element kind not supported")
 }
@@ -101,6 +107,10 @@ func (y YTerminal) Get() (kind string, yelm interface{}) {
 		return Chan, valve.YValve{r[1].(circuit.X)}
 	case Proc:
 		return Proc, proc.YProc{r[1].(circuit.X)}
+	case OnJoin:
+		return OnJoin, pubsub.YSubscription{r[1].(circuit.X)}
+	case OnLeave:
+		return OnLeave, pubsub.YSubscription{r[1].(circuit.X)}
 	}
 	return "", nil
 }

@@ -8,16 +8,11 @@
 package main
 
 import (
-	"fmt"
-	"encoding/json"
-
-	"github.com/gocircuit/circuit/client"
-
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
-// circuit peek /X1234/hola/charlie
-func peek(x *cli.Context) {
+// circuit mk@join /X1234/hola/listy
+func mkonjoin(x *cli.Context) {
 	defer func() {
 		if r := recover(); r != nil {
 			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
@@ -26,28 +21,17 @@ func peek(x *cli.Context) {
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
-		fatalf("peek needs one anchor argument")
+		fatalf("mk@join needs an anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	switch t := c.Walk(w).Get().(type) {
-	case client.Chan:
-		buf, _ := json.MarshalIndent(t.Stat(), "", "\t")
-		fmt.Println(string(buf))
-	case client.Proc:
-		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
-		fmt.Println(string(buf))
-	case client.Subscription:
-		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
-		fmt.Println(string(buf))
-	case nil:
-		buf, _ := json.MarshalIndent(nil, "", "\t")
-		fmt.Println(string(buf))
-	default:
-		fatalf("unknown element")
+	_, err := c.Walk(w).MakeOnJoin()
+	if err != nil {
+		fatalf("mk@join error: %s", err)
 	}
 }
 
-func scrb(x *cli.Context) {
+// circuit mk@leave /X1234/hola/listy
+func mkonleave(x *cli.Context) {
 	defer func() {
 		if r := recover(); r != nil {
 			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
@@ -56,8 +40,11 @@ func scrb(x *cli.Context) {
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
-		fatalf("scrub needs one anchor argument")
+		fatalf("mk@leave needs an anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	c.Walk(w).Scrub()
+	_, err := c.Walk(w).MakeOnLeave()
+	if err != nil {
+		fatalf("mk@leave error: %s", err)
+	}
 }

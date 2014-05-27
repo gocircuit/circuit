@@ -12,6 +12,7 @@ import (
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/kit/pubsub"
 )
 
 // An Anchor represents a location in the global anchor namespace of a circuit
@@ -58,6 +59,12 @@ type Anchor interface {
 	// If the anchor already stores an element, a non-nil error is returned.
 	// Panics indicate that the server hosting the anchor is gone.
 	MakeProc(cmd Cmd) (Proc, error)
+
+	// MakeOnJoin…
+	MakeOnJoin() (Subscription, error)
+
+	// MakeOnLeave…
+	MakeOnLeave() (Subscription, error)
 
 	// Get returns a handle for the circuit element (one of Chan or Proc) stored at this anchor, and nil otherwise. 
 	// Panics indicate that the server hosting the anchor and its element has already died.
@@ -128,6 +135,22 @@ func (t terminal) MakeProc(cmd Cmd) (Proc, error) {
 	return yprocProc{yproc.(proc.YProc)}, nil
 }
 
+func (t terminal) MakeOnJoin() (Subscription, error) {
+	ysub, err := t.y.Make(anchor.OnJoin, nil)
+	if err != nil {
+		return nil, err
+	}
+	return ysubSub{ysub.(pubsub.YSubscription)}, nil
+}
+
+func (t terminal) MakeOnLeave() (Subscription, error) {
+	ysub, err := t.y.Make(anchor.OnLeave, nil)
+	if err != nil {
+		return nil, err
+	}
+	return ysubSub{ysub.(pubsub.YSubscription)}, nil
+}
+
 func (t terminal) Get() interface{} {
 	kind, y := t.y.Get()
 	if y == nil {
@@ -138,6 +161,10 @@ func (t terminal) Get() interface{} {
 		return yvalveChan{y.(valve.YValve)}
 	case anchor.Proc:
 		return yprocProc{y.(proc.YProc)}
+	case anchor.OnJoin:
+		return ysubSub{y.(pubsub.YSubscription)}
+	case anchor.OnLeave:
+		return ysubSub{y.(pubsub.YSubscription)}
 	}
 	panic("client/circuit mismatch")
 }

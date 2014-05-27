@@ -66,32 +66,6 @@ func send(x *cli.Context) {
 	}
 }
 
-func recv(x *cli.Context) {
-	defer func() {
-		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
-		}
-	}()
-	c := dial(x)
-	args := x.Args()
-	if len(args) != 1 {
-		fatalf("recv needs one anchor argument")
-	}
-	w, _ := parseGlob(args[0])
-	u, ok := c.Walk(w).Get().(client.Chan)
-	if !ok {
-		fatalf("not a channel")
-	}
-	msgr, err := u.Recv()
-	if err != nil {
-		fatalf("recv error: %v", err)
-	}
-	io.Copy(os.Stdout, msgr)
-	// if _, err = io.Copy(os.Stdout, msgr); err != nil {
-	// 	fatalf("transmission error: %v", err)
-	// }
-}
-
 func clos(x *cli.Context) {
 	c := dial(x)
 	args := x.Args()

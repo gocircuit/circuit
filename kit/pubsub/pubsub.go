@@ -166,7 +166,7 @@ type Stat struct {
 	Closed bool
 }
 
-func (q *queue) Stat() Stat {
+func (q *queue) Peek() Stat {
 	q.Lock()
 	defer q.Unlock()
 	return Stat{
@@ -260,7 +260,7 @@ func (q *queue) Consume() (v interface{}, ok bool) {
 
 // Subscription is the user's interface to consuming messages from a topic.
 type Subscription struct {
-	*queue // Consume(), Stat()
+	*queue // Consume(), Peek()
 }
 
 func init() {
@@ -271,10 +271,32 @@ func (s *Subscription) X() circuit.X {
 	return circuit.Ref(s)
 }
 
-func (s *Subscription) Stat() Stat {
-	return s.queue.Stat()
+func (s *Subscription) Scrub() {}
+
+func (s *Subscription) Peek() Stat {
+	return s.queue.Peek()
 }
 
 func (s *Subscription) Consume() (interface{}, bool) {
 	return s.queue.Consume()
 }
+
+// YSubscription is a client wrapper for cross-interface to *Subscription
+type YSubscription struct {
+	X circuit.X
+}
+
+func (y YSubscription) Peek() Stat {
+	return y.X.Call("Peek")[0].(Stat)
+}
+
+func (y YSubscription) Consume() (interface{}, bool) {
+	r := y.X.Call("Consume")
+	return r[0], r[1].(bool)
+}
+
+func (y YSubscription) IsDone() bool {
+	return true
+}
+
+func (y YSubscription) Scrub() {}

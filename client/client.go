@@ -120,6 +120,16 @@ func (c *Client) MakeProc(cmd Cmd) (Proc, error) {
 	return nil, errors.New("cannot create elements outside of workers")
 }
 
+// MakeOnJoin is an Anchor interface method, not applicable to the root-level anchor.
+func (c *Client) MakeOnJoin() (Subscription, error) {
+	return nil, errors.New("cannot create elements outside of workers")
+}
+
+// MakeOnLeave is an Anchor interface method, not applicable to the root-level anchor.
+func (c *Client) MakeOnLeave() (Subscription, error) {
+	return nil, errors.New("cannot create elements outside of workers")
+}
+
 // Get is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) Get() interface{} {
 	return nil

@@ -47,6 +47,25 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
+		// subscription-specific
+		{
+			Name: "mk@join",
+			Usage: "Create a subscription element, receiving server join events",
+			Action: mkonjoin,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
+		{
+			Name: "mk@leave",
+			Usage: "Create a subscription element, receiving server leave events",
+			Action: mkonleave,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		// channel-specific
 		{
 			Name: "mkchan",
@@ -68,7 +87,7 @@ func main() {
 		},
 		{
 			Name: "recv",
-			Usage: "Receive data from the channel on stadard output",
+			Usage: "Receive data from a channel or a subscription on stadard output",
 			Action: recv,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},

@@ -23,8 +23,7 @@ func (x XLocus) GetPeers() []*Peer {
 	return x.l.GetPeers()
 }
 
-//
-
+// YLocus…
 type YLocus struct {
 	X circuit.PermX
 }

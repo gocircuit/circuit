@@ -14,6 +14,7 @@ import (
 
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
+	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
@@ -25,25 +26,50 @@ type Element interface {
 const (
 	Chan = "chan"
 	Proc = "proc"
-	//Pipe = "pipe"
-	//Mutex = "mutex"
+	OnJoin = "@join"
+	OnLeave = "@leave"
 )
 
 // Terminal presents a facade to *Anchor with added element manipulation methods
-type Terminal Anchor
+type Terminal struct {
+	genus Genus
+	anchor *Anchor
+}
+
+type Genus interface {
+	NewArrivals() *pubsub.Subscription
+	NewDepartures() *pubsub.Subscription
+}
+
+// NewTerm create the root node of a new anchor file system.
+func NewTerm(name string, genus Genus) circuit.PermX {
+	t := XTerminal{
+		&Terminal{
+			genus: genus,
+			anchor: newAnchor(nil, name).use(),
+		},
+	}
+	return circuit.PermRef(t)
+}
 
 func (t *Terminal) carrier() *Anchor {
-	return (*Anchor)(t)
+	return t.anchor
 }
 
 func (t *Terminal) Walk(walk []string) *Terminal {
-	return (*Terminal)(t.carrier().Walk(walk))
+	return &Terminal{
+		genus: t.genus,
+		anchor: t.carrier().Walk(walk),
+	}
 }
 
 func (t *Terminal) View() map[string]*Terminal {
 	r := make(map[string]*Terminal)
 	for n, a := range t.carrier().View() {
-		r[n] = (*Terminal)(a)
+		r[n] = &Terminal{
+			genus: t.genus,
+			anchor: a,
+		}
 	}
 	return r
 }
@@ -91,6 +117,20 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 			}
 			u.elem.(proc.Proc).Wait()
 		}()
+		return u.elem, nil
+	case OnJoin:
+		u := &urn{
+			kind: OnJoin,
+			elem: t.genus.NewArrivals(),
+		}
+		t.carrier().Set(u)
+		return u.elem, nil
+	case OnLeave:
+		u := &urn{
+			kind: OnLeave,
+			elem: t.genus.NewDepartures(),
+		}
+		t.carrier().Set(u)
 		return u.elem, nil
 	}
 	return nil, errors.New("element kind not known")

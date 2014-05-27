@@ -14,6 +14,7 @@ import (
 	"github.com/gocircuit/circuit/anchor"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/tube"
+	"github.com/gocircuit/circuit/kit/pubsub"
 )
 
 // Locus is a device that listens to the join/leave events reported by the kinfolk social
@@ -27,15 +28,15 @@ type Locus struct {
 func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus {
 	locus := &Locus{
 		tube: tube.NewTube(kin, "locus"),
-		Peer: &Peer{
-			// It is crucial to use permanent cross-references, and not
-			// "plain" ones within values stored inside the tube table. If
-			// cross-references are used, they are managed by the cross-
-			// garbage collection system and therefore connections to ALL
-			// underlying workers are maintained superfluously.
-			Kin:    kin.XID(),
-			Term: anchor.NewTerm(kin.XID().ID.String()),
-		},
+	}
+	locus.Peer = &Peer{
+		// It is crucial to use permanent cross-references, and not
+		// "plain" ones within values stored inside the tube table. If
+		// cross-references are used, they are managed by the cross-
+		// garbage collection system and therefore connections to ALL
+		// underlying workers are maintained superfluously.
+		Kin:    kin.XID(),
+		Term: anchor.NewTerm(kin.XID().ID.String(), locus),
 	}
 	go loopJoin(kinJoin)
 	go locus.loopLeave(kinLeave)
@@ -52,6 +53,14 @@ func (locus *Locus) GetPeers() []*Peer {
 		s[i] = r.Value.(*Peer)
 	}
 	return s
+}
+
+func (locus *Locus) NewArrivals() *pubsub.Subscription {
+	return locus.tube.NewArrivals()
+}
+
+func (locus *Locus) NewDepartures() *pubsub.Subscription {
+	return locus.tube.NewDepartures()
 }
 
 // loopAnnounceAndExpire writes a new version of this server's peer record to the tube view every 2 seconds,
