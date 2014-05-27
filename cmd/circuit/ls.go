@@ -53,6 +53,8 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			} else {
 				e.k = "proc"
 			}
+		case client.Subscription:
+			e.k = "@" + t.Peek().Source
 		default:
 			e.k = "·"
 		}

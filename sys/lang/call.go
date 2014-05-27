@@ -22,7 +22,7 @@ func call(recv reflect.Value, t *types.TypeChar, id types.FuncID, arg []interfac
 		if p == nil {
 			return
 		}
-		t := string(debug.Stack())
+		t := "server-side runtime.call(…):\n" + string(debug.Stack())
 		switch q := p.(type) {
 		case error:
 			err = NewError(q.Error() + "\n" + t)

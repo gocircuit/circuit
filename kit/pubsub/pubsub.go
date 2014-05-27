@@ -17,6 +17,7 @@ import (
 
 // PubSub…
 type PubSub struct {
+	name string
 	up struct {
 		sync.Mutex
 		src chan<- interface{}
@@ -33,14 +34,19 @@ type PubSub struct {
 // for subscribers joining now.
 type Summarize func() []interface{}
 
-func New(sum Summarize) (ps *PubSub) {
+func New(name string, sum Summarize) (ps *PubSub) {
 	src := make(chan interface{})
-	ps = &PubSub{}
+	ps = &PubSub{name: name}
 	ps.up.src = src
 	ps.down.sum = sum
 	ps.down.member = make(map[int]*queue)
 	go ps.loop(src)
 	return
+}
+
+// Source returns the name of the event source.
+func (ps *PubSub) Source() string {
+	return ps.name
 }
 
 // Publish appends a value onto the infinite update stream.
@@ -162,6 +168,7 @@ func (q *queue) setClosed(v bool) {
 }
 
 type Stat struct {
+	Source string
 	Pending int
 	Closed bool
 }
@@ -170,6 +177,7 @@ func (q *queue) Peek() Stat {
 	q.Lock()
 	defer q.Unlock()
 	return Stat{
+		Source: q.ps.Source(),
 		Pending: q.pend,
 		Closed: q.closed,
 	}

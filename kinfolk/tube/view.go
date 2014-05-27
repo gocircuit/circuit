@@ -30,7 +30,7 @@ func NewView() (v *View) {
 	v = &View{
 		lkp: make(map[string]int),
 	}
-	v.arrive, v.depart = pubsub.New(v.peek), pubsub.New(nil)
+	v.arrive, v.depart = pubsub.New("join", v.peek), pubsub.New("leave", nil)
 	return
 }
 

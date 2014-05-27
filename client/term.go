@@ -136,7 +136,7 @@ func (t terminal) MakeProc(cmd Cmd) (Proc, error) {
 }
 
 func (t terminal) MakeOnJoin() (Subscription, error) {
-	ysub, err := t.y.Make(anchor.OnJoin, nil)
+	ysub, err := t.y.Make(anchor.OnJoin, "")
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (t terminal) MakeOnJoin() (Subscription, error) {
 }
 
 func (t terminal) MakeOnLeave() (Subscription, error) {
-	ysub, err := t.y.Make(anchor.OnLeave, nil)
+	ysub, err := t.y.Make(anchor.OnLeave, "")
 	if err != nil {
 		return nil, err
 	}

@@ -14,6 +14,9 @@ import (
 // SubscriptionStat encloses subscription state information.
 type SubscriptionStat struct {
 
+	// Name of event source
+	Source string
+
 	// Pending equals the number of messages waiting to be consumed.
 	Pending int
 
@@ -23,6 +26,7 @@ type SubscriptionStat struct {
 
 func subscriptionStat(s pubsub.Stat) SubscriptionStat {
 	return SubscriptionStat{
+		Source: s.Source,
 		Pending: s.Pending,
 		Closed: s.Closed,
 	}
