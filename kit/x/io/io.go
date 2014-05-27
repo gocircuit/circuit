@@ -71,6 +71,10 @@ type YReadCloser struct {
 	YCloser
 }
 
+func NewYReader(u interface{}) YReader {
+	return YReader{u.(circuit.X)}
+}
+
 func NewYReadCloser(u interface{}) *YReadCloser {
 	return &YReadCloser{YReader{u.(circuit.X)}, YCloser{u.(circuit.X)}}
 }
@@ -167,6 +171,10 @@ type XReadCloser struct {
 	*XCloser
 }
 
+func NewXReader(u io.Reader) circuit.X {
+	return circuit.Ref(XReader{u})
+}
+
 func NewXReadCloser(u io.ReadCloser) circuit.X {
 	return circuit.Ref(&XReadCloser{XReader{u}, NewXCloser(u)})
 }
@@ -194,7 +202,7 @@ func NewXReadWriter(u io.ReadWriter) circuit.X {
 // Init
 func init() {
 	//
-	//circuit.RegisterValue(XReader{})
+	circuit.RegisterValue(XReader{})
 	//circuit.RegisterValue(XWriter{})
 	//circuit.RegisterValue(&XCloser{})
 	//
