@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gocircuit/circuit/anchor"
+	"github.com/gocircuit/circuit/element/srv"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/tube"
 	"github.com/gocircuit/circuit/kit/pubsub"
@@ -31,6 +32,8 @@ func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus 
 	locus := &Locus{
 		tube: tube.NewTube(kin, "locus"),
 	}
+	term, xterm := anchor.NewTerm(kin.XID().ID.String(), locus)
+	term.Attach(anchor.Server, srv.New(kin.XID().X.Addr().String()))
 	locus.Peer = &Peer{
 		// It is crucial to use permanent cross-references, and not
 		// "plain" ones within values stored inside the tube table. If
@@ -38,8 +41,9 @@ func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus 
 		// garbage collection system and therefore connections to ALL
 		// underlying workers are maintained superfluously.
 		Kin:    kin.XID(),
-		Term: anchor.NewTerm(kin.XID().ID.String(), locus),
+		Term: xterm,
 	}
+
 	go loopJoin(kinJoin)
 	go locus.loopLeave(kinLeave)
 	go locus.loopAnnounceAndExpire()

@@ -30,6 +30,9 @@ func peek(x *cli.Context) {
 	}
 	w, _ := parseGlob(args[0])
 	switch t := c.Walk(w).Get().(type) {
+	case client.Server:
+		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
+		fmt.Println(string(buf))
 	case client.Chan:
 		buf, _ := json.MarshalIndent(t.Stat(), "", "\t")
 		fmt.Println(string(buf))

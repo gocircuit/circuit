@@ -15,6 +15,10 @@ import (
 	"github.com/gocircuit/circuit/use/errors"
 )
 
+func init() {
+	circuit.RegisterValue(XServer{})
+}
+
 // XServer…
 type XServer struct {
 	*server

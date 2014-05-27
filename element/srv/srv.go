@@ -49,7 +49,8 @@ func (s *server) Profile(name string) (io.Reader, error) {
 		return nil, errors.New("no profile")
 	}
 	r, w := interruptible.BufferPipe(8e3)
-	go p.WriteTo(w, 0)
+	p.WriteTo(w, 0) // TODO: dbg=0?
+	println("okkk")
 	return r, nil
 }
 

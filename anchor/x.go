@@ -10,6 +10,7 @@ package anchor
 import (
 	"errors"
 
+	"github.com/gocircuit/circuit/element/srv"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/pubsub"
@@ -103,6 +104,8 @@ func (y YTerminal) Get() (kind string, yelm interface{}) {
 	r := y.X.Call("Get")
 	kind = r[0].(string)
 	switch kind {
+	case Server:
+		return Server, srv.YServer{r[1].(circuit.X)}
 	case Chan:
 		return Chan, valve.YValve{r[1].(circuit.X)}
 	case Proc:

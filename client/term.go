@@ -9,6 +9,7 @@ package client
 
 import (
 	"github.com/gocircuit/circuit/anchor"
+	"github.com/gocircuit/circuit/element/srv"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kinfolk"
@@ -66,7 +67,8 @@ type Anchor interface {
 	// MakeOnLeave…
 	MakeOnLeave() (Subscription, error)
 
-	// Get returns a handle for the circuit element (one of Chan or Proc) stored at this anchor, and nil otherwise. 
+	// Get returns a handle for the circuit element (Chan, Proc, Subscription, Server, etc) 
+	// stored at this anchor, and nil otherwise. 
 	// Panics indicate that the server hosting the anchor and its element has already died.
 	Get() interface{}
 
@@ -157,6 +159,8 @@ func (t terminal) Get() interface{} {
 		return nil
 	}
 	switch kind {
+	case anchor.Server:
+		return ysrvSrv{y.(srv.YServer)}
 	case anchor.Chan:
 		return yvalveChan{y.(valve.YValve)}
 	case anchor.Proc:

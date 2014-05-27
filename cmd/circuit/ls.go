@@ -45,6 +45,8 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 		e := &entry{n: n, a: a}
 		v := a.Get()
 		switch t := v.(type) {
+		case client.Server:
+			e.k = "server"
 		case client.Chan:
 			e.k = "chan"
 		case client.Proc:

@@ -66,6 +66,16 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
+		// server-specific
+		{
+			Name: "stack",
+			Usage: "Print the runtime stack trace of a server element",
+			Action: stack,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		// channel-specific
 		{
 			Name: "mkchan",

@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 
+	"github.com/gocircuit/circuit/element/srv"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/pubsub"
@@ -24,6 +25,7 @@ type Element interface {
 }
 
 const (
+	Server = "server"
 	Chan = "chan"
 	Proc = "proc"
 	OnJoin = "@join"
@@ -42,14 +44,12 @@ type Genus interface {
 }
 
 // NewTerm create the root node of a new anchor file system.
-func NewTerm(name string, genus Genus) circuit.PermX {
-	t := XTerminal{
-		&Terminal{
-			genus: genus,
-			anchor: newAnchor(nil, name).use(),
-		},
+func NewTerm(name string, genus Genus) (*Terminal, circuit.PermX) {
+	t := &Terminal{
+		genus: genus,
+		anchor: newAnchor(nil, name).use(),
 	}
-	return circuit.PermRef(t)
+	return t, circuit.PermRef(XTerminal{t})
 }
 
 func (t *Terminal) carrier() *Anchor {
@@ -77,6 +77,23 @@ func (t *Terminal) View() map[string]*Terminal {
 type urn struct {
 	kind string
 	elem Element // valve.Valve, proc.Proc, etc
+}
+
+func (t *Terminal) Attach(kind string, elm Element) {
+	if kind != Server {
+		panic(0)
+	}
+	log.Printf("Attaching %s as %s", t.carrier().Path(), kind)
+	t.carrier().TxLock()
+	defer t.carrier().TxUnlock()
+	if t.carrier().Get() != nil {
+		panic(0)
+	}
+	u := &urn{
+		kind: kind,
+		elem: elm,
+	}
+	t.carrier().Set(u)
 }
 
 func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) {
@@ -147,12 +164,15 @@ func (t *Terminal) Get() (string, Element) {
 }
 
 func (t *Terminal) Scrub() {
-	log.Printf("scrubbing %s", t.carrier().Path())
+	log.Printf("Scrubbing %s", t.carrier().Path())
 	t.carrier().TxLock()
 	defer t.carrier().TxUnlock()
 	u, ok := t.carrier().Get().(*urn)
 	if !ok {
 		return
+	}
+	if _, ok := u.elem.(srv.Server); ok {
+		return // Cannot scrub server anchors
 	}
 	u.elem.Scrub()
 	t.carrier().Set(nil)
