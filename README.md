@@ -250,6 +250,26 @@ Receiving is accomplished with the command
 The received message will be produced on the standard output of 
 the command above.
 
+### Example: Listen on server join and leave announcements ###
+
+The circuit provides two special element types `@join` and `@leave`, 
+called _subscriptions_. Their job is to notify you when new
+circuit servers join the systems or others leave it.
+Both of them behave like receive-only channels.
+
+	circuit mk@join /X88550014d4c82e4d/watch/join
+	circuit mk@leave /X88550014d4c82e4d/watch/leave
+
+The join subscription delivers a new message each time a cicruit server joins
+the system. The received message holds the anchor path of the new server.
+
+	circuit recv /X88550014d4c82e4d/watch/join
+
+Similarly, the leave subscription delivers a new message each time
+a circuit server disappears from the system.
+
+	circuit peek /X88550014d4c82e4d/watch/join
+
 ## Be creative ##
 
 The circuit allows for unusual flexibilities in process orchestration.
