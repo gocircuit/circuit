@@ -37,8 +37,8 @@ type Terminal struct {
 }
 
 type Genus interface {
-	NewArrivals() *pubsub.Subscription
-	NewDepartures() *pubsub.Subscription
+	NewArrivals() pubsub.Consumer
+	NewDepartures() pubsub.Consumer
 }
 
 // NewTerm create the root node of a new anchor file system.

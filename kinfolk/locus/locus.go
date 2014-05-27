@@ -9,12 +9,14 @@ package locus
 
 import (
 	"log"
+	"path"
 	"time"
 
 	"github.com/gocircuit/circuit/anchor"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/tube"
 	"github.com/gocircuit/circuit/kit/pubsub"
+	"github.com/gocircuit/circuit/use/circuit"
 )
 
 // Locus is a device that listens to the join/leave events reported by the kinfolk social
@@ -55,12 +57,33 @@ func (locus *Locus) GetPeers() []*Peer {
 	return s
 }
 
-func (locus *Locus) NewArrivals() *pubsub.Subscription {
-	return locus.tube.NewArrivals()
+// peerSubscription
+type peerSubscription struct {
+	pubsub.Consumer
 }
 
-func (locus *Locus) NewDepartures() *pubsub.Subscription {
-	return locus.tube.NewDepartures()
+func init() {
+	circuit.RegisterValue(&peerSubscription{})
+}
+
+func (a *peerSubscription) X() circuit.X {
+	return circuit.Ref(a)
+}
+
+func (a *peerSubscription) Consume() (interface{}, bool) {
+	v, ok := a.Consumer.Consume()
+	if !ok {
+		return nil, false
+	}
+	return path.Join("/", v.(*tube.Record).Key), true
+}
+
+func (locus *Locus) NewArrivals() pubsub.Consumer {
+	return &peerSubscription{locus.tube.NewArrivals()}
+}
+
+func (locus *Locus) NewDepartures() pubsub.Consumer {
+	return &peerSubscription{locus.tube.NewDepartures()}
 }
 
 // loopAnnounceAndExpire writes a new version of this server's peer record to the tube view every 2 seconds,

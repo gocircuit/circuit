@@ -271,6 +271,13 @@ type Subscription struct {
 	*queue // Consume(), Peek()
 }
 
+type Consumer interface {
+	Consume() (interface{}, bool)
+	Peek() Stat
+	Scrub()
+	X() circuit.X
+}
+
 func init() {
 	circuit.RegisterValue(&Subscription{})
 }

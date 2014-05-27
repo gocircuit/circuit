@@ -92,7 +92,9 @@ func (v *View) Update(r *Record) (changed bool) {
 		v.img = append(v.img, r)
 		v.lkp[r.Key] = len(v.img) - 1
 	}
-	v.arrive.Publish(r.Clone())
+	if !ok { // Report only keys that didn't exist
+		v.arrive.Publish(r.Clone())
+	}
 	return true
 }
 
