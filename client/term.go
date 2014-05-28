@@ -9,7 +9,7 @@ package client
 
 import (
 	"github.com/gocircuit/circuit/anchor"
-	"github.com/gocircuit/circuit/element/srv"
+	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kinfolk"

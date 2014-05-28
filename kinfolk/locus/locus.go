@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/gocircuit/circuit/anchor"
-	"github.com/gocircuit/circuit/element/srv"
+	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/tube"
 	"github.com/gocircuit/circuit/kit/pubsub"
