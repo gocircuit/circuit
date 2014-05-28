@@ -211,9 +211,16 @@ func (c *codecConn) Read() (chunk []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	q := make([]byte, k)
-	n, err := c.r.Read(q)
-	return q[:n], err
+	var q = make([]byte, k)
+	var n, m int
+	for m < len(q) && err == nil {
+		n, err = c.r.Read(q[m:])
+		m += n
+	}
+	if err != nil {
+		return nil, err
+	}
+	return q, nil
 }
 
 func (c *codecConn) Write(chunk []byte) (err error) {

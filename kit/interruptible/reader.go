@@ -10,6 +10,7 @@ package interruptible
 import (
 	"bytes"
 	"errors"
+	// "fmt"
 	"io"
 	"sync"
 )
@@ -36,6 +37,9 @@ type reader struct {
 }
 
 func (r *reader) Read(p []byte) (n int, err error) {
+	// defer func() {
+	// 	println(fmt.Sprintf("read n=%d err=%v r=%v", n, err, recover()))
+	// }()
 	return r.ReadIntr(p, nil)
 }
 

@@ -51,7 +51,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			e.k = "chan"
 		case client.Proc:
 			if t.GetCmd().Scrub {
-				e.k = "proc:scrub-on-exit"
+				e.k = "proc·autoscrub"
 			} else {
 				e.k = "proc"
 			}
@@ -68,7 +68,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
 		}
 		if long {
-			fmt.Printf("%-10s %s%s\n", e.k, prefix, e.n)
+			fmt.Printf("%-15s %s%s\n", e.k, prefix, e.n)
 		} else {
 			fmt.Printf("%s%s\n", prefix, e.n)
 		}

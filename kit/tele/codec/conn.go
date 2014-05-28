@@ -8,8 +8,8 @@
 package codec
 
 import (
-	//"fmt"
 	"net"
+	"io"
 )
 
 type Conn struct {
@@ -38,7 +38,6 @@ func (c *Conn) RemoteAddr() net.Addr {
 }
 
 func (c *Conn) Write(v interface{}) (err error) {
-	//println(fmt.Sprintf("value=%v", v))
 	chunk, err := c.enc.Encode(v)
 	if err != nil {
 		return err
@@ -48,12 +47,12 @@ func (c *Conn) Write(v interface{}) (err error) {
 
 func (c *Conn) Read(v interface{}) (err error) {
 	chunk, err := c.carrier.Read()
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return err
 	}
 	return c.dec.Decode(chunk, v)
 }
 
-func (c *Conn) Close() error {
+func (c *Conn) Close() (err error) {
 	return c.carrier.Close()
 }

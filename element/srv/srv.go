@@ -18,7 +18,7 @@ import (
 )
 
 type Server interface {
-	Profile(string) (io.Reader, error)
+	Profile(string) (io.ReadCloser, error)
 	Peek() Stat
 	IsDone() bool
 	Scrub()
@@ -43,15 +43,26 @@ type Stat struct {
 	Joined time.Time
 }
 
-func (s *server) Profile(name string) (io.Reader, error) {
+func (s *server) Profile(name string) (io.ReadCloser, error) {
 	p := pprof.Lookup(name)
 	if p == nil {
 		return nil, errors.New("no profile")
 	}
-	r, w := interruptible.BufferPipe(8e3)
-	p.WriteTo(w, 0) // TODO: dbg=0?
-	println("okkk")
+	r, w := interruptible.Pipe()
+	go func() {
+		p.WriteTo(w, 1)
+		w.Write([]byte("•••\n"))
+		w.Close()
+	}()
 	return r, nil
+}
+
+type nopCloser struct {
+	io.Reader
+}
+
+func (nopCloser) Close() error {
+	return nil
 }
 
 func (s *server) Peek() Stat {

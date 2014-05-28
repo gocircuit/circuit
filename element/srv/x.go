@@ -8,6 +8,7 @@
 package srv
 
 import (
+	// "fmt"
 	"io"
 
 	xio "github.com/gocircuit/circuit/kit/x/io"
@@ -29,7 +30,7 @@ func (x XServer) Profile(name string) (circuit.X, error) {
 	if err != nil {
 		return nil, errors.Pack(err)
 	}
-	return xio.NewXReader(r), nil
+	return xio.NewXReadCloser(r), nil
 }
 
 // YServer…
@@ -37,12 +38,12 @@ type YServer struct {
 	X circuit.X
 }
 
-func (y YServer) Profile(name string) (io.Reader, error) {
+func (y YServer) Profile(name string) (rc io.ReadCloser, err error) {
 	r := y.X.Call("Profile", name)
 	if err := errors.Unpack(r[1]); err != nil {
 		return nil, err
 	}
-	return xio.NewYReader(r[0]), nil
+	return xio.NewYReadCloser(r[0]), nil
 }
 
 func (y YServer) Peek() Stat {

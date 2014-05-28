@@ -23,7 +23,13 @@ func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn n.Conn) {
 
 // Call invokes the method of the underlying remote receiver
 func (u *_ptr) Call(proc string, in ...interface{}) []interface{} {
-	//log.Printf("calling %s.%s on %s", u.imph.Type.Name(), proc, u.imph.Exporter.String())
+	// log.Printf("calling %s.%s on %s", u.imph.Type.Name(), proc, u.imph.Exporter.String())
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("call panic: %v", r)
+			panic(r)
+		}
+	}()
 
 	conn, err := u.r.t.Dial(u.imph.Exporter)
 	if err != nil {

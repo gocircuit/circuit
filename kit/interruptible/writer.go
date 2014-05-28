@@ -9,6 +9,7 @@ package interruptible
 
 import (
 	"errors"
+	//"fmt"
 	"io"
 	"sync"
 )
@@ -37,7 +38,10 @@ type writer struct {
 	}
 }
 
-func (w *writer) Write(p []byte) (int, error) {
+func (w *writer) Write(p []byte) (n int, err error) {
+	// defer func() {
+	// 	println(fmt.Sprintf("write n=%d err=%v recov=%v", n, err, recover()))
+	// }()
 	return w.WriteIntr(p, nil)
 }
 
