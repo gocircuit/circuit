@@ -68,7 +68,7 @@ func main() {
 		},
 		// server-specific
 		{
-			Name: "stack",
+			Name: "stk",
 			Usage: "Print the runtime stack trace of a server element",
 			Action: stack,
 			Flags: []cli.Flag{

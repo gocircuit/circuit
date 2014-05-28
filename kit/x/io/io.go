@@ -130,7 +130,7 @@ type XReader struct {
 }
 
 func (x XReader) Read(n int) ([]byte, error) {
-	p := make([]byte, min(n, 1e4))
+	p := make([]byte, n)
 	m, err := x.Reader.Read(p)
 	return p[:m], errors.Pack(err)
 }
