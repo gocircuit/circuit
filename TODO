@@ -1,8 +1,11 @@
 PROJECTS
 ========
 
+* discovery using local net broadcast
+* automatic visualisation of circuit dynamics history and live (log -> viz)
+
 add mutex element
-add docker tool
+add docker image-compiler
 Circuit Apps infrastructure (mention in talk)
 /tty element; interactive shell: Fix ^D/^C/exit issue of RSX's interactive shell
 /broadcast, /reduce, /allreduce file systems
