@@ -2,7 +2,7 @@ package cli_test
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 	"os"
 	"testing"
 )

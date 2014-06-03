@@ -1,7 +1,7 @@
 package cli_test
 
 import (
-	"github.com/codegangsta/cli"
+	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 	"reflect"
 	"testing"
 )

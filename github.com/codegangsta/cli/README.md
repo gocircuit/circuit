@@ -32,7 +32,7 @@ package main
 
 import (
   "os"
-  "github.com/codegangsta/cli"
+  "github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 func main() {
@@ -47,7 +47,7 @@ package main
 
 import (
   "os"
-  "github.com/codegangsta/cli"
+  "github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 func main() {
@@ -74,7 +74,7 @@ package main
 
 import (
   "os"
-  "github.com/codegangsta/cli"
+  "github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 func main() {
