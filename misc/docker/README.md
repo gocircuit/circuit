@@ -1,4 +1,8 @@
+# IN PROGRESS
 
-## Preparing a Docker image with a circuit ##
+## To preparing a Docker image with a circuit inside
 
 	sudo docker build .
+
+	sudo docker run -i -t petar/circuit:dev /bin/bash
+

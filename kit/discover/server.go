@@ -10,16 +10,17 @@ package discover
 import (
 	"encoding/json"
 	"net"
+	"os"
 	"time"
 
 	"github.com/gocircuit/circuit/kit/xor"
 )
 
-// circuit start -a :7711 -discover 4242
+// circuit start -a :7711 -discover 228.8.8.8:8822
 
 // Server is a network server for the beacon discovery protocol.
 type Server struct {
-	port int // udp broadcast port for discovery
+	addr *net.UDPAddr // udp multicast address for discovery
 	payload []byte // payload (circuit address) that we are advertising to the broadcast channel
 	family *family
 }
@@ -28,10 +29,16 @@ type InviteMsg struct {
 	Payload []byte
 }
 
-func New(port int, payload []byte) (*Server, <-chan []byte) {
+// addr is a multicast address.
+func New(addr string, payload []byte) (*Server, <-chan []byte) {
+	a, err := net.ResolveUDPAddr("udp", addr)
+	if err != nil {
+		println("discovery multicast address", addr, "does not parse")
+		os.Exit(1)
+	}
 	ch := make(chan []byte)
 	s := &Server{
-		port: port,
+		addr: a,
 		payload: payload,
 		family: newFamily(xor.HashBytes(payload), 2),
 	}
@@ -44,7 +51,7 @@ func New(port int, payload []byte) (*Server, <-chan []byte) {
 func (s *Server) Invite() {
 	s.family.Clear()
 	go func() {
-		conn, err := net.DialUDP("udp4", nil, &net.UDPAddr{ IP: net.IPv4bcast, Port: s.port })
+		conn, err := net.DialUDP("udp", nil, s.addr)
 		if err != nil {
 			panic(err)
 		}
@@ -65,7 +72,7 @@ func (s *Server) Invite() {
 
 // accept listens to broadcasts and chooses to join some of the newcomers, using an XOR-metric choice rule.
 func (s *Server) accept(ch chan<- []byte) {
-	conn, err := net.DialUDP("udp4", nil, &net.UDPAddr{ IP: net.IPv4zero, Port: s.port })
+	conn, err := net.ListenMulticastUDP("udp", nil, s.addr)
 	if err != nil {
 		panic(err)
 	}
