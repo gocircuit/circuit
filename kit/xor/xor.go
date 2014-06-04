@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package xor implements a nearest-neighbor data structure for the XOR-metric
+// Package xor implements a nearest-neighbor data structure for the XOR-metric.
 package xor
 
 import (
@@ -15,10 +15,10 @@ import (
 	"unsafe"
 )
 
-// Key represents a point in the XOR-space
+// Key represents a point in the 64-bit XOR-space.
 type Key uint64
 
-// Key implements interface Item
+// Key implements interface Point
 func (id Key) Key() Key {
 	return id
 }
@@ -39,15 +39,28 @@ func (id Key) ShortString(k uint) string {
 	return fmt.Sprintf("%0"+strconv.Itoa(int(k))+"b", ((id << shift) >> shift))
 }
 
-// Item is any type that has an XOR-space Key
-type Item interface {
+// Point is any type that has an XOR-space Key
+type Point interface {
 	Key() Key
+}
+
+// Proximity equals the number of contiguous bits, starting from 
+// the metrically most significant one, that x and y share.
+func Proximity(x, y Point) int {
+	const nbits = 64
+	xy := x.Key() ^ y.Key()
+	for i := 0; i < nbits; i++ {
+		if xy.Bit(i) != 0 {
+			return i
+		}
+	}
+	return nbits
 }
 
 // Metric is an XOR-metric space that supports point addition and nearest neighbor (NN) queries.
 // The zero value is an empty metric space.
 type Metric struct {
-	Item
+	Point
 	sub [2]*Metric
 	n   int // Number of items (not nodes) in the subtree of and including this node
 }
@@ -55,9 +68,9 @@ type Metric struct {
 var ErrDup = errors.New("duplicate point")
 
 // Iterate calls f on each node of the XOR-tree that has a non-nil item.
-func (m *Metric) Iterate(f func(Item)) {
-	if m.Item != nil {
-		f(m.Item)
+func (m *Metric) Iterate(f func(Point)) {
+	if m.Point != nil {
+		f(m.Point)
 	}
 	if m.sub[0] != nil {
 		m.sub[0].Iterate(f)
@@ -67,9 +80,9 @@ func (m *Metric) Iterate(f func(Item)) {
 	}
 }
 
-func (m *Metric) Dump() []Item {
-	var result []Item
-	m.Iterate(func(item Item) {
+func (m *Metric) Dump() []Point {
+	var result []Point
+	m.Iterate(func(item Point) {
 		result = append(result, item)
 	})
 	return result
@@ -78,7 +91,7 @@ func (m *Metric) Dump() []Item {
 // Copy returns a deep copy of the metric
 func (m *Metric) Copy() *Metric {
 	m_ := &Metric{
-		Item: m.Item,
+		Point: m.Point,
 		n:    m.n,
 	}
 	if m.sub[0] != nil {
@@ -108,36 +121,36 @@ func (m *Metric) calcSize() {
 	if m.sub[1] != nil {
 		m.n += m.sub[1].n
 	}
-	if m.Item != nil {
+	if m.Point != nil {
 		m.n++
 	}
 }
 
 // Add adds the item to the metric. It returns the smallest number of
 // significant bits that distinguish this item from the rest in the metric.
-func (m *Metric) Add(item Item) (level int, err error) {
+func (m *Metric) Add(item Point) (level int, err error) {
 	return m.add(item, 0)
 }
 
-func (m *Metric) add(item Item, r int) (bottom int, err error) {
+func (m *Metric) add(item Point, r int) (bottom int, err error) {
 	defer m.calcSize()
-	if m.Item == nil {
+	if m.Point == nil {
 		if m.sub[0] == nil && m.sub[1] == nil {
 			// This is an empty leaf node
-			m.Item = item
+			m.Point = item
 			return r, nil
 		}
 		// This is an intermediate node
 		return m.forward(item, r)
 	}
 	// This is a non-empty leaf node
-	if m.Item.Key() == item.Key() {
+	if m.Point.Key() == item.Key() {
 		return r, ErrDup
 	}
-	if _, err = m.forward(m.Item, r); err != nil {
+	if _, err = m.forward(m.Point, r); err != nil {
 		panic("¢")
 	}
-	m.Item = nil
+	m.Point = nil
 	bottom, err = m.forward(item, r)
 	if err != nil {
 		panic("¢")
@@ -145,7 +158,7 @@ func (m *Metric) add(item Item, r int) (bottom int, err error) {
 	return bottom, err
 }
 
-func (m *Metric) forward(item Item, r int) (bottom int, err error) {
+func (m *Metric) forward(item Point, r int) (bottom int, err error) {
 	j := item.Key().Bit(r)
 	if m.sub[j] == nil {
 		m.sub[j] = &Metric{}
@@ -155,17 +168,17 @@ func (m *Metric) forward(item Item, r int) (bottom int, err error) {
 
 // Remove removes an item with id from the metric, if present.
 // It returns the removed item, or nil if non present.
-func (m *Metric) Remove(id Key) Item {
+func (m *Metric) Remove(id Key) Point {
 	item, _ := m.remove(id, 0)
 	return item
 }
 
-func (m *Metric) remove(id Key, r int) (Item, bool) {
+func (m *Metric) remove(id Key, r int) (Point, bool) {
 	defer m.calcSize()
-	if m.Item != nil {
-		if m.Item.Key() == id {
-			item := m.Item
-			m.Item = nil
+	if m.Point != nil {
+		if m.Point.Key() == id {
+			item := m.Point
+			m.Point = nil
 			return item, true
 		}
 		return nil, false
@@ -186,18 +199,18 @@ func (m *Metric) remove(id Key, r int) (Item, bool) {
 }
 
 // Nearest returns the k points in the metric that are closest to the pivot.
-func (m *Metric) Nearest(pivot Key, k int) []Item {
+func (m *Metric) Nearest(pivot Key, k int) []Point {
 	return m.nearest(pivot, k, 0)
 }
 
-func (m *Metric) nearest(pivot Key, k int, r int) []Item {
+func (m *Metric) nearest(pivot Key, k int, r int) []Point {
 	if k == 0 {
 		return nil
 	}
-	if m.Item != nil {
-		return []Item{m.Item}
+	if m.Point != nil {
+		return []Point{m.Point}
 	}
-	var result []Item
+	var result []Point
 	b := pivot.Bit(r)
 	sub := m.sub[b]
 	if sub != nil {

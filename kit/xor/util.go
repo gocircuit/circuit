@@ -68,3 +68,9 @@ func HashString(s string) Key {
 	h.Write([]byte(s))
 	return Key(h.Sum64())
 }
+
+func HashBytes(b []byte) Key {
+	h := fnv.New64a()
+	h.Write(b)
+	return Key(h.Sum64())
+}
