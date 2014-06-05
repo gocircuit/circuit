@@ -8,13 +8,15 @@
 package discover
 
 import (
+	"net"
 	"testing"
 )
 
 func TestDiscovering(t *testing.T) {
 	ch := make(chan int)
-	_, ch1 := New("228.8.8.8:8822", []byte("d1"))
-	_, ch2 := New("228.8.8.8:8822", []byte("d2"))
+	maddr := &net.UDPAddr{IP: net.IP{228, 8, 8, 8}, Port: 8822}
+	_, ch1 := New(maddr, []byte("d1"))
+	_, ch2 := New(maddr, []byte("d2"))
 	go func() {
 		<-ch1
 		ch <- 1

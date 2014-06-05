@@ -10,12 +10,14 @@ package kinfolk
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"sync"
 	//"runtime/debug"
 
 	"github.com/gocircuit/circuit/kit/lang"
 	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/gocircuit/circuit/use/n"
 )
 
 // Kin is the kinfolk system logic, visible inside the circuit process
@@ -29,6 +31,8 @@ type Kin struct {
 	folk   []*Folk
 }
 
+const ServiceName = "kin"
+
 // NewKin creates a new kinfolk system server which, optionally,
 // joins the kinfolk network that join is a member of; join is a
 // permanent cross-interface to a peering kinfolk system.
@@ -36,7 +40,7 @@ type Kin struct {
 // Additions and removals of new members to the circuit system
 // will be announced over add and rmv. These two channels must 
 // be consumed by the user.
-func NewKin(join circuit.PermX) (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
+func NewKin() (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
 	k = &Kin{
 		rtr:   NewRotor(),
 		ach:   make(chan KinXID, 3*Spread),
@@ -48,23 +52,26 @@ func NewKin(join circuit.PermX) (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
 		X:  circuit.PermRef(XKin{k}),
 		ID: lang.ComputeReceiverID(k),
 	})
-	if join == nil {
-		return k, XKin{k}, k.ach, k.dch
-	}
-	// Join peer
+	return k, XKin{k}, k.ach, k.dch
+}
+
+// ReJoin contacts the peering kin service join and joins its circuit network.
+func (k *Kin) ReJoin(join n.Addr) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Fatalf("error joining (%s)", r)
+			err = fmt.Errorf("panic joining: %v", r)
 		}
 	}()
+	xjoin := circuit.Dial(join, ServiceName) 
 	var w bytes.Buffer
-	for _, peer := range (YKin{ KinXID{ X: join }}).Join() {
+	ykin := YKin{KinXID{X: xjoin}}
+	for _, peer := range ykin.Join() {
 		peer = k.open(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')
 	}
 	log.Println("Initial peering servers:", w.String())
-	return k, XKin{k}, k.ach, k.dch
+	return nil
 }
 
 func (k *Kin) open(peer KinXID) KinXID {

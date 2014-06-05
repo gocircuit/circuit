@@ -11,13 +11,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"path"
 
+	"github.com/gocircuit/circuit/kit/discover"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/locus"
-
-	// "github.com/gocircuit/circuit/kit/shell"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 
@@ -26,45 +26,66 @@ import (
 
 func server(c *cli.Context) {
 	println("CIRCUIT 2014 gocircuit.org")
-	log.Println("Starting circuit server")
+
 	// parse arguments
+	var err error
+	// network address for server to bind
 	if !c.IsSet("addr") {
 		log.Fatal("server network address not given; use -addr")
 	}
-	var err error
+	// join address of another circuit server
 	var join n.Addr
 	if c.IsSet("join") {
 		if join, err = n.ParseAddr(c.String("join")); err != nil {
 			log.Fatalf("join address does not parse (%s)", err)
 		}
 	}
-	var mutexDir string
-	if !c.IsSet("mutex") {
-		mutexDir = path.Join(os.TempDir(), fmt.Sprintf("%s-%%W-P%04d", n.Scheme, os.Getpid()))
+	// discover system udp multicast address
+	var disc *net.UDPAddr
+	if c.IsSet("discover") {
+		if disc, err = net.ResolveUDPAddr("udp", c.String("discover")); err != nil {
+			log.Fatalf("udp multicast address for discovery does not parse (%s)", err)
+		}
+	}
+	// server instance working directory
+	var varDir string
+	if !c.IsSet("var") {
+		varDir = path.Join(os.TempDir(), fmt.Sprintf("%s-%%W-P%04d", n.Scheme, os.Getpid()))
 	} else {
-		mutexDir = c.String("mutex")
+		varDir = c.String("var")
 	}
 
 	// start circuit runtime
-	load(c.String("addr"), mutexDir, readkey(c))
+	addr := load(c.String("addr"), varDir, readkey(c))
 
-	// kinfolk join
-	var xjoin circuit.PermX
-	dontPanic(func() { 
-		xjoin = circuit.Dial(join, KinfolkName) 
-	}, "join")
-
-	// locus
-	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin(xjoin)
+	// kinfolk + locus
+	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin()
 	xlocus := locus.NewLocus(kin, kinJoin, kinLeave)
 
-	circuit.Listen(KinfolkName, xkin)
+	// joining
+	switch {
+	case join != nil:
+		kin.ReJoin(join)
+	case disc != nil:
+		_, ch := discover.New(disc, []byte(addr.String()))
+		go func() {
+			for ja := range ch {
+				println("encountered->", string(ja))
+				join, err := n.ParseAddr(string(ja))
+				if err != nil {
+					continue // skip messages that don't parse
+				}
+				kin.ReJoin(join)
+			}
+		}()
+	}
+
+	circuit.Listen(kinfolk.ServiceName, xkin)
 	circuit.Listen(LocusName, xlocus)
 
 	<-(chan int)(nil)
 }
 
-const KinfolkName = "kin"
 const LocusName = "locus"
 
 func dontPanic(call func(), ifPanic string) {

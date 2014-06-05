@@ -26,9 +26,10 @@ func main() {
 			Action: server,
 			Flags: []cli.Flag{
 				cli.StringFlag{"addr, a", "", "Address of circuit server."},
-				cli.StringFlag{"mutex, m", "", "Directory to use as a circuit instance mutex lock."},
+				cli.StringFlag{"var", "", "Lock and log directory for the circuit server."},
 				cli.StringFlag{"join, j", "", "Join a circuit through a current member by address."},
-				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{"hmac", "", "File with HMAC credentials for HMAC/RC4 transport security."},
+				cli.StringFlag{"discover", "", "Multicast address for circuit discovery."},
 			},
 	 	},
 		{

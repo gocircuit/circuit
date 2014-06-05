@@ -18,20 +18,15 @@ import (
 	"strings"
 	"time"
 
-	//"github.com/gocircuit/circuit/kit/debug"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
 	"github.com/gocircuit/circuit/kit/lockfile"
-
-	// Sys
 	"github.com/gocircuit/circuit/sys/lang"
 	_ "github.com/gocircuit/circuit/sys/tele"
-
-	// Use
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 )
 
-func load(addr, mutex string, key []byte) {
+func load(addr, vardir string, key []byte) n.Addr {
 	//debug.InstallCtrlCPanic()
 
 	// Randomize execution
@@ -39,10 +34,10 @@ func load(addr, mutex string, key []byte) {
 
 	// Generate worker ID
 	id := n.ChooseWorkerID()
-	mutex = strings.Replace(mutex, "%W", id.String(), 1)
+	vardir = strings.Replace(vardir, "%W", id.String(), 1)
 
 	// Ensure chroot directory exists and we have access to it
-	dir, err := filepath.Abs(mutex)
+	dir, err := filepath.Abs(vardir)
 	if err != nil {
 		log.Fatalf("abs (%s)", err)
 	}
@@ -74,4 +69,5 @@ func load(addr, mutex string, key []byte) {
 
 	// Initialize language runtime
 	circuit.Bind(lang.New(t))
+	return t.Addr()
 }

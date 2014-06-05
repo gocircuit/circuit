@@ -9,8 +9,8 @@ package discover
 
 import (
 	"encoding/json"
+	"log"
 	"net"
-	"os"
 	"time"
 
 	"github.com/gocircuit/circuit/kit/xor"
@@ -30,15 +30,10 @@ type InviteMsg struct {
 }
 
 // addr is a multicast address.
-func New(addr string, payload []byte) (*Server, <-chan []byte) {
-	a, err := net.ResolveUDPAddr("udp", addr)
-	if err != nil {
-		println("discovery multicast address", addr, "does not parse")
-		os.Exit(1)
-	}
+func New(addr *net.UDPAddr, payload []byte) (*Server, <-chan []byte) {
 	ch := make(chan []byte)
 	s := &Server{
-		addr: a,
+		addr: addr,
 		payload: payload,
 		family: newFamily(xor.HashBytes(payload), 2),
 	}
@@ -61,11 +56,13 @@ func (s *Server) Invite() {
 		if err != nil {
 			panic(err)
 		}
-		for i := 0; i < 3; i++ {
+		dur := time.Second
+		for i := 0; i < 10; i++ {
 			if _, err = conn.Write(buf); err != nil {
-				panic("invitation error: " + err.Error())
+				log.Printf("invitation error: " + err.Error())
 			}
-			time.Sleep(time.Second)
+			time.Sleep(dur)
+			dur = (dur * 7) / 5
 		}
 	}()
 }
