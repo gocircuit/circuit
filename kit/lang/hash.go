@@ -14,6 +14,7 @@ import (
 	"math/rand"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 // ReceiverID is a universal ID referring to the unique identity of a cross-reference receiver
@@ -27,9 +28,14 @@ func chooseReceiverID() ReceiverID {
 	return ReceiverID(rand.Int63())
 }
 
-var nonce = chooseReceiverID() // runtime-identifying nonce
+var nonce ReceiverID // random nonce, unique to this process
 
-// ComputeReceiverID computes a universal, that is valid out-of-process, unique ID for the receiver r
+func init() {
+	rand.Seed(time.Now().UnixNano()) // main()'s seeding runs too late to capture this init
+	nonce = chooseReceiverID()
+}
+
+// ComputeReceiverID computes a unique across-processes ID for the receiver r
 func ComputeReceiverID(r interface{}) ReceiverID {
 	h := fnv.New64a()
 	h.Write([]byte(nonce.String()))

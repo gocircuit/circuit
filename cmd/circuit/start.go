@@ -70,7 +70,6 @@ func server(c *cli.Context) {
 		_, ch := discover.New(disc, []byte(addr.String()))
 		go func() {
 			for ja := range ch {
-				println("encountered->", string(ja))
 				join, err := n.ParseAddr(string(ja))
 				if err != nil {
 					continue // skip messages that don't parse
