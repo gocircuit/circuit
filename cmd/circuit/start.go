@@ -72,11 +72,14 @@ func server(c *cli.Context) {
 			for ja := range ch {
 				join, err := n.ParseAddr(string(ja))
 				if err != nil {
+					log.Printf("Unrecognized discovery packets (%v)", err)
 					continue // skip messages that don't parse
 				}
 				kin.ReJoin(join)
 			}
 		}()
+	default:
+		log.Println("Singleton server.")
 	}
 
 	circuit.Listen(kinfolk.ServiceName, xkin)

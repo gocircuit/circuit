@@ -19,11 +19,10 @@ type Folk struct {
 	ch chan FolkXID // Services pending to be opened
 }
 
-//
 func (folk *Folk) Opened() []FolkXID {
-	o := folk.rtr.Opened()
-	r := make([]FolkXID, len(o))
-	for i, v := range o {
+	neighbors := folk.rtr.View()
+	r := make([]FolkXID, len(neighbors))
+	for i, v := range neighbors {
 		r[i] = FolkXID(v)
 	}
 	return r

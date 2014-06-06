@@ -20,12 +20,14 @@ import (
 	"github.com/gocircuit/circuit/use/n"
 )
 
-// Kin is the kinfolk system logic, visible inside the circuit process
+// Kin is the kinfolk system server.
 type Kin struct {
 	kinxid KinXID // Permanent circuit-wide unique ID for this kin
 	rtr    *Rotor
+	///
 	ach    chan KinXID // announcements of newly discovered kins
 	dch    chan KinXID // denouncements of newly discovered deceased kins
+	///
 	sync.Mutex
 	topic  map[string]FolkXID // topic -> yfolk
 	folk   []*Folk
@@ -33,14 +35,7 @@ type Kin struct {
 
 const ServiceName = "kin"
 
-// NewKin creates a new kinfolk system server which, optionally,
-// joins the kinfolk network that join is a member of; join is a
-// permanent cross-interface to a peering kinfolk system.
-//
-// Additions and removals of new members to the circuit system
-// will be announced over add and rmv. These two channels must 
-// be consumed by the user.
-func NewKin() (k *Kin, xkin XKin, add, rmv <-chan KinXID) {
+func NewKin() (k *Kin, xkin XKin, join, leave <-chan KinXID) {
 	k = &Kin{
 		rtr:   NewRotor(),
 		ach:   make(chan KinXID, 3*Spread),
@@ -61,21 +56,28 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic joining: %v", r)
 		}
-	}()
-	xjoin := circuit.Dial(join, ServiceName) 
+	}() // XXX: Fewer than VertexExpansion entries triggers expand up
+	ykin := YKin{KinXID{X: circuit.Dial(join, ServiceName)}}
 	var w bytes.Buffer
-	ykin := YKin{KinXID{X: xjoin}}
 	for _, peer := range ykin.Join() {
-		peer = k.open(peer)
+		peer = k.attach(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')
 	}
-	log.Println("Initial peering servers:", w.String())
+	if w.Len() > 0 {
+		log.Println("Adding peering server(s):", w.String())
+	}
 	return nil
 }
 
-func (k *Kin) open(peer KinXID) KinXID {
-	peer = KinXID(k.rtr.Open(XID(peer)))
+func (k *Kin) remember(peer KinXID) KinXID {
+	peer = KinXID(ForwardXIDPanic(XID(peer),
+		func (r interface{}) {
+			k.rtr.Scrub(peer)
+			k.expand()
+		},
+	))
+	k.rtr.Add(peer)
 	k.ach <- peer
 	return peer
 }
@@ -84,27 +86,25 @@ func (k *Kin) XID() KinXID {
 	return k.kinxid
 }
 
-func (k *Kin) replenish() {
-	if k.rtr.NOpened() >= Spread {
+func (k *Kin) expand() {
+	if k.rtr.Len() < ExpansionLow {
 		return
 	}
-	// Walk to a new XKin peer
-	kinXID := XKin{k}.Walk(Depth)
-	if XID(kinXID).IsNil() || kinXID.ID == k.XID().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
-		// If peer is nil or self, ignore it
-		return
-	}
-	// Open the peer
-	kinXID = k.open(kinXID)
-
-	// Send new peer to all folk
-	log.Printf("replenishing kinfolk system with a freshly chosen random kin %s", kinXID.ID.String())
-	for _, folk := range k.snapfolk() {
-		folk.supply(YKin{kinXID}.Attach(folk.Topic))
+	for i := 0; i < ExpansionHigh - k.rtr.Len(); i++ {
+		// Choose a random peer, using a random walk
+		kinXID := XKin{k}.Walk(Depth)
+		if XID(kinXID).IsNil() || kinXID.ID == k.XID().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
+			continue // If peer is nil or self, ignore it
+		}
+		kinXID = k.remember(kinXID)
+		log.Printf("expanding kinfolk system with a random kin %s", kinXID.ID.String())
+		for _, folk := range k.users() {
+			folk.supply(YKin{kinXID}.Attach(folk.Topic))
+		}
 	}
 }
 
-func (k *Kin) snapfolk() []*Folk {
+func (k *Kin) users() []*Folk {
 	k.Lock()
 	defer k.Unlock()
 	folk := make([]*Folk, len(k.folk))
@@ -112,13 +112,21 @@ func (k *Kin) snapfolk() []*Folk {
 	return folk
 }
 
+func (k *Kin) shrink() {
+	for i := 0; i < k.rtr.Len() - ExpansionHigh; i++ {
+		k.rtr.ScrubRandom()
+	}
+}
+
+??
+
 func (k *Kin) scrub(kinXID KinXID) {
 	//debug.PrintStack()
 	if k.rtr.Scrub(kinXID.X).IsNil() {
 		return
 	}
-	log.Printf("kinfolk system scrubbing kin %s", kinXID.ID.String())
-	k.replenish()
+	log.Printf("Scrubbing kin %s", kinXID.ID.String())
+	k.expand()
 	k.dch <- kinXID
 }
 

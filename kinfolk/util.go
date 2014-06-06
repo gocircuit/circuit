@@ -20,10 +20,11 @@ func init() {
 }
 
 const (
-	// Spread is the number of peers that each circuit worker is continuously connected to  
+	// Expansion is the number of peers that each circuit worker is continuously connected to  
 	// for the purposes of dynamically maintaining node presence using the kinfolk
 	// collaborative protocol.
-	Spread = 5
+	ExpansionLow = 7
+	ExpansionHigh = 11
 
 	// Depth is the number of random walk steps taken when sampling for a random circuit worker.
 	Depth  = 5
@@ -33,6 +34,13 @@ const (
 type XID struct {
 	X  circuit.PermX
 	ID lang.ReceiverID
+}
+
+func (xid XID) Equals(w XID) bool {
+	if xid.ID == 0 {
+		panic(0)
+	}
+	return xid.ID == w.ID
 }
 
 // String returns a textual form of the XID.
@@ -45,24 +53,28 @@ func (xid XID) IsNil() bool {
 	return xid.X == nil
 }
 
-// watch returns an equivalent cross-reference to x, which will execute the function r
-// each time an invokation to x.Call results in panic.
-type recoverFunc func(wx circuit.PermX, r interface{})
-
-func watch(x circuit.PermX, recov recoverFunc) circuit.PermX {
-	return &watchx{PermX: x, r: recov}
+// ForwardPanic…
+func ForwardPanic(x circuit.PermX, fwd func(recov interface{})) circuit.PermX {
+	return &forwardPanic{PermX: x, fwd: fwd}
 }
 
-type watchx struct {
+type forwardPanic struct {
 	circuit.PermX
-	r func(circuit.PermX, interface{})
+	fwd func(interface{})
 }
 
-func (wx *watchx) Call(proc string, in ...interface{}) []interface{} {
+func (fp *forwardPanic) Call(proc string, in ...interface{}) []interface{} {
 	defer func() {
 		if r := recover(); r != nil {
-			wx.r(wx, r)
+			go fp.fwd(r)
+			panic(r) // panics still have to go to the user
 		}
 	}()
-	return wx.PermX.Call(proc, in...)
+	return fp.PermX.Call(proc, in...)
+}
+
+// ForwardXIDPanic…
+fun ForwardXIDPanic(xid XID, fwd func(recov interface{})) XID {
+	xid.X = ForwardPanic(xid.X, recov)
+	return xid
 }

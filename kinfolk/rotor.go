@@ -11,61 +11,59 @@ import (
 	"math/rand"
 	"sync"
 
+	"github.com/gocircuit/circuit/kit/lang"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
-// Rotor maintains a set of XIDs (cross-interfaces, paired with unique
-// receiver identifiers). When an XID is added to the rotor with Open, it is
-// equipped with a watchdog logic that automatically removes the XID from the
-// rotor, if any invocation to its Call method panics.
+// Rotor is a set of perm cross-interfaces.
 type Rotor struct {
 	sync.Mutex
-	open []XID
+	open map[lang.ReceiverID]XID
 }
 
 // NewRotor creates a new rotor.
 func NewRotor() *Rotor {
 	return &Rotor{
-		open: make([]XID, 0, 6*Spread),
+		open: make(map[lang.ReceiverID]XID),
 	}
 }
 
-func (rtr *Rotor) add(xid XID) {
+func (rtr *Rotor) Add(xid XID) {
 	rtr.Lock()
 	defer rtr.Unlock()
-	rtr.open = append(rtr.open, xid)
+	rtr.open[xid.ID()] = xid
 }
 
-// Scrub looks up an XID by the value of its cross-interface;
-// If it finds a matching XID, it removes it from the rotor
-// and returns the removed XID.
-func (rtr *Rotor) Scrub(x circuit.X) XID {
+func (rtr *Rotor) Scrub(xid XID) {
 	rtr.Lock()
 	defer rtr.Unlock()
-	for i, xid := range rtr.open {
-		if xid.X == x {
-			n := len(rtr.open)
-			rtr.open[i] = rtr.open[n-1]
-			rtr.open = rtr.open[:n-1]
-			return xid
-		}
+	if xid.ID() == 0 {
+		panic("missig unique receiver id")
 	}
-	return XID{}
+	delete(rtr.open, xid.ID())
 }
 
-// Opened returns a list of all open and healthy XIDs
-func (rtr *Rotor) Opened() []XID {
+func (rtr *Rotor) ScrubRandom() {
 	rtr.Lock()
 	defer rtr.Unlock()
-	open := make([]XID, len(rtr.open))
-	for i, j := range rand.Perm(len(rtr.open)) {
-		open[i] = rtr.open[j]
+	for hid, _ := rtr.open {
+		delete(rtr.open, hid)
+	}
+}
+
+// View returns a list of all XIDs in the rotor.
+func (rtr *Rotor) View() []XID {
+	rtr.Lock()
+	defer rtr.Unlock()
+	open := make([]XID, 0, len(rtr.open))
+	for _, xid := range rtr.open {
+		open = append(open, xid)
 	}
 	return open
 }
 
-// NOpened returns the number of XIDs in the rotor.
-func (rtr *Rotor) NOpened() int {
+// Len returns the number of XIDs in the rotor.
+func (rtr *Rotor) Len() int {
 	rtr.Lock()
 	defer rtr.Unlock()
 	return len(rtr.open)
@@ -75,20 +73,8 @@ func (rtr *Rotor) NOpened() int {
 func (rtr *Rotor) Choose() XID {
 	rtr.Lock()
 	defer rtr.Unlock()
-	n := len(rtr.open)
-	if n <= 0 {
-		return XID{}
+	for _, xid := rtr.open {
+		return xid
 	}
-	return rtr.open[rand.Intn(n)]
-}
-
-// Open moves the cross-interface XID to the set of open XIDs.
-func (rtr *Rotor) Open(xid XID) XID {
-	scrubx := watch(xid.X, func(scrubx circuit.PermX, r interface{}) {
-		rtr.Scrub(scrubx)
-		panic(r)
-	})
-	xid = XID{X: scrubx, ID: xid.ID}
-	rtr.add(xid)
-	return xid
+	return XID{}
 }
