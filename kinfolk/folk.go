@@ -11,16 +11,15 @@ import (
 	"sync"
 )
 
-//
 type Folk struct {
-	Topic string
-	rtr   *Rotor
+	kin *Kin
+	topic string
 	sync.Mutex
 	ch chan FolkXID // Services pending to be opened
 }
 
 func (folk *Folk) Opened() []FolkXID {
-	neighbors := folk.rtr.View()
+	neighbors := folk.kin.View()
 	r := make([]FolkXID, len(neighbors))
 	for i, v := range neighbors {
 		r[i] = FolkXID(v)
@@ -30,8 +29,7 @@ func (folk *Folk) Opened() []FolkXID {
 
 // Replenish blocks and returns the next downstream peer when one is chosen by the kin system.
 func (folk *Folk) Replenish() (peer FolkXID) {
-	x := <-folk.ch
-	return FolkXID(folk.rtr.Open(XID(x)))
+	return <-folk.ch
 }
 
 func (folk *Folk) supply(peer FolkXID) {

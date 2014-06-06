@@ -38,8 +38,8 @@ const ServiceName = "kin"
 func NewKin() (k *Kin, xkin XKin, join, leave <-chan KinXID) {
 	k = &Kin{
 		rtr:   NewRotor(),
-		ach:   make(chan KinXID, 3*Spread),
-		dch:   make(chan KinXID, 3*Spread),
+		ach:   make(chan KinXID, ExpansionHigh),
+		dch:   make(chan KinXID, ExpansionHigh),
 		topic: make(map[string]FolkXID),
 	}
 	// Create a KinXID for this system.
@@ -56,11 +56,11 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic joining: %v", r)
 		}
-	}() // XXX: Fewer than VertexExpansion entries triggers expand up
+	}()
 	ykin := YKin{KinXID{X: circuit.Dial(join, ServiceName)}}
 	var w bytes.Buffer
 	for _, peer := range ykin.Join() {
-		peer = k.attach(peer)
+		peer = k.remember(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')
 	}
@@ -72,14 +72,35 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 
 func (k *Kin) remember(peer KinXID) KinXID {
 	peer = KinXID(ForwardXIDPanic(XID(peer),
-		func (r interface{}) {
-			k.rtr.Scrub(peer)
-			k.expand()
+		func (interface{}) {
+			k.forget(peer)
 		},
 	))
 	k.rtr.Add(peer)
 	k.ach <- peer
+	k.shrink()
 	return peer
+}
+
+// shrink shrinks the neighborhood down to size ExpansionHigh.
+func (k *Kin) shrink() {
+	for i := 0; i < k.rtr.Len() - ExpansionHigh; i++ {
+		xid, ok := k.rtr.ScrubRandom()
+		if !ok {
+			return
+		}
+		log.Printf("Shrunk kin %s", xid.ID.String())
+		k.dch <- KinXID(xid)
+	}
+}
+
+func (k *Kin) forget(kinXID KinXID) {
+	if !k.rtr.Scrub(kinXID) {
+		return
+	}
+	log.Printf("Forgetting kin %s", kinXID.ID.String())
+	k.expand()
+	k.dch <- kinXID
 }
 
 func (k *Kin) XID() KinXID {
@@ -92,14 +113,14 @@ func (k *Kin) expand() {
 	}
 	for i := 0; i < ExpansionHigh - k.rtr.Len(); i++ {
 		// Choose a random peer, using a random walk
-		kinXID := XKin{k}.Walk(Depth)
-		if XID(kinXID).IsNil() || kinXID.ID == k.XID().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
+		w := XKin{k}.Walk(Depth)
+		if XID(w).IsNil() || w.ID == k.XID().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
 			continue // If peer is nil or self, ignore it
 		}
-		kinXID = k.remember(kinXID)
-		log.Printf("expanding kinfolk system with a random kin %s", kinXID.ID.String())
+		w = k.remember(w)
+		log.Printf("expanding kinfolk system with a random kin %s", w.ID.String())
 		for _, folk := range k.users() {
-			folk.supply(YKin{kinXID}.Attach(folk.Topic))
+			folk.supply(YKin{w}.Attach(folk.Topic))
 		}
 	}
 }
@@ -112,59 +133,29 @@ func (k *Kin) users() []*Folk {
 	return folk
 }
 
-func (k *Kin) shrink() {
-	for i := 0; i < k.rtr.Len() - ExpansionHigh; i++ {
-		k.rtr.ScrubRandom()
-	}
-}
-
-??
-
-func (k *Kin) scrub(kinXID KinXID) {
-	//debug.PrintStack()
-	if k.rtr.Scrub(kinXID.X).IsNil() {
-		return
-	}
-	log.Printf("Scrubbing kin %s", kinXID.ID.String())
-	k.expand()
-	k.dch <- kinXID
-}
-
 func (k *Kin) Attach(topic string, folkXID FolkXID) *Folk {
-	// Fetch initial peer connections
-	var opened = k.rtr.Opened()
-	peers := make([]FolkXID, 0, len(opened))
-	for _, xid := range opened {
+	var neighbors = k.rtr.View()
+	peers := make([]FolkXID, 0, len(neighbors))
+	for _, xid := range neighbors {
 		kinXID := KinXID(xid)
 		if folkXID := (YKin{kinXID}).Attach(topic); folkXID.X != nil {
-			// Scrub kinXID if folkXID.X ever panics
-			folkXID.X = watch(folkXID.X, func(_ circuit.PermX, r interface{}) {
-				k.scrub(kinXID)
-				panic(r)
-			})
 			peers = append(peers, folkXID)
 		}
 	}
-
 	k.Lock()
 	defer k.Unlock()
-
 	if _, present := k.topic[topic]; present {
 		panic("dup attach")
 	}
 	folk := &Folk{
-		Topic: topic,
-		rtr:   NewRotor(),
-		ch:    make(chan FolkXID, 6*(1+len(peers))),
+		topic: topic,
+		kin: k,
+		ch:    make(chan FolkXID, 2*ExpansionHigh),
 	}
-	// Inject initial peers
 	for _, peer := range peers {
 		folk.supply(peer)
 	}
-
-	// Register
 	k.folk = append(k.folk, folk)
 	k.topic[topic] = folkXID
-
 	return folk
 }

@@ -34,21 +34,24 @@ func (rtr *Rotor) Add(xid XID) {
 	rtr.open[xid.ID()] = xid
 }
 
-func (rtr *Rotor) Scrub(xid XID) {
+func (rtr *Rotor) Scrub(xid XID) bool {
 	rtr.Lock()
 	defer rtr.Unlock()
 	if xid.ID() == 0 {
 		panic("missig unique receiver id")
 	}
+	_, ok = rtr.open[xid.ID()]
 	delete(rtr.open, xid.ID())
 }
 
-func (rtr *Rotor) ScrubRandom() {
+func (rtr *Rotor) ScrubRandom() (XID, bool) {
 	rtr.Lock()
 	defer rtr.Unlock()
-	for hid, _ := rtr.open {
+	for hid, xid := rtr.open {
 		delete(rtr.open, hid)
+		return xid, true
 	}
+	return XID{}, false
 }
 
 // View returns a list of all XIDs in the rotor.

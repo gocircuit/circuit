@@ -43,6 +43,7 @@ func (x XKin) Attach(topic string) FolkXID {
 
 // Join returns an initial set of peers that the joining kin should use as initial entry into the kinfolk system.
 func (x XKin) Join() []KinXID {
+	??? // Reciprocate by joining into their network
 	m := make(map[lang.ReceiverID]KinXID)
 	for i := 0; i < Spread; i++ {
 		peerXID := x.Walk(Depth)

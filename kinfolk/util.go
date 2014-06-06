@@ -25,6 +25,7 @@ const (
 	// collaborative protocol.
 	ExpansionLow = 7
 	ExpansionHigh = 11
+	Spread = 5
 
 	// Depth is the number of random walk steps taken when sampling for a random circuit worker.
 	Depth  = 5
