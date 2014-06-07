@@ -8,6 +8,9 @@
 package kinfolk
 
 import (
+	"time"
+
+	"github.com/gocircuit/circuit/use/n"
 	"github.com/gocircuit/circuit/kit/lang"
 )
 
@@ -41,9 +44,8 @@ func (x XKin) Attach(topic string) FolkXID {
 	return x.k.topic[topic]
 }
 
-// Join returns an initial set of peers that the joining kin should use as initial entry into the kinfolk system.
-func (x XKin) Join() []KinXID {
-	??? // Reciprocate by joining into their network
+// Join returns an initial set of peers that the joining kin should use as initial entry into the system.
+func (x XKin) Join(joinee n.Addr) []KinXID {
 	m := make(map[lang.ReceiverID]KinXID)
 	for i := 0; i < Spread; i++ {
 		peerXID := x.Walk(Depth)
@@ -60,6 +62,12 @@ func (x XKin) Join() []KinXID {
 	for _, peerXID := range m {
 		r = append(r, peerXID)
 	}
+	if joinee != nil {
+		go func() {
+			time.Sleep(time.Second/2)
+			x.k.ReJoin(joinee) // Reciprocate by joining into their network
+		}()
+	}
 	return r
 }
 
@@ -74,9 +82,7 @@ func (x XKin) Walk(t int) KinXID {
 		return x.k.XID()
 	}
 	defer func() {
-		if r := recover(); r != nil {
-			x.k.scrub(hop)
-		}
+		recover()
 	}()
 	return YKin{hop}.Walk(t - 1)
 }
@@ -86,9 +92,9 @@ type YKin struct {
 	xid KinXID
 }
 
-func (y YKin) Join() []KinXID {
+func (y YKin) Join(joinee n.Addr) []KinXID {
 	// Do not recover
-	return y.xid.X.Call("Join")[0].([]KinXID)
+	return y.xid.X.Call("Join", joinee)[0].([]KinXID)
 }
 
 func (y YKin) Walk(t int) KinXID {

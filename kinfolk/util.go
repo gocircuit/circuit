@@ -75,7 +75,7 @@ func (fp *forwardPanic) Call(proc string, in ...interface{}) []interface{} {
 }
 
 // ForwardXIDPanic…
-fun ForwardXIDPanic(xid XID, fwd func(recov interface{})) XID {
-	xid.X = ForwardPanic(xid.X, recov)
+func ForwardXIDPanic(xid XID, fwd func(recov interface{})) XID {
+	xid.X = ForwardPanic(xid.X, fwd)
 	return xid
 }

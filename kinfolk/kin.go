@@ -59,7 +59,7 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 	}()
 	ykin := YKin{KinXID{X: circuit.Dial(join, ServiceName)}}
 	var w bytes.Buffer
-	for _, peer := range ykin.Join() {
+	for _, peer := range ykin.Join(nil) {
 		peer = k.remember(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')
@@ -76,7 +76,7 @@ func (k *Kin) remember(peer KinXID) KinXID {
 			k.forget(peer)
 		},
 	))
-	k.rtr.Add(peer)
+	k.rtr.Add(XID(peer))
 	k.ach <- peer
 	k.shrink()
 	return peer
@@ -95,7 +95,7 @@ func (k *Kin) shrink() {
 }
 
 func (k *Kin) forget(kinXID KinXID) {
-	if !k.rtr.Scrub(kinXID) {
+	if !k.rtr.Scrub(XID(kinXID)) {
 		return
 	}
 	log.Printf("Forgetting kin %s", kinXID.ID.String())
@@ -120,7 +120,7 @@ func (k *Kin) expand() {
 		w = k.remember(w)
 		log.Printf("expanding kinfolk system with a random kin %s", w.ID.String())
 		for _, folk := range k.users() {
-			folk.supply(YKin{w}.Attach(folk.Topic))
+			folk.supply(YKin{w}.Attach(folk.topic))
 		}
 	}
 }

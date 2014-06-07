@@ -8,11 +8,9 @@
 package kinfolk
 
 import (
-	"math/rand"
 	"sync"
 
 	"github.com/gocircuit/circuit/kit/lang"
-	"github.com/gocircuit/circuit/use/circuit"
 )
 
 // Rotor is a set of perm cross-interfaces.
@@ -31,23 +29,24 @@ func NewRotor() *Rotor {
 func (rtr *Rotor) Add(xid XID) {
 	rtr.Lock()
 	defer rtr.Unlock()
-	rtr.open[xid.ID()] = xid
+	rtr.open[xid.ID] = xid
 }
 
 func (rtr *Rotor) Scrub(xid XID) bool {
 	rtr.Lock()
 	defer rtr.Unlock()
-	if xid.ID() == 0 {
+	if xid.ID == 0 {
 		panic("missig unique receiver id")
 	}
-	_, ok = rtr.open[xid.ID()]
-	delete(rtr.open, xid.ID())
+	_, ok := rtr.open[xid.ID]
+	delete(rtr.open, xid.ID)
+	return ok
 }
 
 func (rtr *Rotor) ScrubRandom() (XID, bool) {
 	rtr.Lock()
 	defer rtr.Unlock()
-	for hid, xid := rtr.open {
+	for hid, xid := range rtr.open {
 		delete(rtr.open, hid)
 		return xid, true
 	}
@@ -76,7 +75,7 @@ func (rtr *Rotor) Len() int {
 func (rtr *Rotor) Choose() XID {
 	rtr.Lock()
 	defer rtr.Unlock()
-	for _, xid := rtr.open {
+	for _, xid := range rtr.open {
 		return xid
 	}
 	return XID{}

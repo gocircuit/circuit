@@ -19,7 +19,8 @@ type Folk struct {
 }
 
 func (folk *Folk) Opened() []FolkXID {
-	neighbors := folk.kin.View()
+	???
+	neighbors := folk.kin.Neighbors()
 	r := make([]FolkXID, len(neighbors))
 	for i, v := range neighbors {
 		r[i] = FolkXID(v)
