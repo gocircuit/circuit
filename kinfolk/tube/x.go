@@ -28,21 +28,6 @@ func (x XTube) XID() kinfolk.FolkXID {
 	return x.t.xid
 }
 
-// Subscribe…
-func (x XTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
-	// log.Printf("xtube subscribing")
-	// defer func() {
-	// 	log.Printf("xtube subscribed\n%s", x.t.Dump())
-	// }()
-	if downXID.ID == x.t.xid.ID {
-		panic("x")
-	}
-	x.t.Lock()
-	defer x.t.Unlock()
-	go x.t.BulkWrite(upsync) // Catch up to peer, after we return (and peer unlocks itself)
-	return x.t.view.Peek()
-}
-
 // Write…
 func (x XTube) Write(key string, rev Rev, value interface{}) bool {
 	// log.Printf("xtube writing (%s,%d,%v)", key, rev, value)
@@ -66,15 +51,6 @@ type YTube struct {
 }
 
 // Lookup and Forget intentionally omitted. To be called only by local tube user.
-
-func (y YTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
-	defer func() {
-		if r := recover(); r != nil {
-			// log.Printf("ytube subscribe panic\n%#v\n", r)
-		}
-	}()
-	return y.xid.X.Call("Subscribe", downXID, upsync)[0].([]*Record)
-}
 
 func (y YTube) Write(key string, rev Rev, value interface{}) bool {
 	defer func() {

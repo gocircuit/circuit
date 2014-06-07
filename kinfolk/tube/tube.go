@@ -65,14 +65,9 @@ func (t *Tube) superscribe(peer kinfolk.FolkXID) {
 	// 	log.Printf("tube superscribed %s\n%s", peer.ID.String(), t.Dump())
 	// }()
 	t.Lock()
-	defer t.Unlock()
-	yup := YTube{peer}
-	// Broadcast our knowledge to joining downstream node, and read in their knowledge
-	// TODO: The BulkWrite update is not necessary, since yup is not necesarily becoming an
-	// upstream provider for us.
-	// go t.BulkWrite(yup.Subscribe(t.xid, t.view.Peek()))
-	// XXX: Remove return value from Subscribe for network efficiency.
-	yup.Subscribe(t.xid, t.view.Peek())
+	peek := t.view.Peek()
+	t.Unlock()
+	(YTube{peer}).BulkWrite(peek) // Broadcast our knowledge to joining downstream node.
 }
 
 // BulkRead returns a listing of all elements of the Tube table
@@ -147,7 +142,7 @@ func (t *Tube) BulkWrite(bulk []*Record) {
 func (t *Tube) bulkWriteSync(changed []*Record) {
 	// Records exchanged within and across tubes are immutable, so no lock is necessary
 	var wg sync.WaitGroup
-	for _, downXID := range t.down.Opened() {
+	for _, downXID := range t.folk.Opened() {
 		ydown := YTube{kinfolk.FolkXID(downXID)}
 		wg.Add(1)
 		go func() {
@@ -181,7 +176,7 @@ func (t *Tube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 // scrub pushes a notification to scrub a record to our downstream peers.
 func (t *Tube) scrubSync(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 	var wg sync.WaitGroup
-	for _, downXID := range t.down.Opened() {
+	for _, downXID := range t.folk.Opened() {
 		ydown := YTube{
 			kinfolk.FolkXID(downXID),
 		}

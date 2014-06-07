@@ -16,7 +16,9 @@ package kinfolk
 
 	Kin hooks FolkXIDs with a trigger that catches Call panics
 
-* Edit tube.go to use the folk's neighborhood methods
+	Use lazy random walk (for sampling nodes) to avoid parity issues.
+
+* On Join reciprocate directly by adding the caller as a kin
 
 	Who is responsible for discovering dying neihbors and reporting to the tube?
 

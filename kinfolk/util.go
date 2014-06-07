@@ -28,7 +28,7 @@ const (
 	Spread = 5
 
 	// Depth is the number of random walk steps taken when sampling for a random circuit worker.
-	Depth  = 5
+	Depth  = 3*2  // Lazy random walk with stay-put probability one half
 )
 
 // XID is a pair of a permanent cross-interface and an ID, identifying its underlying receiver uniquely.

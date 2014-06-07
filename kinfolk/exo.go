@@ -8,6 +8,7 @@
 package kinfolk
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/gocircuit/circuit/use/n"
@@ -76,6 +77,9 @@ func (x XKin) Join(joinee n.Addr) []KinXID {
 func (x XKin) Walk(t int) KinXID {
 	if t <= 0 {
 		return x.k.XID()
+	}
+	if rand.Intn(2) < 1 { // Lazy random walk
+		return x.Walk(t-1)
 	}
 	hop := KinXID(x.k.neighborhood.Choose())
 	if hop.X == nil {

@@ -89,7 +89,7 @@ func (k *Kin) remember(peer KinXID) KinXID {
 	return peer
 }
 
-// shrink shrinks the neighborhood down to size ExpansionHigh.
+// If the neighborhood is too big, shrink shrinks it to size ExpansionHigh.
 func (k *Kin) shrink() {
 	for i := 0; i < k.neighborhood.Len() - ExpansionHigh; i++ {
 		xid, ok := k.neighborhood.ScrubRandom()
@@ -114,6 +114,7 @@ func (k *Kin) XID() KinXID {
 	return k.kinxid
 }
 
+// If the neighborhood is too small, expand chooses random peers to refill it.
 func (k *Kin) expand() {
 	if k.neighborhood.Len() < ExpansionLow {
 		return
@@ -154,10 +155,10 @@ func (k *Kin) Attach(topic string, folkXID FolkXID) *Folk {
 		topic: topic,
 		neighborhood: NewNeighborhood(),
 		kin: k,
-		ch:    make(chan FolkXID, 2*ExpansionHigh),
+		ch: make(chan FolkXID, len(peers)), // make sure initial set can be sent unblocked
 	}
 	for _, peer := range peers {
-		folk.supply(peer)
+		folk.addPeer(peer)
 	}
 	k.folk = append(k.folk, folk)
 	k.topic[topic] = folkXID
