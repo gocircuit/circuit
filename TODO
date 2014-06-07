@@ -2,10 +2,12 @@ PROJECTS
 ========
 
 * discovery using local net broadcast
-* automatic visualisation of circuit dynamics history and live (log -> viz)
+* switch tool argument parsing to https://github.com/docopt/docopt.go
+* job scheduler ala mesos
 
+automatic visualisation of circuit dynamics history and live (log -> viz)
 add mutex element
 add docker image-compiler
 Circuit Apps infrastructure (mention in talk)
-/tty element; interactive shell: Fix ^D/^C/exit issue of RSX's interactive shell
-/broadcast, /reduce, /allreduce file systems
+tty element; interactive shell
+broadcast, reduce, allreduce elements (for apps like vowpal wabbit)

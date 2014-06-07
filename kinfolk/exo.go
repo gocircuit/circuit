@@ -77,7 +77,7 @@ func (x XKin) Walk(t int) KinXID {
 	if t <= 0 {
 		return x.k.XID()
 	}
-	hop := KinXID(x.k.rtr.Choose())
+	hop := KinXID(x.k.neighborhood.Choose())
 	if hop.X == nil {
 		return x.k.XID()
 	}

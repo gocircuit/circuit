@@ -39,7 +39,6 @@ func (x XTube) Subscribe(downXID kinfolk.FolkXID, upsync []*Record) []*Record {
 	}
 	x.t.Lock()
 	defer x.t.Unlock()
-	x.t.down.Open(kinfolk.XID(downXID)) // Add peer to downstream list
 	go x.t.BulkWrite(upsync) // Catch up to peer, after we return (and peer unlocks itself)
 	return x.t.view.Peek()
 }

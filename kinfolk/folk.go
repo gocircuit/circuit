@@ -8,19 +8,18 @@
 package kinfolk
 
 import (
-	"sync"
+	//"sync"
 )
 
 type Folk struct {
 	kin *Kin
 	topic string
-	sync.Mutex
+	neighborhood *Neighborhood
 	ch chan FolkXID // Services pending to be opened
 }
 
 func (folk *Folk) Opened() []FolkXID {
-	???
-	neighbors := folk.kin.Neighbors()
+	neighbors := folk.neighborhood.View()
 	r := make([]FolkXID, len(neighbors))
 	for i, v := range neighbors {
 		r[i] = FolkXID(v)
@@ -28,16 +27,20 @@ func (folk *Folk) Opened() []FolkXID {
 	return r
 }
 
-// Replenish blocks and returns the next downstream peer when one is chosen by the kin system.
+// Replenish blocks and returns the next downstream peer added to the neighborhod set by the kin.
 func (folk *Folk) Replenish() (peer FolkXID) {
-	return <-folk.ch
+	peer = <-folk.ch
+	folk.neighborhood.Add(XID(peer))
+	return peer
 }
 
-func (folk *Folk) supply(peer FolkXID) {
+func (folk *Folk) addPeer(peer FolkXID) {
 	if XID(peer).IsNil() {
 		return
 	}
-	folk.Lock()
-	defer folk.Unlock()
 	folk.ch <- peer
+}
+
+func (folk *Folk) removePeer(peer FolkXID) {
+	folk.neighborhood.Scrub(XID(peer))
 }

@@ -13,26 +13,35 @@ import (
 	"github.com/gocircuit/circuit/kit/lang"
 )
 
-// Rotor is a set of perm cross-interfaces.
-type Rotor struct {
+type Reservoir interface {
+	Add(XID)
+	Scrub(XID) bool
+	ScrubRandom() (XID, bool)
+	View() []XID
+	Len() int
+	Choose() XID
+}
+
+// Neighborhood is a set of perm cross-interfaces.
+type Neighborhood struct {
 	sync.Mutex
 	open map[lang.ReceiverID]XID
 }
 
-// NewRotor creates a new rotor.
-func NewRotor() *Rotor {
-	return &Rotor{
+// NewNeighborhood creates a new rotor.
+func NewNeighborhood() *Neighborhood {
+	return &Neighborhood{
 		open: make(map[lang.ReceiverID]XID),
 	}
 }
 
-func (rtr *Rotor) Add(xid XID) {
+func (rtr *Neighborhood) Add(xid XID) {
 	rtr.Lock()
 	defer rtr.Unlock()
 	rtr.open[xid.ID] = xid
 }
 
-func (rtr *Rotor) Scrub(xid XID) bool {
+func (rtr *Neighborhood) Scrub(xid XID) bool {
 	rtr.Lock()
 	defer rtr.Unlock()
 	if xid.ID == 0 {
@@ -43,7 +52,7 @@ func (rtr *Rotor) Scrub(xid XID) bool {
 	return ok
 }
 
-func (rtr *Rotor) ScrubRandom() (XID, bool) {
+func (rtr *Neighborhood) ScrubRandom() (XID, bool) {
 	rtr.Lock()
 	defer rtr.Unlock()
 	for hid, xid := range rtr.open {
@@ -54,7 +63,7 @@ func (rtr *Rotor) ScrubRandom() (XID, bool) {
 }
 
 // View returns a list of all XIDs in the rotor.
-func (rtr *Rotor) View() []XID {
+func (rtr *Neighborhood) View() []XID {
 	rtr.Lock()
 	defer rtr.Unlock()
 	open := make([]XID, 0, len(rtr.open))
@@ -65,14 +74,14 @@ func (rtr *Rotor) View() []XID {
 }
 
 // Len returns the number of XIDs in the rotor.
-func (rtr *Rotor) Len() int {
+func (rtr *Neighborhood) Len() int {
 	rtr.Lock()
 	defer rtr.Unlock()
 	return len(rtr.open)
 }
 
 // Choose returns a randomly chosen XID.
-func (rtr *Rotor) Choose() XID {
+func (rtr *Neighborhood) Choose() XID {
 	rtr.Lock()
 	defer rtr.Unlock()
 	for _, xid := range rtr.open {

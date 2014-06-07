@@ -5,7 +5,6 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package kinfolk is an efficient “social” protocol for maintaining mutual awareness and sharing resources amongs circuit workers.
 package kinfolk
 
 import (
@@ -23,23 +22,19 @@ import (
 // Kin is the kinfolk system server.
 type Kin struct {
 	kinxid KinXID // Permanent circuit-wide unique ID for this kin
-	rtr    *Rotor
-	///
-	ach    chan KinXID // announcements of newly discovered kins
-	dch    chan KinXID // denouncements of newly discovered deceased kins
-	///
+	neighborhood *Neighborhood
+	rip chan KinXID // denouncements of newly discovered deceased kins
 	sync.Mutex
-	topic  map[string]FolkXID // topic -> yfolk
-	folk   []*Folk
+	topic map[string]FolkXID // topic -> yfolk
+	folk []*Folk
 }
 
 const ServiceName = "kin"
 
-func NewKin() (k *Kin, xkin XKin, join, leave <-chan KinXID) {
+func NewKin() (k *Kin, xkin XKin, rip <-chan KinXID) {
 	k = &Kin{
-		rtr:   NewRotor(),
-		ach:   make(chan KinXID, ExpansionHigh),
-		dch:   make(chan KinXID, ExpansionHigh),
+		neighborhood:   NewNeighborhood(),
+		rip:   make(chan KinXID, ExpansionHigh),
 		topic: make(map[string]FolkXID),
 	}
 	// Create a KinXID for this system.
@@ -47,7 +42,7 @@ func NewKin() (k *Kin, xkin XKin, join, leave <-chan KinXID) {
 		X:  circuit.PermRef(XKin{k}),
 		ID: lang.ComputeReceiverID(k),
 	})
-	return k, XKin{k}, k.ach, k.dch
+	return k, XKin{k}, k.rip
 }
 
 // ReJoin contacts the peering kin service join and joins its circuit network.
@@ -71,36 +66,48 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 }
 
 func (k *Kin) remember(peer KinXID) KinXID {
-	peer = KinXID(ForwardXIDPanic(XID(peer),
-		func (interface{}) {
-			k.forget(peer)
-		},
-	))
-	k.rtr.Add(XID(peer))
-	k.ach <- peer
+	peer = KinXID(
+		ForwardXIDPanic(
+			XID(peer),
+			func (interface{}) {
+				k.forget(peer)
+			},
+		))
+	k.neighborhood.Add(XID(peer))
+	for _, folk := range k.users() {
+		p := YKin{peer}.Attach(folk.topic)
+		p = FolkXID(
+			ForwardXIDPanic(
+				XID(p),
+				func (interface{}) {
+					k.forget(peer)
+				},
+			))
+		folk.addPeer(p)
+	}
 	k.shrink()
 	return peer
 }
 
 // shrink shrinks the neighborhood down to size ExpansionHigh.
 func (k *Kin) shrink() {
-	for i := 0; i < k.rtr.Len() - ExpansionHigh; i++ {
-		xid, ok := k.rtr.ScrubRandom()
+	for i := 0; i < k.neighborhood.Len() - ExpansionHigh; i++ {
+		xid, ok := k.neighborhood.ScrubRandom()
 		if !ok {
 			return
 		}
-		log.Printf("Shrunk kin %s", xid.ID.String())
-		k.dch <- KinXID(xid)
+		log.Printf("Evicting kin %s", xid.ID.String())
 	}
 }
 
-func (k *Kin) forget(kinXID KinXID) {
-	if !k.rtr.Scrub(XID(kinXID)) {
+// forget removes peer from its neighborhood and announces the newly discovered death of peer to the user.
+func (k *Kin) forget(peer KinXID) {
+	if !k.neighborhood.Scrub(XID(peer)) {
 		return
 	}
-	log.Printf("Forgetting kin %s", kinXID.ID.String())
+	log.Printf("Forgetting kin %s", peer.ID.String())
+	k.rip <- peer
 	k.expand()
-	k.dch <- kinXID
 }
 
 func (k *Kin) XID() KinXID {
@@ -108,20 +115,16 @@ func (k *Kin) XID() KinXID {
 }
 
 func (k *Kin) expand() {
-	if k.rtr.Len() < ExpansionLow {
+	if k.neighborhood.Len() < ExpansionLow {
 		return
 	}
-	for i := 0; i < ExpansionHigh - k.rtr.Len(); i++ {
-		// Choose a random peer, using a random walk
-		w := XKin{k}.Walk(Depth)
+	for i := 0; i < ExpansionHigh - k.neighborhood.Len(); i++ {
+		w := XKin{k}.Walk(Depth) // Choose a random peer, using a random walk
 		if XID(w).IsNil() || w.ID == k.XID().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
 			continue // If peer is nil or self, ignore it
 		}
 		w = k.remember(w)
 		log.Printf("expanding kinfolk system with a random kin %s", w.ID.String())
-		for _, folk := range k.users() {
-			folk.supply(YKin{w}.Attach(folk.topic))
-		}
 	}
 }
 
@@ -134,7 +137,7 @@ func (k *Kin) users() []*Folk {
 }
 
 func (k *Kin) Attach(topic string, folkXID FolkXID) *Folk {
-	var neighbors = k.rtr.View()
+	var neighbors = k.neighborhood.View()
 	peers := make([]FolkXID, 0, len(neighbors))
 	for _, xid := range neighbors {
 		kinXID := KinXID(xid)
@@ -149,6 +152,7 @@ func (k *Kin) Attach(topic string, folkXID FolkXID) *Folk {
 	}
 	folk := &Folk{
 		topic: topic,
+		neighborhood: NewNeighborhood(),
 		kin: k,
 		ch:    make(chan FolkXID, 2*ExpansionHigh),
 	}

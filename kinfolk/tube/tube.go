@@ -25,7 +25,6 @@ type Tube struct {
 	folk   *kinfolk.Folk   // Folk interface of this tube to the kin system
 	sync.Mutex
 	view  *View
-	down *kinfolk.Rotor // Rotor of YTubes for downstream updates
 }
 
 func init() {
@@ -34,10 +33,7 @@ func init() {
 
 // NewTube…
 func NewTube(kin *kinfolk.Kin, topic string) *Tube {
-	t := &Tube{
-		view: NewView(),
-		down: kinfolk.NewRotor(),
-	}
+	t := &Tube{view: NewView()}
 	t.xid = kinfolk.FolkXID{
 		X:  circuit.PermRef(XTube{t}),
 		ID: lang.ComputeReceiverID(t),
@@ -63,24 +59,20 @@ func (t *Tube) NewDepartures() *pubsub.Subscription {
 }
 
 
-func (t *Tube) superscribe(peerXID kinfolk.FolkXID) {
-	// log.Printf("tube superscribing %s", peerXID.ID.String())
+func (t *Tube) superscribe(peer kinfolk.FolkXID) {
+	// log.Printf("tube superscribing %s", peer.ID.String())
 	// defer func() {
-	// 	log.Printf("tube superscribed %s\n%s", peerXID.ID.String(), t.Dump())
+	// 	log.Printf("tube superscribed %s\n%s", peer.ID.String(), t.Dump())
 	// }()
-
 	t.Lock()
 	defer t.Unlock()
-	// Add new cross-tube to rotor, in order to keep track of all live downstream nodes we re-broadcast to
-	yup := YTube{
-		kinfolk.FolkXID(
-			t.down.Open(
-				kinfolk.XID(peerXID),
-			),
-		),
-	}
+	yup := YTube{peer}
 	// Broadcast our knowledge to joining downstream node, and read in their knowledge
-	go t.BulkWrite(yup.Subscribe(t.xid, t.view.Peek()))
+	// TODO: The BulkWrite update is not necessary, since yup is not necesarily becoming an
+	// upstream provider for us.
+	// go t.BulkWrite(yup.Subscribe(t.xid, t.view.Peek()))
+	// XXX: Remove return value from Subscribe for network efficiency.
+	yup.Subscribe(t.xid, t.view.Peek())
 }
 
 // BulkRead returns a listing of all elements of the Tube table
@@ -117,7 +109,7 @@ func (t *Tube) Write(key string, rev Rev, value interface{}) (changed bool) {
 // writeSync pushes an update to our downstream peering tubes.
 func (t *Tube) writeSync(key string, rev Rev, value interface{}) {
 	var wg sync.WaitGroup
-	for _, downXID := range t.down.Opened() {
+	for _, downXID := range t.folk.Opened() {
 		ydown := YTube{
 			kinfolk.FolkXID(downXID),
 		}
