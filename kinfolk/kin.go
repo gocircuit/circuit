@@ -70,23 +70,22 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 }
 
 func (k *Kin) remember(peer KinXID) KinXID {
-	peer = KinXID(
-		ForwardXIDPanic(
-			XID(peer),
-			func (interface{}) {
-				k.forget(peer)
-			},
-		))
+	peer.X = ForwardPanic(
+		peer.X,
+		func (interface{}) {
+			k.forget(peer.ID)
+		},
+	)
 	k.neighborhood.Add(XID(peer))
 	for _, folk := range k.users() {
 		p := YKin{peer}.Attach(folk.topic)
-		p = FolkXID(
-			ForwardXIDPanic(
-				XID(p),
-				func (interface{}) {
-					k.forget(peer)
-				},
-			))
+		p.X = ForwardPanic(
+			p.X,
+			func (interface{}) {
+				k.forget(p.ID)
+			},
+		)
+		p.ID = peer.ID // use the kin ID
 		folk.addPeer(p)
 	}
 	k.shrink()
@@ -105,12 +104,16 @@ func (k *Kin) shrink() {
 }
 
 // forget removes peer from its neighborhood and announces the newly discovered death of peer to the user.
-func (k *Kin) forget(peer KinXID) {
-	if !k.neighborhood.Scrub(XID(peer)) {
+func (k *Kin) forget(key lang.ReceiverID) {
+	for _, folk := range k.users() { // Remove peer from all users
+		folk.removePeer(key)
+	}
+	peer, ok := k.neighborhood.Scrub(key) 
+	if !ok {
 		return
 	}
-	log.Printf("Forgetting kin %s", peer.ID.String())
-	k.rip <- peer
+	log.Printf("Forgetting kin %s", key.String())
+	k.rip <- KinXID(peer)
 	k.expand()
 }
 
@@ -161,7 +164,16 @@ func (k *Kin) Attach(topic string, folkXID FolkXID) *Folk {
 		kin: k,
 		ch: make(chan FolkXID, len(peers)), // make sure initial set can be sent unblocked
 	}
-	for _, peer := range peers {
+	for i, peer := range peers {
+		// Rig the peers to be removed from the folk when their method calls cause panic
+		key := neighbors[i].ID
+		peer.ID = key
+		peer.X = ForwardPanic(
+			peer.X,
+			func (interface{}) {
+				k.forget(key)
+			},
+		)
 		folk.addPeer(peer)
 	}
 	k.folk = append(k.folk, folk)

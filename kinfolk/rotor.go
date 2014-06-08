@@ -13,78 +13,66 @@ import (
 	"github.com/gocircuit/circuit/kit/lang"
 )
 
-type Reservoir interface {
-	Add(XID)
-	Scrub(XID) bool
-	ScrubRandom() (XID, bool)
-	View() []XID
-	Len() int
-	Choose() XID
-}
-
 // Neighborhood is a set of perm cross-interfaces.
 type Neighborhood struct {
 	sync.Mutex
-	open map[lang.ReceiverID]XID
+	open map[interface{}]XID
 }
 
 // NewNeighborhood creates a new rotor.
 func NewNeighborhood() *Neighborhood {
 	return &Neighborhood{
-		open: make(map[lang.ReceiverID]XID),
+		open: make(map[interface{}]XID),
 	}
 }
 
-func (rtr *Neighborhood) Add(xid XID) {
-	rtr.Lock()
-	defer rtr.Unlock()
-	rtr.open[xid.ID] = xid
+func (nh *Neighborhood) Add(xid XID) {
+	nh.Lock()
+	defer nh.Unlock()
+	nh.open[xid.ID] = xid
 }
 
-func (rtr *Neighborhood) Scrub(xid XID) bool {
-	rtr.Lock()
-	defer rtr.Unlock()
-	if xid.ID == 0 {
-		panic("missig unique receiver id")
-	}
-	_, ok := rtr.open[xid.ID]
-	delete(rtr.open, xid.ID)
-	return ok
+func (nh *Neighborhood) Scrub(key lang.ReceiverID) (XID, bool) {
+	nh.Lock()
+	defer nh.Unlock()
+	xid, ok := nh.open[key]
+	delete(nh.open, key)
+	return xid, ok
 }
 
-func (rtr *Neighborhood) ScrubRandom() (XID, bool) {
-	rtr.Lock()
-	defer rtr.Unlock()
-	for hid, xid := range rtr.open {
-		delete(rtr.open, hid)
+func (nh *Neighborhood) ScrubRandom() (XID, bool) {
+	nh.Lock()
+	defer nh.Unlock()
+	for key, xid := range nh.open {
+		delete(nh.open, key)
 		return xid, true
 	}
 	return XID{}, false
 }
 
 // View returns a list of all XIDs in the rotor.
-func (rtr *Neighborhood) View() []XID {
-	rtr.Lock()
-	defer rtr.Unlock()
-	open := make([]XID, 0, len(rtr.open))
-	for _, xid := range rtr.open {
+func (nh *Neighborhood) View() []XID {
+	nh.Lock()
+	defer nh.Unlock()
+	open := make([]XID, 0, len(nh.open))
+	for _, xid := range nh.open {
 		open = append(open, xid)
 	}
 	return open
 }
 
 // Len returns the number of XIDs in the rotor.
-func (rtr *Neighborhood) Len() int {
-	rtr.Lock()
-	defer rtr.Unlock()
-	return len(rtr.open)
+func (nh *Neighborhood) Len() int {
+	nh.Lock()
+	defer nh.Unlock()
+	return len(nh.open)
 }
 
 // Choose returns a randomly chosen XID.
-func (rtr *Neighborhood) Choose() XID {
-	rtr.Lock()
-	defer rtr.Unlock()
-	for _, xid := range rtr.open {
+func (nh *Neighborhood) Choose() XID {
+	nh.Lock()
+	defer nh.Unlock()
+	for _, xid := range nh.open {
 		return xid
 	}
 	return XID{}

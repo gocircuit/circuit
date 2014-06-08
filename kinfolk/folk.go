@@ -9,6 +9,8 @@ package kinfolk
 
 import (
 	//"sync"
+
+	"github.com/gocircuit/circuit/kit/lang"
 )
 
 type Folk struct {
@@ -41,6 +43,6 @@ func (folk *Folk) addPeer(peer FolkXID) {
 	folk.ch <- peer
 }
 
-func (folk *Folk) removePeer(peer FolkXID) {
-	folk.neighborhood.Scrub(XID(peer))
+func (folk *Folk) removePeer(key lang.ReceiverID) {
+	folk.neighborhood.Scrub(key)
 }

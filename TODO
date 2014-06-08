@@ -3,6 +3,7 @@ PROJECTS
 
 * discovery using local net broadcast
 * switch tool argument parsing to https://github.com/docopt/docopt.go
+* tool also has multicast discovery mode; add env var for discovery
 * test coverage
 * job scheduler ala mesos
 
