@@ -18,7 +18,7 @@ package kinfolk
 
 	Use lazy random walk (for sampling nodes) to avoid parity issues.
 
-* On Join reciprocate directly by adding the caller as a kin
+	On Join reciprocate directly by adding the caller as a kin.
 
 	Who is responsible for discovering dying neihbors and reporting to the tube?
 

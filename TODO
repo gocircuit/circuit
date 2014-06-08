@@ -3,6 +3,7 @@ PROJECTS
 
 * discovery using local net broadcast
 * switch tool argument parsing to https://github.com/docopt/docopt.go
+* test coverage
 * job scheduler ala mesos
 
 automatic visualisation of circuit dynamics history and live (log -> viz)

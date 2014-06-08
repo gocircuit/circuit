@@ -52,9 +52,13 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 			err = fmt.Errorf("panic joining: %v", r)
 		}
 	}()
-	ykin := YKin{KinXID{X: circuit.Dial(join, ServiceName)}}
+	ykin := YKin{
+		KinXID{
+			X: circuit.Dial(join, ServiceName),
+		},
+	}
 	var w bytes.Buffer
-	for _, peer := range ykin.Join(nil) {
+	for _, peer := range ykin.Join(KinXID{}) {
 		peer = k.remember(peer)
 		w.WriteString(peer.X.Addr().WorkerID().String())
 		w.WriteByte(' ')

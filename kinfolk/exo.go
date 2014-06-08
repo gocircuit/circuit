@@ -11,7 +11,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/gocircuit/circuit/use/n"
 	"github.com/gocircuit/circuit/kit/lang"
 )
 
@@ -46,7 +45,7 @@ func (x XKin) Attach(topic string) FolkXID {
 }
 
 // Join returns an initial set of peers that the joining kin should use as initial entry into the system.
-func (x XKin) Join(joinee n.Addr) []KinXID {
+func (x XKin) Join(joinee KinXID) []KinXID {
 	m := make(map[lang.ReceiverID]KinXID)
 	for i := 0; i < Spread; i++ {
 		peerXID := x.Walk(Depth)
@@ -63,10 +62,14 @@ func (x XKin) Join(joinee n.Addr) []KinXID {
 	for _, peerXID := range m {
 		r = append(r, peerXID)
 	}
-	if joinee != nil {
+	if !XID(joinee).IsNil() {
 		go func() {
+			defer func() {
+				recover()
+			}()
 			time.Sleep(time.Second/2)
-			x.k.ReJoin(joinee) // Reciprocate by joining into their network
+			x.k.ReJoin(joinee.X.Addr()) // Reciprocate by joining into their network
+			x.k.remember(joinee)
 		}()
 	}
 	return r
@@ -96,7 +99,7 @@ type YKin struct {
 	xid KinXID
 }
 
-func (y YKin) Join(joinee n.Addr) []KinXID {
+func (y YKin) Join(joinee KinXID) []KinXID {
 	// Do not recover
 	return y.xid.X.Call("Join", joinee)[0].([]KinXID)
 }
