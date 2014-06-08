@@ -59,8 +59,8 @@ func server(c *cli.Context) {
 	addr := load(c.String("addr"), varDir, readkey(c))
 
 	// kinfolk + locus
-	kin, xkin, kinJoin, kinLeave := kinfolk.NewKin()
-	xlocus := locus.NewLocus(kin, kinJoin, kinLeave)
+	kin, xkin, rip := kinfolk.NewKin()
+	xlocus := locus.NewLocus(kin, rip)
 
 	// joining
 	switch {

@@ -28,7 +28,7 @@ type Locus struct {
 }
 
 // NewLocus creates a new locus device.
-func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus {
+func NewLocus(kin *kinfolk.Kin, rip <-chan kinfolk.KinXID) XLocus {
 	locus := &Locus{
 		tube: tube.NewTube(kin, "locus"),
 	}
@@ -43,11 +43,8 @@ func NewLocus(kin *kinfolk.Kin, kinJoin, kinLeave <-chan kinfolk.KinXID) XLocus 
 		Kin:    kin.XID(),
 		Term: xterm,
 	}
-
-	go loopJoin(kinJoin)
-	go locus.loopLeave(kinLeave)
+	go locus.loopRIP(rip)
 	go locus.loopAnnounceAndExpire()
-	//log.Println(locus.Peer.Key())
 	return XLocus{locus}
 }
 
@@ -108,20 +105,9 @@ func (locus *Locus) loopAnnounceAndExpire() {
 	}
 }
 
-func loopJoin(kinjoin <-chan kinfolk.KinXID) {
-	// Discard join events
+func (locus *Locus) loopRIP(rip <-chan kinfolk.KinXID) {
 	for {
-		kinXID, ok := <-kinjoin
-		if !ok {
-			panic("u")
-		}
-		log.Println("Peering server", kinXID.X.Addr(), "joined the circuit.")
-	}
-}
-
-func (locus *Locus) loopLeave(kinleave <-chan kinfolk.KinXID) {
-	for {
-		kinXID, ok := <-kinleave
+		kinXID, ok := <-rip
 		if !ok {
 			panic("u")
 		}
