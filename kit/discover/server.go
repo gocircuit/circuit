@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/gocircuit/circuit/kit/xor"
@@ -71,7 +72,8 @@ func (s *Server) Invite() {
 func (s *Server) accept(ch chan<- []byte) {
 	conn, err := net.ListenMulticastUDP("udp", nil, s.addr)
 	if err != nil {
-		panic(err)
+		log.Printf("problem listening to udp mulsticast: %v", err)
+		os.Exit(1)
 	}
 	defer conn.Close()
 	buf := make([]byte, 7e3)
