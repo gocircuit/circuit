@@ -8,10 +8,9 @@
 package kinfolk
 
 import (
+	"bytes"
+	"log"
 	"math/rand"
-	"time"
-
-	"github.com/gocircuit/circuit/kit/lang"
 )
 
 // FolkXID is an XID underlied by a user receiver for a service shared over the kinfolk system.
@@ -44,35 +43,19 @@ func (x XKin) Attach(topic string) FolkXID {
 	return x.k.topic[topic]
 }
 
-// Join returns an initial set of peers that the joining kin should use as initial entry into the system.
-func (x XKin) Join(joinee KinXID) []KinXID {
-	m := make(map[lang.ReceiverID]KinXID)
-	for i := 0; i < Spread; i++ {
-		peerXID := x.Walk(Depth)
-		if XID(peerXID).IsNil() {
-			continue
-		}
-		if _, ok := m[peerXID.ID]; ok {
-			// Duplicate
-			continue
-		}
-		m[peerXID.ID] = peerXID
+// Join …
+func (x XKin) Join(boundary []KinXID) []KinXID {
+	offer := x.k.chooseBoundary() // compute boundary before merge happens
+	var w bytes.Buffer
+	for _, q := range boundary {
+		q = x.k.remember(q)
+		w.WriteString(q.X.Addr().String())
+		w.WriteByte(' ')
 	}
-	r := make([]KinXID, 0, len(m))
-	for _, peerXID := range m {
-		r = append(r, peerXID)
+	if len(boundary) > 0 {
+		log.Println("Remembering merging server(s):", w.String())
 	}
-	if !XID(joinee).IsNil() {
-		go func() {
-			defer func() {
-				recover()
-			}()
-			time.Sleep(time.Second/2)
-			x.k.ReJoin(joinee.X.Addr()) // Reciprocate by joining into their network
-			x.k.remember(joinee)
-		}()
-	}
-	return r
+	return offer
 }
 
 // Walk performs a random walk through the expander-graph network of circuit workers
@@ -99,9 +82,9 @@ type YKin struct {
 	xid KinXID
 }
 
-func (y YKin) Join(joinee KinXID) []KinXID {
+func (y YKin) Join(boundary []KinXID) []KinXID {
 	// Do not recover
-	return y.xid.X.Call("Join", joinee)[0].([]KinXID)
+	return y.xid.X.Call("Join", boundary)[0].([]KinXID)
 }
 
 func (y YKin) Walk(t int) KinXID {

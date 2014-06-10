@@ -24,7 +24,7 @@ type Server struct {
 	family *family
 }
 
-type InviteMsg struct {
+type BroadcastMsg struct {
 	Payload []byte
 }
 
@@ -50,7 +50,7 @@ func (s *Server) Invite() {
 			panic(err)
 		}
 		defer conn.Close()
-		msg := &InviteMsg{s.payload}
+		msg := &BroadcastMsg{s.payload}
 		buf, err := json.Marshal(msg)
 		if err != nil {
 			panic(err)
@@ -80,7 +80,7 @@ func (s *Server) accept(ch chan<- []byte) {
 		if err != nil {
 			panic(err)
 		}
-		var invite InviteMsg
+		var invite BroadcastMsg
 		if err = json.Unmarshal(buf[:n], &invite); err != nil {
 			continue // malformed invitation
 		}

@@ -58,15 +58,39 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 		},
 	}
 	var w bytes.Buffer
-	for _, peer := range ykin.Join(KinXID{}) {
+	for _, peer := range ykin.Join(k.chooseBoundary()) {
 		peer = k.remember(peer)
-		w.WriteString(peer.X.Addr().WorkerID().String())
+		w.WriteString(peer.X.Addr().String())
 		w.WriteByte(' ')
 	}
 	if w.Len() > 0 {
-		log.Println("Adding peering server(s):", w.String())
+		log.Println("Remembering offered server(s):", w.String())
 	}
 	return nil
+}
+
+func (k *Kin) chooseBoundary() []KinXID {
+	defer func() {
+		recover()
+	}()
+	m := make(map[lang.ReceiverID]KinXID)
+	m[k.kinxid.ID] = k.kinxid // add self in boundary offering
+	for i := 0; i < Spread; i++ {
+		peerXID := XKin{k}.Walk(Depth)
+		if XID(peerXID).IsNil() {
+			continue
+		}
+		if _, ok := m[peerXID.ID]; ok {
+			// Duplicate
+			continue
+		}
+		m[peerXID.ID] = peerXID
+	}
+	r := make([]KinXID, 0, len(m))
+	for _, peerXID := range m {
+		r = append(r, peerXID)
+	}
+	return r
 }
 
 func (k *Kin) remember(peer KinXID) KinXID {
