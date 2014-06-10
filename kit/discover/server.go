@@ -17,8 +17,6 @@ import (
 	"github.com/gocircuit/circuit/kit/xor"
 )
 
-// circuit start -a :7711 -discover 228.8.8.8:8822
-
 // Server is a network server for the beacon discovery protocol.
 type Server struct {
 	addr *net.UDPAddr // udp multicast address for discovery

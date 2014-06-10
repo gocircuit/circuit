@@ -26,11 +26,11 @@ func main() {
 			Action: server,
 			Flags: []cli.Flag{
 				cli.StringFlag{"addr, a", "", "Address of circuit server."},
-				cli.StringFlag{"if", "", "Network interface for server. No -addr option necessary."},
+				cli.StringFlag{"if", "", "Bind any available port on the specified interface."},
 				cli.StringFlag{"var", "", "Lock and log directory for the circuit server."},
 				cli.StringFlag{"join, j", "", "Join a circuit through a current member by address."},
 				cli.StringFlag{"hmac", "", "File with HMAC credentials for HMAC/RC4 transport security."},
-				cli.StringFlag{"discover", "", "Multicast address for peering server discovery."},
+				cli.StringFlag{"discover", "", "Multicast address for peer server discovery, e.g. 228.8.8.8:8822"},
 			},
 	 	},
 		{
@@ -44,6 +44,7 @@ func main() {
 			Action: ls,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				//cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.BoolFlag{"long, l", "show detailed anchor information"},
 				cli.BoolFlag{"depth, de", "traverse anchors in depth-first order (leaves first)"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
