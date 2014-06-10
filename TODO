@@ -1,7 +1,7 @@
 PROJECTS
 ========
 
-* switch tool argument parsing to https://github.com/docopt/docopt.go
+* add -if as alternative to -addr
 * tool also has multicast discovery mode; add env var for discovery
 * test coverage
 * job scheduler ala mesos
@@ -13,3 +13,5 @@ add docker image-compiler
 Circuit Apps infrastructure (mention in talk)
 tty element; interactive shell
 broadcast, reduce, allreduce elements (for apps like vowpal wabbit)
+
+switch tool argument parsing to https://github.com/docopt/docopt.go (tentative)

@@ -26,10 +26,11 @@ func main() {
 			Action: server,
 			Flags: []cli.Flag{
 				cli.StringFlag{"addr, a", "", "Address of circuit server."},
+				cli.StringFlag{"if", "", "Network interface for server. No -addr option necessary."},
 				cli.StringFlag{"var", "", "Lock and log directory for the circuit server."},
 				cli.StringFlag{"join, j", "", "Join a circuit through a current member by address."},
 				cli.StringFlag{"hmac", "", "File with HMAC credentials for HMAC/RC4 transport security."},
-				cli.StringFlag{"discover", "", "Multicast address for circuit discovery."},
+				cli.StringFlag{"discover", "", "Multicast address for peering server discovery."},
 			},
 	 	},
 		{

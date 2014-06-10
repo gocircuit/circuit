@@ -26,15 +26,11 @@ import (
 
 func server(c *cli.Context) {
 	println("CIRCUIT 2014 gocircuit.org")
+	var err error
 
 	// parse arguments
-	var err error
-	// network address for server to bind
-	if !c.IsSet("addr") {
-		log.Fatal("server network address not given; use -addr")
-	}
-	// join address of another circuit server
-	var join n.Addr
+	var tcpaddr = parseAddr(c) // server bind address
+	var join n.Addr // join address of another circuit server
 	if c.IsSet("join") {
 		if join, err = n.ParseAddr(c.String("join")); err != nil {
 			log.Fatalf("join address does not parse (%s)", err)
@@ -56,7 +52,7 @@ func server(c *cli.Context) {
 	}
 
 	// start circuit runtime
-	addr := load(c.String("addr"), varDir, readkey(c))
+	addr := load(tcpaddr, varDir, readkey(c))
 
 	// kinfolk + locus
 	kin, xkin, rip := kinfolk.NewKin()
@@ -86,6 +82,44 @@ func server(c *cli.Context) {
 	circuit.Listen(LocusName, xlocus)
 
 	<-(chan int)(nil)
+}
+
+func parseAddr(c *cli.Context) *net.TCPAddr {
+	switch {
+	case c.IsSet("addr"):
+		addr, err := net.ResolveTCPAddr("tcp", c.String("addr"))
+		if err != nil {
+			log.Fatalf("resolve %s (%s)\n", addr, err)
+		}
+		if len(addr.IP) == 0 {
+			addr.IP = net.IPv4zero
+		}
+		return addr
+
+	case c.IsSet("if"):
+		ifc, err := net.InterfaceByName(c.String("if"))
+		if err != nil {
+			log.Fatalf("interface %s not found (%v)", c.String("if"), err)
+		}
+		addrs, err := ifc.Addrs()
+		if err != nil {
+			log.Fatalf("interface address cannot be retrieved (%v)", err)
+		}
+		if len(addrs) == 0 {
+			log.Fatalf("no addresses associated with this interface")
+		}
+		for _, a := range addrs { // pick the IPv4 one
+			ipn := a.(*net.IPNet)
+			if ipn.IP.To4() == nil {
+				continue
+			}
+			return &net.TCPAddr{IP: ipn.IP}
+		}
+		log.Fatal("specified interface has no IPv4 addresses")
+	default:
+		log.Fatal("either an -addr or an -if option is required to start a server")
+	}
+	panic(0)
 }
 
 const LocusName = "locus"

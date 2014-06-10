@@ -26,7 +26,7 @@ import (
 	"github.com/gocircuit/circuit/use/n"
 )
 
-func load(addr, vardir string, key []byte) n.Addr {
+func load(addr *net.TCPAddr, vardir string, key []byte) n.Addr {
 	//debug.InstallCtrlCPanic()
 
 	// Randomize execution
@@ -53,18 +53,10 @@ func load(addr, vardir string, key []byte) n.Addr {
 	log.Printf("Created and locked %s", lockname)
 
 	// Initialize networking
-	bindaddr_, err := n.ParseNetAddr(addr)
-	if err != nil {
-		log.Fatalf("resolve %s (%s)\n", addr, err)
-	}
-	bindaddr := bindaddr_.(*net.TCPAddr)
-	if len(bindaddr.IP) == 0 {
-		bindaddr.IP = net.IPv4zero
-	}
 	if len(key) > 0 {
 		log.Println("Using symmetric HMAC authentication and RC4 encryption.")
 	}	
-	t := n.NewTransport(id, bindaddr, key)
+	t := n.NewTransport(id, addr, key)
 	fmt.Println(t.Addr().String())
 
 	// Initialize language runtime
