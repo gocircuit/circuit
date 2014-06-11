@@ -1,5 +1,7 @@
 # The Circuit [![Build Status](https://travis-ci.org/gocircuit/circuit.svg?branch=master)](https://travis-ci.org/gocircuit/circuit) [![GoDoc](https://godoc.org/github.com/gocircuit/circuit/client?status.png)](https://godoc.org/github.com/gocircuit/circuit/client)
 
+![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
+
 The circuit is a tiny server process which runs instances on a cluster of
 machines to form a network, which enables distributed process orchestration
 and synchronization from any one machine.
