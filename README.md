@@ -320,6 +320,8 @@ be behind a firewall with respect to the servers they are dialing into.
 
 # Learn more #
 
+Ask questions to [The Circuit User Group](https://groups.google.com/forum/#!forum/gocircuit-user).
+
 The Go client for writing circuit apps is package
 
 	github.com/gocircuit/circuit/client
