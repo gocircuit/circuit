@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package bsg
+package assemble
 
 import (
 	"encoding/json"
@@ -66,11 +66,11 @@ func NewGatherLens(addr *net.UDPAddr, focus xor.Key, k int) *GatherLens {
 	}
 }
 
-func (s *GatherLens) Gather()  (xor.Key, []byte) {
+func (s *GatherLens) Gather()  []byte {
 	for {
 		key, payload := s.gather.Gather()
 		if s.lens.Remember(key) {
-			return key, payload
+			return payload
 		}
 	}
 }
