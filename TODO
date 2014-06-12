@@ -1,11 +1,12 @@
 PROJECTS
 ========
 
-* add -if as alternative to -addr
-* tool also has multicast discovery mode; add env var for discovery
+* multicast join for tool and client (env var for tool as well)
+
+* document -if and -discover
+* docker-based stress test
 * test coverage
 * job scheduler ala mesos
-* docker-based stress test
 
 automatic visualisation of circuit dynamics history and live (log -> viz)
 add mutex element
@@ -13,5 +14,3 @@ add docker image-compiler
 Circuit Apps infrastructure (mention in talk)
 tty element; interactive shell
 broadcast, reduce, allreduce elements (for apps like vowpal wabbit)
-
-switch tool argument parsing to https://github.com/docopt/docopt.go (tentative)

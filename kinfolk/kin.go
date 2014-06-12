@@ -58,7 +58,7 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 		},
 	}
 	var w bytes.Buffer
-	for _, peer := range ykin.Join(k.chooseBoundary()) {
+	for _, peer := range ykin.Join(k.chooseBoundary(Spread), Spread) {
 		peer = k.remember(peer)
 		w.WriteString(peer.X.Addr().String())
 		w.WriteByte(' ')
@@ -69,13 +69,13 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 	return nil
 }
 
-func (k *Kin) chooseBoundary() []KinXID {
+func (k *Kin) chooseBoundary(spread int) []KinXID {
 	defer func() {
 		recover()
 	}()
 	m := make(map[lang.ReceiverID]KinXID)
 	m[k.kinxid.ID] = k.kinxid // add self in boundary offering
-	for i := 0; i < Spread; i++ {
+	for i := 0; i+1 < spread; i++ {
 		peerXID := XKin{k}.Walk(Depth)
 		if XID(peerXID).IsNil() {
 			continue

@@ -13,34 +13,36 @@ import (
 	"github.com/gocircuit/circuit/kit/xor"
 )
 
-type family struct {
+// Lens: newFamily(xor.HashBytes(payload), 2),
+
+type Lens struct {
 	cap int // capacity of proximity buckets
-	pov xor.Key // point of view
+	focus xor.Key
 	sync.Mutex
-	mem map[int]map[xor.Key]struct{} // proximity => key => {}
+	mem map[int]map[xor.Key]struct{} // proximity => set of keys
 }
 
-func newFamily(pov xor.Key, k int) *family {
+func NewLens(focus xor.Key, k int) *Lens {
 	if k < 1 {
 		panic(0)
 	}
-	return &family{
+	return &Lens{
 		cap: k,
-		pov: pov,
+		focus: focus,
 		mem: make(map[int]map[xor.Key]struct{}),
 	}
 }
 
-func (f *family) Clear() {
+func (f *Lens) Clear() {
 	f.Lock()
 	defer f.Unlock()
 	f.mem = make(map[int]map[xor.Key]struct{})
 }
 
-func (f *family) Remember(key xor.Key) bool {
+func (f *Lens) Remember(key xor.Key) bool {
 	f.Lock()
 	defer f.Unlock()
-	p := xor.Proximity(f.pov, key)
+	p := xor.Proximity(f.focus, key)
 	s, ok := f.mem[p]
 	if !ok {
 		s = make(map[xor.Key]struct{})

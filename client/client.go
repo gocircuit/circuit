@@ -43,7 +43,7 @@ type Client struct {
 	y locus.YLocus
 }
 
-// Dial establishes a connection to a circuit server specified by a circuit address.
+// DialAddr establishes a connection to a circuit server specified by a circuit address.
 // Circuit addresses are printed to standard output when a server is started with the 
 // "circuit start …" command.
 //
@@ -65,6 +65,15 @@ func Dial(addr string, key []byte) *Client {
 	c.y = locus.YLocus{circuit.Dial(w, "locus")}
 	return c
 }
+
+// DialDiscover…
+// func DialDiscover(addr string, key []byte) *Client {
+// 	_once.Do(func() {
+// 		_init(key)
+// 	})
+// 	c := &Client{}
+// 	?
+// }
 
 // Address returns the circuit address of the server that this client is connected to.
 func (c *Client) Addr() string {

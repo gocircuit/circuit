@@ -10,21 +10,21 @@ package discover
 import (
 	"net"
 	"testing"
+
+	"github.com/gocircuit/circuit/kit/xor"
 )
 
 func TestDiscovering(t *testing.T) {
 	ch := make(chan int)
 	maddr := &net.UDPAddr{IP: net.IP{228, 8, 8, 8}, Port: 8822}
-	_, ch1 := New(maddr, []byte("d1"))
-	_, ch2 := New(maddr, []byte("d2"))
+	scatter := NewScatter(maddr, xor.Key(0), []byte("d1"))
+	gather := NewGatherLens(maddr, xor.Key(1), 2)
 	go func() {
-		<-ch1
-		ch <- 1
+		scatter.Scatter()
 	}()
 	go func() {
-		<-ch2
+		gather.Gather()
 		ch <- 1
 	}()
-	<-ch
 	<-ch
 }

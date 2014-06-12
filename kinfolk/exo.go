@@ -44,8 +44,8 @@ func (x XKin) Attach(topic string) FolkXID {
 }
 
 // Join …
-func (x XKin) Join(boundary []KinXID) []KinXID {
-	offer := x.k.chooseBoundary() // compute boundary before merge happens
+func (x XKin) Join(boundary []KinXID, spread int) []KinXID {
+	offer := x.k.chooseBoundary(spread) // compute boundary before merge happens
 	var w bytes.Buffer
 	for _, q := range boundary {
 		q = x.k.remember(q)
@@ -82,9 +82,9 @@ type YKin struct {
 	xid KinXID
 }
 
-func (y YKin) Join(boundary []KinXID) []KinXID {
+func (y YKin) Join(boundary []KinXID, n int) []KinXID {
 	// Do not recover
-	return y.xid.X.Call("Join", boundary)[0].([]KinXID)
+	return y.xid.X.Call("Join", boundary, n)[0].([]KinXID)
 }
 
 func (y YKin) Walk(t int) KinXID {
