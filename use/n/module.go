@@ -24,7 +24,7 @@ func get() System {
 
 var workeraddr Addr
 
-func WorkerAddr() Addr {
+func ServerAddr() Addr {
 	return workeraddr
 }
 

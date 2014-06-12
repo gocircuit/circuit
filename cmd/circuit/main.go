@@ -44,7 +44,7 @@ func main() {
 			Action: ls,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
-				//cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.BoolFlag{"long, l", "show detailed anchor information"},
 				cli.BoolFlag{"depth, de", "traverse anchors in depth-first order (leaves first)"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
@@ -57,6 +57,7 @@ func main() {
 			Action: mkonjoin,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -66,6 +67,7 @@ func main() {
 			Action: mkonleave,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -76,6 +78,7 @@ func main() {
 			Action: stack,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -86,6 +89,7 @@ func main() {
 			Action: mkchan,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -95,6 +99,7 @@ func main() {
 			Action: send,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -104,6 +109,7 @@ func main() {
 			Action: recv,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -113,6 +119,7 @@ func main() {
 			Action: clos,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -123,6 +130,7 @@ func main() {
 			Action: scrb,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -132,6 +140,7 @@ func main() {
 			Action: peek,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -142,6 +151,7 @@ func main() {
 			Action: mkproc,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.BoolFlag{"scrub", "scrub the process anchor automatically on exit"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
@@ -152,6 +162,7 @@ func main() {
 			Action: sgnl,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -161,6 +172,7 @@ func main() {
 			Action: wait,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -171,6 +183,7 @@ func main() {
 			Action: stdin,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -180,6 +193,7 @@ func main() {
 			Action: stdout,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
@@ -189,6 +203,7 @@ func main() {
 			Action: stderr,
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},

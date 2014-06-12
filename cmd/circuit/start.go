@@ -15,7 +15,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/gocircuit/circuit/kit/discover"
+	"github.com/gocircuit/circuit/kit/assemble"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/locus"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -36,11 +36,11 @@ func server(c *cli.Context) {
 			log.Fatalf("join address does not parse (%s)", err)
 		}
 	}
-	// discover system udp multicast address
-	var disc *net.UDPAddr
+	// assemble system udp multicast address
+	var multicast *net.UDPAddr
 	if c.IsSet("discover") {
-		if disc, err = net.ResolveUDPAddr("udp", c.String("discover")); err != nil {
-			log.Fatalf("udp multicast address for discovery does not parse (%s)", err)
+		if multicast, err = net.ResolveUDPAddr("udp", c.String("discover")); err != nil {
+			log.Fatalf("udp multicast address for discovery and assembly does not parse (%s)", err)
 		}
 	}
 	// server instance working directory
@@ -62,22 +62,12 @@ func server(c *cli.Context) {
 	switch {
 	case join != nil:
 		kin.ReJoin(join)
-	case disc != nil:
-		payload := []byte(addr.String())
-		scatter := discover.NewScatter(disc, xor.HashBytes(payload), payload)
-		go scatter.Scatter()
-		??
-		go func() {
-
-			for ja := range ch {
-				join, err := n.ParseAddr(string(ja))
-				if err != nil {
-					log.Printf("Unrecognized discovery packets (%v)", err)
-					continue // skip messages that don't parse
-				}
-				kin.ReJoin(join)
-			}
-		}()
+	case multicast != nil:
+		go assemble.NewAssembler(addr, multicast).AssembleServer(
+			func(joinAddr n.Addr) {
+				kin.ReJoin(joinAddr)
+			},
+		)
 	default:
 		log.Println("Singleton server.")
 	}

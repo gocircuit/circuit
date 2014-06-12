@@ -41,7 +41,7 @@ func (a *Assembler) scatter(origin string) {
 
 type JoinFunc func(n.Addr)
 
-func (a *Assembler) AssembleServer(joinServer, joinClient JoinFunc) {
+func (a *Assembler) AssembleServer(joinServer JoinFunc) {
 	go a.scatter("server")
 	go func() {
 		gather := NewGatherLens(a.multicast, a.focus, 2)
@@ -61,13 +61,22 @@ func (a *Assembler) AssembleServer(joinServer, joinClient JoinFunc) {
 			case "server":
 				joinServer(joinAddr)
 			case "client":
-				joinClient(joinAddr)
+				joinClient(a.addr, joinAddr)
 			}
 		}
 	}()
 }
 
-func (a *Assembler) AssembleClient() n.Addr {
+func joinClient(serverAddr, clientAddr n.Addr) {
+	x, err := circuit.TryDial(clientAddr, "dialback")
+	if err != nil {
+		return
+	}
+	y := YDialBack{x}
+	y.OfferAddr(serverAddr)
+}
+
+func (a *Assembler) AssembleClient() n.Addr { // XXX: Clients should get more than one offering.
 	d, xd := NewDialBack()
 	circuit.Listen("dialback", xd)
 	go a.scatter("client")

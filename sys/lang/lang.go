@@ -21,7 +21,7 @@ type _ref struct {
 }
 
 func (*_ref) Addr() n.Addr {
-	return circuit.WorkerAddr()
+	return circuit.ServerAddr()
 }
 
 func (r *_ref) HandleID() circuit.HandleID {
@@ -48,7 +48,7 @@ func (x *_permref) String() string {
 }
 
 func (*_permref) Addr() n.Addr {
-	return circuit.WorkerAddr()
+	return circuit.ServerAddr()
 }
 
 func (pr *_permref) HandleID() circuit.HandleID {

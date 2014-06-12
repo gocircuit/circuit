@@ -18,16 +18,14 @@ import (
 	"sync"
 
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
-
 	"github.com/gocircuit/circuit/sys/lang"
 	_ "github.com/gocircuit/circuit/sys/tele"
-
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
-
 	"github.com/gocircuit/circuit/anchor"
 	"github.com/gocircuit/circuit/kinfolk"
 	"github.com/gocircuit/circuit/kinfolk/locus"
+	"github.com/gocircuit/circuit/kit/assemble"
+	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/gocircuit/circuit/use/n"
 )
 
 var _once sync.Once
@@ -43,19 +41,19 @@ type Client struct {
 	y locus.YLocus
 }
 
-// DialAddr establishes a connection to a circuit server specified by a circuit address.
+// Dial establishes a connection to a circuit server specified by a circuit address.
 // Circuit addresses are printed to standard output when a server is started with the 
 // "circuit start …" command.
 //
-// If key is non-nil it is used as a private key and all communications are
+// If authkey is non-nil it is used as a private key and all communications are
 // secured by HMAC authentication and RC4 symmetric encryption;
 // otherwise transmissions are in plaintext.
 //
 // Errors in communication, such as a missing server, or invalid URL format
 // are reported through panics.
-func Dial(addr string, key []byte) *Client {
+func Dial(addr string, authkey []byte) *Client {
 	_once.Do(func() {
-		_init(key)
+		_init(authkey)
 	})
 	c := &Client{}
 	w, err := n.ParseAddr(addr)
@@ -66,14 +64,19 @@ func Dial(addr string, key []byte) *Client {
 	return c
 }
 
-// DialDiscover…
-// func DialDiscover(addr string, key []byte) *Client {
-// 	_once.Do(func() {
-// 		_init(key)
-// 	})
-// 	c := &Client{}
-// 	?
-// }
+func DialDiscover(multicast string, authkey []byte) *Client {
+	mcast, err := net.ResolveUDPAddr("udp", multicast)
+	if err != nil {
+		panic(err)
+	}
+	_once.Do(func() {
+		_init(authkey)
+	})
+	c := &Client{}
+	dialback := assemble.NewAssembler(circuit.ServerAddr(), mcast).AssembleClient()
+	c.y = locus.YLocus{circuit.Dial(dialback, "locus")}
+	return c
+}
 
 // Address returns the circuit address of the server that this client is connected to.
 func (c *Client) Addr() string {

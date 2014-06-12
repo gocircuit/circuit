@@ -14,7 +14,7 @@ import (
 
 type runtime interface {
 	// Low-level
-	WorkerAddr() n.Addr
+	ServerAddr() n.Addr
 	SetBoot(interface{})
 	Kill(n.Addr) error
 

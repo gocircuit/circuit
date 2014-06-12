@@ -51,7 +51,7 @@ func New(t n.Transport) *Runtime {
 	return r
 }
 
-func (r *Runtime) WorkerAddr() n.Addr {
+func (r *Runtime) ServerAddr() n.Addr {
 	return r.t.Addr()
 }
 

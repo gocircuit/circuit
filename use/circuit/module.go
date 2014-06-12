@@ -56,9 +56,9 @@ func PermRef(v interface{}) PermX {
 	return get().PermRef(v)
 }
 
-// WorkerAddr returns the address of this worker.
-func WorkerAddr() n.Addr {
-	return get().WorkerAddr()
+// ServerAddr returns the address of this worker.
+func ServerAddr() n.Addr {
+	return get().ServerAddr()
 }
 
 func setBoot(v interface{}) {
