@@ -63,8 +63,12 @@ func server(c *cli.Context) {
 	case join != nil:
 		kin.ReJoin(join)
 	case disc != nil:
-		_, ch := discover.New(disc, []byte(addr.String()))
+		payload := []byte(addr.String())
+		scatter := discover.NewScatter(disc, xor.HashBytes(payload), payload)
+		go scatter.Scatter()
+		??
 		go func() {
+
 			for ja := range ch {
 				join, err := n.ParseAddr(string(ja))
 				if err != nil {

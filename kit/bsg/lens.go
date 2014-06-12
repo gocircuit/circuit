@@ -5,15 +5,13 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package discover
+package bsg
 
 import (
 	"sync"
 
 	"github.com/gocircuit/circuit/kit/xor"
 )
-
-// Lens: newFamily(xor.HashBytes(payload), 2),
 
 type Lens struct {
 	cap int // capacity of proximity buckets

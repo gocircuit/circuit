@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package discover
+package bsg
 
 import (
 	"net"
