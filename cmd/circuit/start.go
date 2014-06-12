@@ -36,13 +36,7 @@ func server(c *cli.Context) {
 			log.Fatalf("join address does not parse (%s)", err)
 		}
 	}
-	// assemble system udp multicast address
-	var multicast *net.UDPAddr
-	if c.IsSet("discover") {
-		if multicast, err = net.ResolveUDPAddr("udp", c.String("discover")); err != nil {
-			log.Fatalf("udp multicast address for discovery and assembly does not parse (%s)", err)
-		}
-	}
+	var multicast = parseDiscover(c)
 	// server instance working directory
 	var varDir string
 	if !c.IsSet("var") {
@@ -76,6 +70,22 @@ func server(c *cli.Context) {
 	circuit.Listen(LocusName, xlocus)
 
 	<-(chan int)(nil)
+}
+
+func parseDiscover(c *cli.Context) *net.UDPAddr {
+	var src string
+	if c.IsSet("discover") {
+		src = c.String("discover")
+	} else if os.Getenv("CIRCUIT_DISCOVER") != "" {
+		src = os.Getenv("CIRCUIT_DISCOVER")
+	} else {
+		return nil
+	}
+	multicast, err := net.ResolveUDPAddr("udp", src)
+	if err != nil {
+		log.Fatalf("udp multicast address for discovery and assembly does not parse (%s)", err)
+	}
+	return multicast
 }
 
 func parseAddr(c *cli.Context) *net.TCPAddr {
