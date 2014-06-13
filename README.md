@@ -3,13 +3,13 @@
 ![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
 
 The circuit is a tiny server process which runs instances on a cluster of
-machines to form a network, which enables distributed process orchestration
+machines to form an efficient, churn-resilient network, which enables distributed process orchestration
 and synchronization from any one machine.
 
 Some of the target applications of the circuit are:
 
 * Automatic dynamic orchestration of complex compute pipelines, as in numerical computation, for instance
-* Packaging and distribution of universal distributed binaries
+* Packaging and distribution of universal distributed binaries that can self-organize into complex cloud apps
 * Incremental automation of small and large OPS engineering workflows
 
 Dive straight into it with the [Quick Start](https://docs.google.com/presentation/d/1x6ZqTg6AeVHMGh1ug1oqGZ9kYFLoorjRhDlTs7ytj3o/edit?usp=sharing) slide deck.
@@ -37,7 +37,22 @@ you can build and install the circuit binary with one line:
 
 	go get github.com/gocircuit/circuit/cmd/circuit
 
-## Run the servers ##
+## Run the servers
+
+Circuit servers can be started asynchronously (and in any order) 
+using the command
+
+	circuit start -if eth0 -discover 228.8.8.8:7711
+
+The same command is used for all instances. The `-if` option specifies the
+desired network interface to bind to, while the `-discover` command 
+specifies a desired IP address of a UDP multicast channel to be used for automatic
+server-server discover.
+
+The `-discover` option can be omitted by setting the environment variable
+`CIRCUIT_DISCOVER` to equal the desired multicast address.
+
+### Alternative advanced server startup 
 
 To run the circuit server on the first machine, pick a public IP address and port for it to
 listen on, and start it like so
@@ -145,11 +160,22 @@ one circuit server for us a _dial-in_ point.
 
 There are two ways to provide the dial-in server address to the tool:
 
-1. With the command-line option `-d`, like e.g.
+1. If the circuit servers were started with the `-discover` option or the
+`CIRCUIT_DISCOVER` environment variable, the command-line tool
+can use the same methods for finding a circuit server. E.g.
+
+	circuit ls -discover 228.8.8.8:7711 /...
+
+Or,
+
+	export CIRCUIT_DISCOVER=228.8.8.8:7711
+	circuit ls /...
+
+2. With the command-line option `-d`, like e.g.
 
 		circuit ls -d circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d /
 
-2. By setting the environment variable `CIRCUIT` to point to a file
+Or, equivalently, by setting the environment variable `CIRCUIT` to point to a file
 whose contents is the desired dial-in address. For example, (in bash):
 
 		echo circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d > ~/.circuit
