@@ -66,6 +66,10 @@ func NewGatherLens(addr *net.UDPAddr, focus xor.Key, k int) *GatherLens {
 	}
 }
 
+func (s *GatherLens) String() string {
+	return s.lens.String()
+}
+
 func (s *GatherLens) Gather()  []byte {
 	for {
 		key, payload := s.gather.Gather()

@@ -9,7 +9,7 @@ package kinfolk
 
 import (
 	"bytes"
-	"log"
+	//"log"
 	"math/rand"
 )
 
@@ -52,9 +52,9 @@ func (x XKin) Join(boundary []KinXID, spread int) []KinXID {
 		w.WriteString(q.X.Addr().String())
 		w.WriteByte(' ')
 	}
-	if len(boundary) > 0 {
-		log.Println("Remembering merging server(s):", w.String())
-	}
+	// if len(boundary) > 0 {
+	// 	log.Println("Remembering merging server(s):", w.String())
+	// }
 	return offer
 }
 

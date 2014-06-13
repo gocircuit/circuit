@@ -8,6 +8,8 @@
 package assemble
 
 import (
+	"bytes"
+	"fmt"
 	"sync"
 
 	"github.com/gocircuit/circuit/kit/xor"
@@ -29,6 +31,21 @@ func NewLens(focus xor.Key, k int) *Lens {
 		focus: focus,
 		mem: make(map[int]map[xor.Key]struct{}),
 	}
+}
+
+func (f *Lens) String() string {
+	f.Lock()
+	defer f.Unlock()
+	var w bytes.Buffer
+	for i, s := range f.mem {
+		fmt.Fprintf(&w, "%d:", i)
+		for x, _ := range s {
+			fmt.Fprintf(&w, "%d,", uint64(x))
+		}
+		w.WriteString(" ")
+	}
+	w.WriteString("\n")
+	return w.String()
 }
 
 func (f *Lens) Clear() {

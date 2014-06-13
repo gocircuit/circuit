@@ -63,9 +63,9 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 		w.WriteString(peer.X.Addr().String())
 		w.WriteByte(' ')
 	}
-	if w.Len() > 0 {
-		log.Println("Remembering offered server(s):", w.String())
-	}
+	// if w.Len() > 0 {
+	// 	log.Println("Remembering offered server(s):", w.String())
+	// }
 	return nil
 }
 

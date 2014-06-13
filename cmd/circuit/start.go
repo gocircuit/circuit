@@ -57,6 +57,7 @@ func server(c *cli.Context) {
 	case join != nil:
 		kin.ReJoin(join)
 	case multicast != nil:
+		log.Printf("Using UDP multicast discovery on address %s", multicast.String())
 		go assemble.NewAssembler(addr, multicast).AssembleServer(
 			func(joinAddr n.Addr) {
 				kin.ReJoin(joinAddr)

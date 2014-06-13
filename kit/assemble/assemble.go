@@ -44,9 +44,9 @@ type JoinFunc func(n.Addr)
 func (a *Assembler) AssembleServer(joinServer JoinFunc) {
 	go a.scatter("server")
 	go func() {
-		gather := NewGatherLens(a.multicast, a.focus, 2)
+		gather := NewGather(a.multicast)
 		for {
-			payload := gather.Gather()
+			_, payload := gather.Gather()
 			trace, err := Decode(payload)
 			if err != nil {
 				log.Printf("Unrecognized trace message (%v)", err)
