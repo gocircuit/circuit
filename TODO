@@ -1,11 +1,6 @@
 PROJECTS
 ========
 
-* multicast join for tool and client (env var for tool as well)
-	* write up algorithm design of discovery lens
-	* add redundant dialback on client discovery-based connect
-
-* document -if and -discover
 * docker-based stress test
 
 test coverage
