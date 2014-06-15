@@ -14,13 +14,13 @@ import (
 
 	"github.com/gocircuit/circuit/anchor"
 	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/kinfolk"
-	"github.com/gocircuit/circuit/kinfolk/tube"
+	"github.com/gocircuit/circuit/tissue"
+	"github.com/gocircuit/circuit/tissue/tube"
 	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
-// Locus is a device that listens to the join/leave events reported by the kinfolk social
+// Locus is a device that listens to the join/leave events reported by the tissue social
 // system, and maintains an asynchronously-readable current list of known peers.
 type Locus struct {
 	Peer  *Peer      // Client peer enclosure for this circuit locus
@@ -28,19 +28,19 @@ type Locus struct {
 }
 
 // NewLocus creates a new locus device.
-func NewLocus(kin *kinfolk.Kin, rip <-chan kinfolk.KinXID) XLocus {
+func NewLocus(kin *tissue.Kin, rip <-chan tissue.KinAvatar) XLocus {
 	locus := &Locus{
 		tube: tube.NewTube(kin, "locus"),
 	}
-	term, xterm := anchor.NewTerm(kin.XID().ID.String(), locus)
-	term.Attach(anchor.Server, srv.New(kin.XID().X.Addr().String()))
+	term, xterm := anchor.NewTerm(kin.Avatar().ID.String(), locus)
+	term.Attach(anchor.Server, srv.New(kin.Avatar().X.Addr().String()))
 	locus.Peer = &Peer{
 		// It is crucial to use permanent cross-references, and not
 		// "plain" ones within values stored inside the tube table. If
 		// cross-references are used, they are managed by the cross-
 		// garbage collection system and therefore connections to ALL
 		// underlying workers are maintained superfluously.
-		Kin:    kin.XID(),
+		Kin:    kin.Avatar(),
 		Term: xterm,
 	}
 	go locus.loopRIP(rip)
@@ -105,18 +105,18 @@ func (locus *Locus) loopAnnounceAndExpire() {
 	}
 }
 
-func (locus *Locus) loopRIP(rip <-chan kinfolk.KinXID) {
+func (locus *Locus) loopRIP(rip <-chan tissue.KinAvatar) {
 	for {
-		kinXID, ok := <-rip
+		kinAvatar, ok := <-rip
 		if !ok {
 			panic("u")
 		}
-		locus.denounce(kinXID)
+		locus.denounce(kinAvatar)
 	}
 }
 
-func (locus *Locus) denounce(kinXID kinfolk.KinXID) {
-	peer := &Peer{Kin: kinXID}
+func (locus *Locus) denounce(kinAvatar tissue.KinAvatar) {
+	peer := &Peer{Kin: kinAvatar}
 	log.Println("Denouncing", peer.Key())
 	r := locus.tube.Lookup(peer.Key())
 	if r == nil {

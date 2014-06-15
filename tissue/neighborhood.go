@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package kinfolk
+package tissue
 
 import (
 	"sync"
@@ -16,64 +16,64 @@ import (
 // Neighborhood is a set of perm cross-interfaces.
 type Neighborhood struct {
 	sync.Mutex
-	open map[interface{}]XID
+	open map[interface{}]Avatar
 }
 
 // NewNeighborhood creates a new rotor.
 func NewNeighborhood() *Neighborhood {
 	return &Neighborhood{
-		open: make(map[interface{}]XID),
+		open: make(map[interface{}]Avatar),
 	}
 }
 
-func (nh *Neighborhood) Add(xid XID) {
+func (nh *Neighborhood) Add(av Avatar) {
 	nh.Lock()
 	defer nh.Unlock()
-	nh.open[xid.ID] = xid
+	nh.open[av.ID] = av
 }
 
-func (nh *Neighborhood) Scrub(key lang.ReceiverID) (XID, bool) {
+func (nh *Neighborhood) Scrub(key lang.ReceiverID) (Avatar, bool) {
 	nh.Lock()
 	defer nh.Unlock()
-	xid, ok := nh.open[key]
+	av, ok := nh.open[key]
 	delete(nh.open, key)
-	return xid, ok
+	return av, ok
 }
 
-func (nh *Neighborhood) ScrubRandom() (XID, bool) {
+func (nh *Neighborhood) ScrubRandom() (Avatar, bool) {
 	nh.Lock()
 	defer nh.Unlock()
-	for key, xid := range nh.open {
+	for key, av := range nh.open {
 		delete(nh.open, key)
-		return xid, true
+		return av, true
 	}
-	return XID{}, false
+	return Avatar{}, false
 }
 
-// View returns a list of all XIDs in the rotor.
-func (nh *Neighborhood) View() []XID {
+// View returns a list of all Avatars in the rotor.
+func (nh *Neighborhood) View() []Avatar {
 	nh.Lock()
 	defer nh.Unlock()
-	open := make([]XID, 0, len(nh.open))
-	for _, xid := range nh.open {
-		open = append(open, xid)
+	open := make([]Avatar, 0, len(nh.open))
+	for _, av := range nh.open {
+		open = append(open, av)
 	}
 	return open
 }
 
-// Len returns the number of XIDs in the rotor.
+// Len returns the number of Avatars in the rotor.
 func (nh *Neighborhood) Len() int {
 	nh.Lock()
 	defer nh.Unlock()
 	return len(nh.open)
 }
 
-// Choose returns a randomly chosen XID.
-func (nh *Neighborhood) Choose() XID {
+// Choose returns a randomly chosen Avatar.
+func (nh *Neighborhood) Choose() Avatar {
 	nh.Lock()
 	defer nh.Unlock()
-	for _, xid := range nh.open {
-		return xid
+	for _, av := range nh.open {
+		return av
 	}
-	return XID{}
+	return Avatar{}
 }

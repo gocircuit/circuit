@@ -12,7 +12,7 @@ import (
 	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
-	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/kit/pubsub"
 )
 
@@ -97,7 +97,7 @@ func Split(walk string) (r []string) {
 
 type terminal struct {
 	y anchor.YTerminal
-	k kinfolk.KinXID
+	k tissue.KinAvatar
 }
 
 func (t terminal) Addr() string {

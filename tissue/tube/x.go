@@ -10,7 +10,7 @@ package tube
 import (
 	"time"
 
-	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
@@ -23,9 +23,9 @@ func init() {
 	circuit.RegisterValue(XTube{})
 }
 
-// XID returns an XID pointing to this tube
-func (x XTube) XID() kinfolk.FolkXID {
-	return x.t.xid
+// Avatar returns an Avatar pointing to this tube
+func (x XTube) Avatar() tissue.FolkAvatar {
+	return x.t.av
 }
 
 // Write…
@@ -47,7 +47,7 @@ func (x XTube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 
 // YTube
 type YTube struct {
-	xid kinfolk.FolkXID
+	av tissue.FolkAvatar
 }
 
 // Lookup and Forget intentionally omitted. To be called only by local tube user.
@@ -58,7 +58,7 @@ func (y YTube) Write(key string, rev Rev, value interface{}) bool {
 			//log.Printf("ytube write panic\n%#v\n", r)
 		}
 	}()
-	return y.xid.X.Call("Write", key, rev, value)[0].(bool)
+	return y.av.X.Call("Write", key, rev, value)[0].(bool)
 }
 
 func (y YTube) BulkWrite(bulk []*Record) {
@@ -67,7 +67,7 @@ func (y YTube) BulkWrite(bulk []*Record) {
 			//log.Printf("ytube bulk write panic\n%#v\n", r)
 		}
 	}()
-	y.xid.X.Call("BulkWrite", bulk)
+	y.av.X.Call("BulkWrite", bulk)
 }
 
 func (y YTube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
@@ -76,5 +76,5 @@ func (y YTube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 			// log.Printf("ytube scrub panic\n%#v\n", r)
 		}
 	}()
-	y.xid.X.Call("Scrub", key, notAfterRev, notAfterUpdated)
+	y.av.X.Call("Scrub", key, notAfterRev, notAfterUpdated)
 }

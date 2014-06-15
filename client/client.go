@@ -21,8 +21,8 @@ import (
 	"github.com/gocircuit/circuit/sys/lang"
 	_ "github.com/gocircuit/circuit/sys/tele"
 	"github.com/gocircuit/circuit/anchor"
-	"github.com/gocircuit/circuit/kinfolk"
-	"github.com/gocircuit/circuit/kinfolk/locus"
+	"github.com/gocircuit/circuit/tissue"
+	"github.com/gocircuit/circuit/tissue/locus"
 	"github.com/gocircuit/circuit/kit/assemble"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
@@ -110,7 +110,7 @@ func (c *Client) View() map[string]Anchor {
 	return r
 }
 
-func (c *Client) newTerminal(xterm circuit.X, xkin kinfolk.KinXID) terminal {
+func (c *Client) newTerminal(xterm circuit.X, xkin tissue.KinAvatar) terminal {
 	return terminal{
 		y: anchor.YTerminal{xterm},
 		k: xkin,

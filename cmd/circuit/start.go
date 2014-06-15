@@ -16,8 +16,8 @@ import (
 	"path"
 
 	"github.com/gocircuit/circuit/kit/assemble"
-	"github.com/gocircuit/circuit/kinfolk"
-	"github.com/gocircuit/circuit/kinfolk/locus"
+	"github.com/gocircuit/circuit/tissue"
+	"github.com/gocircuit/circuit/tissue/locus"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 
@@ -48,8 +48,8 @@ func server(c *cli.Context) {
 	// start circuit runtime
 	addr := load(tcpaddr, varDir, readkey(c))
 
-	// kinfolk + locus
-	kin, xkin, rip := kinfolk.NewKin()
+	// tissue + locus
+	kin, xkin, rip := tissue.NewKin()
 	xlocus := locus.NewLocus(kin, rip)
 
 	// joining
@@ -67,7 +67,7 @@ func server(c *cli.Context) {
 		log.Println("Singleton server.")
 	}
 
-	circuit.Listen(kinfolk.ServiceName, xkin)
+	circuit.Listen(tissue.ServiceName, xkin)
 	circuit.Listen(LocusName, xlocus)
 
 	<-(chan int)(nil)

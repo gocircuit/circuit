@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package kinfolk
+package tissue
 
 import (
 	//"sync"
@@ -17,27 +17,27 @@ type Folk struct {
 	kin *Kin
 	topic string
 	neighborhood *Neighborhood
-	ch chan FolkXID // Services pending to be opened
+	ch chan FolkAvatar // Services pending to be opened
 }
 
-func (folk *Folk) Opened() []FolkXID {
+func (folk *Folk) Opened() []FolkAvatar {
 	neighbors := folk.neighborhood.View()
-	r := make([]FolkXID, len(neighbors))
+	r := make([]FolkAvatar, len(neighbors))
 	for i, v := range neighbors {
-		r[i] = FolkXID(v)
+		r[i] = FolkAvatar(v)
 	}
 	return r
 }
 
 // Replenish blocks and returns the next downstream peer added to the neighborhod set by the kin.
-func (folk *Folk) Replenish() (peer FolkXID) {
+func (folk *Folk) Replenish() (peer FolkAvatar) {
 	peer = <-folk.ch
-	folk.neighborhood.Add(XID(peer))
+	folk.neighborhood.Add(Avatar(peer))
 	return peer
 }
 
-func (folk *Folk) addPeer(peer FolkXID) {
-	if XID(peer).IsNil() {
+func (folk *Folk) addPeer(peer FolkAvatar) {
+	if Avatar(peer).IsNil() {
 		return
 	}
 	folk.ch <- peer

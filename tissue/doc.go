@@ -5,8 +5,8 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-// Package kinfolk is an efficient “social” protocol for maintaining mutual awareness and sharing resources amongs circuit workers.
-package kinfolk
+// Package tissue is an efficient “social” protocol for maintaining mutual awareness and sharing resources amongs circuit workers.
+package tissue
 
 /*
 
@@ -14,7 +14,7 @@ package kinfolk
 
 	It reports peers that are discovered to be dead to the users.
 
-	Kin hooks FolkXIDs with a trigger that catches Call panics
+	Kin hooks FolkAvatars with a trigger that catches Call panics
 
 	Use lazy random walk (for sampling nodes) to avoid parity issues.
 
@@ -22,7 +22,7 @@ package kinfolk
 
 	Who is responsible for discovering dying neihbors and reporting to the tube?
 
-		The FolkXIDs (of remote peers), that kin passes to its folk services,
+		The FolkAvatars (of remote peers), that kin passes to its folk services,
 		are rigged with a trigger that catches panics on Call and reports to the kin server.
 
 		The Kin server reports discovered dead peers on its internal channel to Locus.

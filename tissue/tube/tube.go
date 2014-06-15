@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gocircuit/circuit/kinfolk"
+	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/kit/lang"
 	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -21,8 +21,8 @@ import (
 // Tube is a folk data structure that maintains a key-value set sorted by key.
 // …
 type Tube struct {
-	xid     kinfolk.FolkXID // XID to this tube
-	folk   *kinfolk.Folk   // Folk interface of this tube to the kin system
+	av     tissue.FolkAvatar // Avatar to this tube
+	folk   *tissue.Folk   // Folk interface of this tube to the kin system
 	sync.Mutex
 	view  *View
 }
@@ -32,13 +32,13 @@ func init() {
 }
 
 // NewTube…
-func NewTube(kin *kinfolk.Kin, topic string) *Tube {
+func NewTube(kin *tissue.Kin, topic string) *Tube {
 	t := &Tube{view: NewView()}
-	t.xid = kinfolk.FolkXID{
+	t.av = tissue.FolkAvatar{
 		X:  circuit.PermRef(XTube{t}),
 		ID: lang.ComputeReceiverID(t),
 	}
-	t.folk = kin.Attach(topic, t.xid)
+	t.folk = kin.Attach(topic, t.av)
 	go func() {
 		for {
 			// Consume identities of new downstream nodes
@@ -59,7 +59,7 @@ func (t *Tube) NewDepartures() *pubsub.Subscription {
 }
 
 
-func (t *Tube) superscribe(peer kinfolk.FolkXID) {
+func (t *Tube) superscribe(peer tissue.FolkAvatar) {
 	// log.Printf("tube superscribing %s", peer.ID.String())
 	// defer func() {
 	// 	log.Printf("tube superscribed %s\n%s", peer.ID.String(), t.Dump())
@@ -104,9 +104,9 @@ func (t *Tube) Write(key string, rev Rev, value interface{}) (changed bool) {
 // writeSync pushes an update to our downstream peering tubes.
 func (t *Tube) writeSync(key string, rev Rev, value interface{}) {
 	var wg sync.WaitGroup
-	for _, downXID := range t.folk.Opened() {
+	for _, downAvatar := range t.folk.Opened() {
 		ydown := YTube{
-			kinfolk.FolkXID(downXID),
+			tissue.FolkAvatar(downAvatar),
 		}
 		wg.Add(1)
 		go func() {
@@ -142,8 +142,8 @@ func (t *Tube) BulkWrite(bulk []*Record) {
 func (t *Tube) bulkWriteSync(changed []*Record) {
 	// Records exchanged within and across tubes are immutable, so no lock is necessary
 	var wg sync.WaitGroup
-	for _, downXID := range t.folk.Opened() {
-		ydown := YTube{kinfolk.FolkXID(downXID)}
+	for _, downAvatar := range t.folk.Opened() {
+		ydown := YTube{tissue.FolkAvatar(downAvatar)}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -176,9 +176,9 @@ func (t *Tube) Scrub(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 // scrub pushes a notification to scrub a record to our downstream peers.
 func (t *Tube) scrubSync(key string, notAfterRev Rev, notAfterUpdated time.Time) {
 	var wg sync.WaitGroup
-	for _, downXID := range t.folk.Opened() {
+	for _, downAvatar := range t.folk.Opened() {
 		ydown := YTube{
-			kinfolk.FolkXID(downXID),
+			tissue.FolkAvatar(downAvatar),
 		}
 		wg.Add(1)
 		go func() {

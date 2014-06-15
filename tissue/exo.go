@@ -5,7 +5,7 @@
 // Authors:
 //   2013 Petar Maymounkov <p@gocircuit.org>
 
-package kinfolk
+package tissue
 
 import (
 	"bytes"
@@ -13,38 +13,38 @@ import (
 	"math/rand"
 )
 
-// FolkXID is an XID underlied by a user receiver for a service shared over the kinfolk system.
-type FolkXID XID
+// FolkAvatar is an Avatar underlied by a user receiver for a service shared over the tissue system.
+type FolkAvatar Avatar
 
-func (xid FolkXID) XID() XID {
-	return XID(xid)
+func (av FolkAvatar) Avatar() Avatar {
+	return Avatar(av)
 }
 
-func (xid FolkXID) String() string {
-	return "FolkXID:" + XID(xid).String()
+func (av FolkAvatar) String() string {
+	return "FolkAvatar:" + Avatar(av).String()
 }
 
-// KinXID is an XID specifically for the XKin receiver.
-type KinXID XID
+// KinAvatar is an Avatar specifically for the XKin receiver.
+type KinAvatar Avatar
 
-func (xid KinXID) String() string {
-	return "KinXID:" + XID(xid).String()
+func (av KinAvatar) String() string {
+	return "KinAvatar:" + Avatar(av).String()
 }
 
-// XKin is the cross-worker interface of the kinfolk system at this circuit.
+// XKin is the cross-worker interface of the tissue system at this circuit.
 type XKin struct {
 	k *Kin
 }
 
 // Attach returns a cross-reference to a folk service at this worker.
-func (x XKin) Attach(topic string) FolkXID {
+func (x XKin) Attach(topic string) FolkAvatar {
 	x.k.Lock()
 	defer x.k.Unlock()
 	return x.k.topic[topic]
 }
 
 // Join …
-func (x XKin) Join(boundary []KinXID, spread int) []KinXID {
+func (x XKin) Join(boundary []KinAvatar, spread int) []KinAvatar {
 	offer := x.k.chooseBoundary(spread) // compute boundary before merge happens
 	var w bytes.Buffer
 	for _, q := range boundary {
@@ -59,17 +59,17 @@ func (x XKin) Join(boundary []KinXID, spread int) []KinXID {
 }
 
 // Walk performs a random walk through the expander-graph network of circuit workers
-// of length t steps and returns the kinfolk XID of the terminal node.
-func (x XKin) Walk(t int) KinXID {
+// of length t steps and returns the tissue Avatar of the terminal node.
+func (x XKin) Walk(t int) KinAvatar {
 	if t <= 0 {
-		return x.k.XID()
+		return x.k.Avatar()
 	}
 	if rand.Intn(2) < 1 { // Lazy random walk
 		return x.Walk(t-1)
 	}
-	hop := KinXID(x.k.neighborhood.Choose())
+	hop := KinAvatar(x.k.neighborhood.Choose())
 	if hop.X == nil {
-		return x.k.XID()
+		return x.k.Avatar()
 	}
 	defer func() {
 		recover()
@@ -79,22 +79,22 @@ func (x XKin) Walk(t int) KinXID {
 
 // YKin
 type YKin struct {
-	xid KinXID
+	av KinAvatar
 }
 
-func (y YKin) Join(boundary []KinXID, n int) []KinXID {
+func (y YKin) Join(boundary []KinAvatar, n int) []KinAvatar {
 	// Do not recover
-	return y.xid.X.Call("Join", boundary, n)[0].([]KinXID)
+	return y.av.X.Call("Join", boundary, n)[0].([]KinAvatar)
 }
 
-func (y YKin) Walk(t int) KinXID {
+func (y YKin) Walk(t int) KinAvatar {
 	// Do not recover; XKin.Walk relies on panics
-	return y.xid.X.Call("Walk", t)[0].(KinXID)
+	return y.av.X.Call("Walk", t)[0].(KinAvatar)
 }
 
-func (y YKin) Attach(topic string) FolkXID {
+func (y YKin) Attach(topic string) FolkAvatar {
 	defer func() {
 		recover()
 	}()
-	return y.xid.X.Call("Attach", topic)[0].(FolkXID)
+	return y.av.X.Call("Attach", topic)[0].(FolkAvatar)
 }
