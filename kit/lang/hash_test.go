@@ -17,6 +17,6 @@ func TestReceiverID(t *testing.T) {
 	var x X
 	px := &x
 	py := &x
-	println(ComputeReceiverID(px))
-	println(ComputeReceiverID(py))
+	println(ComputeReceiverID(px).String())
+	println(ComputeReceiverID(py).String())
 }

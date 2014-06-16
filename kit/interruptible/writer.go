@@ -55,8 +55,10 @@ func (w *writer) WriteIntr(p []byte, intr Intr) (n int, err error) {
 	if w.w.ch == nil {
 		return 0, io.ErrClosedPipe
 	}
+	q := make([]byte, len(p))
+	copy(q, p)
 	select {
-	case w.w.ch <- p:
+	case w.w.ch <- q:
 		w.s.Lock()
 		defer w.s.Unlock()
 		//

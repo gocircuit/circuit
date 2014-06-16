@@ -35,13 +35,13 @@ func Pipe() (Reader, Writer) {
 
 //  ww<–pipe–>wr <–copy–> rw<–pipe–>rr
 func BufferPipe(n int) (Reader, Writer) {
-	wr, ww := Pipe()
-	rr, rw := Pipe()
+	x1, x0 := Pipe()
+	x3, x2 := Pipe()
 	go func() {
-		brw := bufio.NewWriterSize(rw, n)
-		io.Copy(brw, wr)
-		brw.Flush()
-		rw.Close()
+		bx2 := bufio.NewWriterSize(x2, n)
+		io.Copy(bx2, x1)
+		bx2.Flush()
+		x2.Close()
 	}()
-	return rr, ww
+	return x3, x0
 }

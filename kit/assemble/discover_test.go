@@ -15,6 +15,11 @@ import (
 	"github.com/gocircuit/circuit/kit/xor"
 )
 
+// func TestAssembler(t *testing.T) {
+// 	maddr := &net.UDPAddr{IP: net.IP{228, 8, 8, 8}, Port: 8822}
+// 	a := NewAssembler(?, maddr)
+// }
+
 func TestDiscovering(t *testing.T) {
 	ch := make(chan int)
 	maddr := &net.UDPAddr{IP: net.IP{228, 8, 8, 8}, Port: 8822}

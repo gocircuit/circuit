@@ -61,7 +61,7 @@ func (r *reader) ReadIntr(p []byte, intr Intr) (n int, err error) {
 	}()
 	//
 	if r.r.buf.Len() > 0 {
-		return r.r.buf.Read(p)
+		return r.r.buf.Read(p) // Since buf.Len() > 0, buf.Read should not return errors into the defer above.
 	}
 	//
 	r.s.Lock()
@@ -75,6 +75,9 @@ func (r *reader) ReadIntr(p []byte, intr Intr) (n int, err error) {
 	case block, ok := <-r.r.ch:
 		if !ok {
 			return 0, io.EOF
+		}
+		if len(block) == 0 {
+			return 0, nil
 		}
 		r.r.buf.Write(block)
 		return r.r.buf.Read(p)

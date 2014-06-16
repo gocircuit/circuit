@@ -42,7 +42,7 @@ func (s *LossyRing) Clear(capacity int) *LossyRing {
 func (s *LossyRing) Len() int {
 	s.Lock()
 	defer s.Unlock()
-	return s.tail - s.head
+	return s.head - s.tail
 }
 
 // Send returns true if and only if the message was stored in the ring.

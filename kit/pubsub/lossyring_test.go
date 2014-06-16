@@ -8,6 +8,7 @@
 package pubsub
 
 import (
+	"runtime"
 	"testing"
 )
 
@@ -18,6 +19,9 @@ func TestLossyRing(t *testing.T) {
 	}
 	if !r.Send(2) {
 		t.Fatalf("x")
+	}
+	if r.Len() != 2 {
+		t.Fatalf("len", r.Len())
 	}
 	if !r.Send(3) {
 		t.Fatalf("x")
@@ -39,4 +43,30 @@ func TestLossyRing(t *testing.T) {
 			t.Fatalf("x")
 		}
 	}
+}
+
+func smrz() []interface{} {
+	return []interface{}{1,2,3}
+}
+
+func TestPubSub(t *testing.T) {
+	ps := New("nm", smrz)
+	ps.Source()
+	ch := make(chan int)
+	go func() {
+		ps.Publish(4)
+		ps.Close()
+		ch <- 1
+	}()
+	go func() {
+		s := ps.Subscribe()
+		s.Peek()
+		// for _, ok := s.Consume(); ok; _, ok = s.Consume() {}
+		s.Consume()
+		s.Scrub()
+		ch <- 1
+	}()
+	<-ch
+	<-ch
+	runtime.GC()
 }
