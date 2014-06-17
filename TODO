@@ -2,7 +2,11 @@ PROJECTS
 ========
 
 * docker element
+* docker image for compiling/playing with the circuit
+* per-server log subscription element
 * docker-based stress test
+
+tool for managing external dependencies?
 
 test coverage
 job scheduler ala mesos
