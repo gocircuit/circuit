@@ -17,16 +17,15 @@ func Connect(endpoint string) (err error) {
 	cli.Lock()
 	defer cli.Unlock()
 	cli.Client, err = dkr.NewClient(endpoint)
-	if err != nil {
-		cli.Client = nil
-	}
-	return err
+	return
 }
 
-var cli struct {
-	sync.Mutex
-	*dkr.Client
-}
+var (
+	cli struct {
+		sync.Mutex
+		*dkr.Client
+	}
+)
 
 func client() *dkr.Client {
 	cli.Lock()

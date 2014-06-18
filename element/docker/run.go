@@ -9,21 +9,20 @@ package docker
 
 import (
 	"encoding/json"
-
-	"github.com/gocircuit/circuit/element/proc"
-
-	// "github.com/fsouza/go-dockerclient"
+	//"strconv"
 )
 
 // Run parameterizes a container execution.
 type Run struct {
 	Image string `json:"image"`
-	CPUShares int `json:"cpu_shares"`
-	LXC []string `json:"lxc"`
-	Memory string `json:"memory"`
+	CpuShares int64 `json:"cpu_shares"`
+	Lxc []string `json:"lxc"`
+	Memory int64 `json:"memory"`
 	Volume []string `json:"volume"`
 	Dir string `json:"dir"`
-	Cmd proc.Cmd `json:"cmd"`
+	Env []string `json:"env"`
+	Path string `json:"path"`
+	Args []string `json:"args"`
 }
 
 func ParseRun(src string) (*Run, error) {
@@ -32,6 +31,14 @@ func ParseRun(src string) (*Run, error) {
 		return nil, err
 	}
 	return x, nil
+}
+
+func (x *Run) Volumes() map[string]struct{} {
+	m := make(map[string]struct{})
+	for _, v := range x.Volume {
+		m[v] = struct{}{}
+	}
+	return m
 }
 
 func (x *Run) String() string {

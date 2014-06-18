@@ -24,7 +24,7 @@ func (rid ReceiverID) String() string {
 	return fmt.Sprintf("X%016x", uint64(rid))
 }
 
-func chooseReceiverID() ReceiverID {
+func ChooseReceiverID() ReceiverID {
 	return ReceiverID(rand.Int63())
 }
 
@@ -32,7 +32,7 @@ var nonce ReceiverID // random nonce, unique to this process
 
 func init() {
 	rand.Seed(time.Now().UnixNano()) // main()'s seeding runs too late to capture this init
-	nonce = chooseReceiverID()
+	nonce = ChooseReceiverID()
 }
 
 // ComputeReceiverID computes a unique across-processes ID for the receiver r
