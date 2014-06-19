@@ -22,10 +22,10 @@ import (
 
 type Container interface {
 	Scrub()
-	Wait() (*Stat, error)
-	Signal(sig string) error
 	IsDone() bool
 	Peek() (*Stat, error)
+	Signal(sig string) error
+	Wait() (*Stat, error)
 	Stdin() io.WriteCloser
 	Stdout() io.ReadCloser
 	Stderr() io.ReadCloser
