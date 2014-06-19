@@ -9,6 +9,7 @@ package proc
 
 import (
 	"encoding/json"
+	"strings"
 	"syscall"
 )
 
@@ -51,6 +52,11 @@ func (ph Phase) String() string {
 		return "continued"
 	}
 	return "unknown"
+}
+
+func ParseSignal(sig string) (s syscall.Signal, ok bool) {
+	s, ok = sigMap[strings.ToUpper(sig)]
+	return
 }
 
 var (

@@ -15,7 +15,7 @@ import (
 )
 
 func TestDocker(t *testing.T) {
-	if err := Connect("unix:///var/run/docker.sock"); err != nil {
+	if err := Dial("unix:///var/run/docker.sock"); err != nil {
 		t.Fatalf("connect: %v", err)
 	}
 	run := Run{
@@ -27,5 +27,10 @@ func TestDocker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("make: %v", err)
 	}
-	fmt.Printf("%v\n", con)
+	println("aah")
+	peek, err := con.Wait()
+	if err != nil {
+		t.Fatalf("wait: %v", err)
+	}
+	fmt.Printf("%v\n", peek)
 }

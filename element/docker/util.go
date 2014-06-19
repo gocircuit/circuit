@@ -13,22 +13,25 @@ import (
 	dkr "github.com/fsouza/go-dockerclient"
 )
 
-func Connect(endpoint string) (err error) {
-	cli.Lock()
-	defer cli.Unlock()
-	cli.Client, err = dkr.NewClient(endpoint)
+func Dial(endpoint string) (err error) {
+	config.Lock()
+	defer config.Unlock()
+	if _, err = dkr.NewClient(endpoint); err != nil {
+		return err
+	}
+	config.endpoint = endpoint
 	return
 }
 
-var (
-	cli struct {
-		sync.Mutex
-		*dkr.Client
-	}
-)
+var config struct {
+	sync.Mutex
+	endpoint string
+}
 
-func client() *dkr.Client {
-	cli.Lock()
-	defer cli.Unlock()
-	return cli.Client
+func dial() (cli *dkr.Client, err error) {
+	config.Lock()
+	endpoint := config.endpoint
+	config.Unlock()
+	cli, err = dkr.NewClient(endpoint)
+	return
 }
