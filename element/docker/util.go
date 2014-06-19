@@ -8,30 +8,17 @@
 package docker
 
 import (
-	"sync"
-
-	dkr "github.com/fsouza/go-dockerclient"
+	"os/exec"
 )
 
-func Dial(endpoint string) (err error) {
-	config.Lock()
-	defer config.Unlock()
-	if _, err = dkr.NewClient(endpoint); err != nil {
+func Init() (err error) {
+	dkr, err = exec.LookPath("docker")
+	if err != nil {
 		return err
 	}
-	config.endpoint = endpoint
-	return
+	return nil
 }
 
-var config struct {
-	sync.Mutex
-	endpoint string
-}
+var dkr string
 
-func dial() (cli *dkr.Client, err error) {
-	config.Lock()
-	endpoint := config.endpoint
-	config.Unlock()
-	cli, err = dkr.NewClient(endpoint)
-	return
-}
+const StdBufferLen = 32e3

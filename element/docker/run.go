@@ -9,17 +9,19 @@ package docker
 
 import (
 	"encoding/json"
-	//"strconv"
+	"fmt"
+	"strconv"
 )
 
 // Run parameterizes a container execution.
 type Run struct {
-	Image string `json:"image"`
-	CpuShares int64 `json:"cpu_shares"`
+	Image string `json:"img"`
+	Memory int64 `json:"mem"`
+	CpuShares int64 `json:"cpu"`
 	Lxc []string `json:"lxc"`
-	Memory int64 `json:"memory"`
-	Volume []string `json:"volume"`
+	Volume []string `json:"vol"`
 	Dir string `json:"dir"`
+	Entry string `json:"entry"`
 	Env []string `json:"env"`
 	Path string `json:"path"`
 	Args []string `json:"args"`
@@ -31,6 +33,38 @@ func ParseRun(src string) (*Run, error) {
 		return nil, err
 	}
 	return x, nil
+}
+
+func (x *Run) Arg() []string {
+	var r = []string{"run"}
+	r = append(r, "--net=bridge") // network
+	r = append(r, fmt.Sprintf("-c=%d", x.CpuShares)) // cpu shares
+	if x.Memory > 0 {
+		r = append(r, fmt.Sprintf("-m=%d", x.Memory))
+	}
+	for _, l := range x.Lxc {
+		r = append(r, fmt.Sprintf("--lxc-conf=%s", strconv.QuoteToASCII(l)))
+	}
+	for _, v := range x.Volume {
+		r = append(r, fmt.Sprintf("--volume=%s", strconv.QuoteToASCII(v)))
+	}
+	for _, e := range x.Env {
+		r = append(r, fmt.Sprintf("--env=%s", strconv.QuoteToASCII(e)))
+	}
+	if x.Dir != "" {
+		r = append(r, fmt.Sprintf("--workdir=%s", strconv.QuoteToASCII(x.Dir)))
+	}
+	if x.Entry != "" {
+		r = append(r, fmt.Sprintf("--entrypoint=%s", strconv.QuoteToASCII(x.Entry)))
+	}
+	r = append(r, x.Image) // image
+	if x.Path != "" {
+		r = append(r, x.Path) // command path
+	}
+	for _, a := range x.Args {
+		r = append(r, strconv.QuoteToASCII(a))
+	}
+	return r
 }
 
 func (x *Run) Volumes() map[string]struct{} {

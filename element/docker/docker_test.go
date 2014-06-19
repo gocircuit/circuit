@@ -10,13 +10,11 @@ package docker
 import (
 	"fmt"
 	"testing"
-
-	//dkr "github.com/fsouza/go-dockerclient"
 )
 
 func TestDocker(t *testing.T) {
-	if err := Dial("unix:///var/run/docker.sock"); err != nil {
-		t.Fatalf("connect: %v", err)
+	if err := Init(); err != nil {
+		t.Fatalf("init: %v", err)
 	}
 	run := Run{
 		Image: "b6b9590f1a97",
@@ -27,7 +25,6 @@ func TestDocker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("make: %v", err)
 	}
-	println("aah")
 	peek, err := con.Wait()
 	if err != nil {
 		t.Fatalf("wait: %v", err)
