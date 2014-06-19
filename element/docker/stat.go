@@ -9,6 +9,7 @@ package docker
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 )
 
@@ -17,10 +18,10 @@ type Stat struct {
 	Created time.Time
 	Path string
 	Args []string
-	Config
-	State
+	Config Config
+	State State
 	Image string
-	NetworkSettings
+	NetworkSettings NetworkSettings
 	ResolvConfPath string
 	HostnamePath string
 	HostsPath string
@@ -29,7 +30,7 @@ type Stat struct {
 	ExecDriver string
 	Volumes map[string]string
 	VolumesRW map[string]bool
-	HostConfig
+	HostConfig HostConfig
 }
 
 func ParseStat(buf []byte) (s *Stat, err error) {
@@ -38,6 +39,17 @@ func ParseStat(buf []byte) (s *Stat, err error) {
 		return nil, err
 	}
 	return s, nil
+}
+
+func ParseStatInArray(buf []byte) (s *Stat, err error) {
+	var a []*Stat
+	if err = json.Unmarshal(buf, &a); err != nil {
+		return nil, err
+	}
+	if len(a) != 1 {
+		return nil, errors.New("slice does not have one element")
+	}
+	return a[0], nil
 }
 
 func (s Stat) String() string {

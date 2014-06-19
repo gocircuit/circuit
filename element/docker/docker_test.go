@@ -25,6 +25,7 @@ func TestDocker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("make: %v", err)
 	}
+	con.Stdin().Close()
 	peek, err := con.Wait()
 	if err != nil {
 		t.Fatalf("wait: %v", err)
