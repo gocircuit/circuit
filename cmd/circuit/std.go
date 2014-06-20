@@ -10,7 +10,6 @@ package main
 import (
 	"io"
 	"os"
-	"github.com/gocircuit/circuit/client"
 
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
@@ -27,9 +26,9 @@ func stdin(x *cli.Context) {
 		fatalf("stdin needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	u, ok := c.Walk(w).Get().(client.Proc)
+	u, ok := c.Walk(w).Get().(interface{Stdin() io.WriteCloser})
 	if !ok {
-		fatalf("not a process")
+		fatalf("not a process or a container")
 	}
 	q := u.Stdin()
 	if _, err := io.Copy(q, os.Stdin); err != nil {
@@ -52,9 +51,9 @@ func stdout(x *cli.Context) {
 		fatalf("stdout needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	u, ok := c.Walk(w).Get().(client.Proc)
+	u, ok := c.Walk(w).Get().(interface{Stdout() io.ReadCloser})
 	if !ok {
-		fatalf("not a process")
+		fatalf("not a process or a container")
 	}
 	io.Copy(os.Stdout, u.Stdout())
 	// if _, err := io.Copy(os.Stdout, u.Stdout()); err != nil {
@@ -74,9 +73,9 @@ func stderr(x *cli.Context) {
 		fatalf("stderr needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	u, ok := c.Walk(w).Get().(client.Proc)
+	u, ok := c.Walk(w).Get().(interface{Stderr() io.ReadCloser})
 	if !ok {
-		fatalf("not a process")
+		fatalf("not a process or a container")
 	}
 	io.Copy(os.Stdout, u.Stderr())
 	// if _, err := io.Copy(os.Stdout, u.Stderr()); err != nil {

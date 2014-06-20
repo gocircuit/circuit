@@ -14,6 +14,7 @@ import (
 	"os"
 
 	"github.com/gocircuit/circuit/client"
+	"github.com/gocircuit/circuit/client/docker"
 
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
@@ -52,6 +53,32 @@ func mkproc(x *cli.Context) {
 	}
 }
 
+func mkdkr(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("mkdkr needs an anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	buf, _ := ioutil.ReadAll(os.Stdin)
+	var run docker.Run
+	if err := json.Unmarshal(buf, &run); err != nil {
+		fatalf("command json not parsing: %v", err)
+	}
+	if x.Bool("scrub") {
+		run.Scrub = true
+	}
+	_, err := c.Walk(w).MakeDocker(run)
+	if err != nil {
+		fatalf("mkdkr error: %s", err)
+	}
+}
+
 // circuit signal kill /X1234/hola/charlie
 func sgnl(x *cli.Context) {
 	defer func() {
@@ -65,9 +92,9 @@ func sgnl(x *cli.Context) {
 		fatalf("signal needs an anchor and a signal name arguments")
 	}
 	w, _ := parseGlob(args[1])
-	u, ok := c.Walk(w).Get().(client.Proc)
+	u, ok := c.Walk(w).Get().(interface{Signal(string) error})
 	if !ok {
-		fatalf("not a process")
+		fatalf("anchor is not a process or a docker container")
 	}
 	if err := u.Signal(args[0]); err != nil {
 		fatalf("signal error: %v", err)
@@ -86,11 +113,17 @@ func wait(x *cli.Context) {
 		fatalf("wait needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
-	u, ok := c.Walk(w).Get().(client.Proc)
-	if !ok {
-		fatalf("not a process")
+	//
+	var stat interface{}
+	var err error
+	switch u := c.Walk(w).Get().(type) {
+	case client.Proc:
+		stat, err = u.Wait()
+	case docker.Container:
+		stat, err = u.Wait()
+	default:
+		fatalf("anchor is not a process or a docker container")
 	}
-	stat, err := u.Wait()
 	if err != nil {
 		fatalf("wait error: %v", err)
 	}

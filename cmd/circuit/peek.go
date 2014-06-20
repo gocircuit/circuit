@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 
 	"github.com/gocircuit/circuit/client"
+	"github.com/gocircuit/circuit/client/docker"
 
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
@@ -38,6 +39,13 @@ func peek(x *cli.Context) {
 		fmt.Println(string(buf))
 	case client.Proc:
 		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
+		fmt.Println(string(buf))
+	case docker.Container:
+		stat, err := t.Peek()
+		if err != nil {
+			fatalf("%v", err)
+		}
+		buf, _ := json.MarshalIndent(stat, "", "\t")
 		fmt.Println(string(buf))
 	case client.Subscription:
 		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
