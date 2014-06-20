@@ -56,9 +56,6 @@ func stdout(x *cli.Context) {
 		fatalf("not a process or a container")
 	}
 	io.Copy(os.Stdout, u.Stdout())
-	// if _, err := io.Copy(os.Stdout, u.Stdout()); err != nil {
-	// 	fatalf("transmission error: %v", err)
-	// }
 }
 
 func stderr(x *cli.Context) {

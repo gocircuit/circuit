@@ -16,7 +16,7 @@ func Init() (err error) {
 	if err != nil {
 		return err
 	}
-	return nil
+	return exec.Command("dkr", "version").Run()
 }
 
 var dkr string

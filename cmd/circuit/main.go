@@ -31,6 +31,7 @@ func main() {
 				cli.StringFlag{"join, j", "", "Join a circuit through a current member by address."},
 				cli.StringFlag{"hmac", "", "File with HMAC credentials for HMAC/RC4 transport security."},
 				cli.StringFlag{"discover", "", "Multicast address for peer server discovery, e.g. 228.8.8.8:8822"},
+				cli.BoolFlag{"docker", "Enable docker elements; docker command must be executable"},
 			},
 	 	},
 		{

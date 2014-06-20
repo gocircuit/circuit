@@ -42,26 +42,26 @@ type container struct {
 }
 
 func MakeContainer(run ds.Run) (_ Container, err error) {
+	if dkr == "" {
+		return nil, errors.New("docker not enabled on this server")
+	}
 	ch := make(chan error, 1)
 	con := &container{
 		name: "via-circuit-"+lang.ChooseReceiverID().String()[1:],
 		exit: ch,
 	}
-	println("dkr=", dkr)
-	dkr = "docker"
 	con.cmd = exec.Command(dkr, run.Arg(con.name)...)
 	con.cmd.Stdin, con.stdin = interruptible.BufferPipe(StdBufferLen)
 	con.stdout, con.cmd.Stdout = interruptible.BufferPipe(StdBufferLen)
 	con.stderr, con.cmd.Stderr = interruptible.BufferPipe(StdBufferLen)
 	if err = con.cmd.Start(); err != nil {
-		println("eeeh")
 		return nil, err
 	}
 	go func() {
 		ch <- con.cmd.Wait()
 		close(ch)
-		con.stdout.Close()
-		con.stderr.Close()
+		con.cmd.Stdout.(io.Closer).Close()
+		con.cmd.Stderr.(io.Closer).Close()
 	}()
 	runtime.SetFinalizer(con,
 		func(c *container) {
@@ -77,10 +77,12 @@ func (con *container) Wait() (_ *ds.Stat, err error) {
 }
 
 func (con *container) Stdin() io.WriteCloser {
+	println("*stdin")
 	return con.stdin
 }
 
 func (con *container) Stdout() io.ReadCloser {
+	println("*stdout")
 	return con.stdout
 }
 

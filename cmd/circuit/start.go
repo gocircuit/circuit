@@ -16,6 +16,7 @@ import (
 	"path"
 
 	"github.com/gocircuit/circuit/kit/assemble"
+	"github.com/gocircuit/circuit/element/docker"
 	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/tissue/locus"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -28,6 +29,11 @@ func server(c *cli.Context) {
 	println("CIRCUIT 2014 gocircuit.org")
 	var err error
 
+	if c.Bool("docker") {
+		if err = docker.Init(); err != nil {
+			log.Fatalf("cannot use docker: %v", err)
+		}
+	}
 	// parse arguments
 	var tcpaddr = parseAddr(c) // server bind address
 	var join n.Addr // join address of another circuit server
