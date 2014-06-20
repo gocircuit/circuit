@@ -18,14 +18,15 @@ import (
 	"github.com/gocircuit/circuit/kit/interruptible"
 	"github.com/gocircuit/circuit/kit/lang"
 	"github.com/gocircuit/circuit/use/circuit"
+	ds "github.com/gocircuit/circuit/client/docker"
 )
 
 type Container interface {
 	Scrub()
 	IsDone() bool
-	Peek() (*Stat, error)
+	Peek() (*ds.Stat, error)
 	Signal(sig string) error
-	Wait() (*Stat, error)
+	Wait() (*ds.Stat, error)
 	Stdin() io.WriteCloser
 	Stdout() io.ReadCloser
 	Stderr() io.ReadCloser
@@ -41,7 +42,7 @@ type container struct {
 	exit <-chan error
 }
 
-func MakeContainer(run Run) (_ Container, err error) {
+func MakeContainer(run ds.Run) (_ Container, err error) {
 	ch := make(chan error, 1)
 	con := &container{
 		name: "via-circuit-"+lang.ChooseReceiverID().String()[1:],
@@ -69,7 +70,7 @@ func MakeContainer(run Run) (_ Container, err error) {
 	return con, nil
 }
 
-func (con *container) Wait() (_ *Stat, err error) {
+func (con *container) Wait() (_ *ds.Stat, err error) {
 	<-con.exit
 	return con.Peek()
 }
@@ -86,12 +87,12 @@ func (con *container) Stderr() io.ReadCloser {
 	return con.stderr
 }
 
-func (con *container) Peek() (stat *Stat, err error) {
+func (con *container) Peek() (stat *ds.Stat, err error) {
 	buf, err := exec.Command(dkr, "inspect", con.name).Output()
 	if err != nil {
 		return nil, err
 	}
-	if stat, err = ParseStatInArray(buf); err != nil {
+	if stat, err = ds.ParseStatInArray(buf); err != nil {
 		return nil, err
 	}
 	return

@@ -26,6 +26,7 @@ import (
 	"github.com/gocircuit/circuit/kit/assemble"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
+	"github.com/gocircuit/circuit/client/docker"
 )
 
 var _once sync.Once
@@ -129,6 +130,11 @@ func (c *Client) MakeChan(n int) (Chan, error) {
 
 // MakeProc is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeProc(cmd Cmd) (Proc, error) {
+	return nil, errors.New("cannot create elements outside of workers")
+}
+
+// MakeDocker is an Anchor interface method, not applicable to the root-level anchor.
+func (c *Client) MakeDocker(run docker.Run) (docker.Container, error) {
 	return nil, errors.New("cannot create elements outside of workers")
 }
 

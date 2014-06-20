@@ -10,13 +10,15 @@ package docker
 import (
 	"fmt"
 	"testing"
+
+	ds "github.com/gocircuit/circuit/client/docker"
 )
 
 func TestDocker(t *testing.T) {
 	if err := Init(); err != nil {
 		t.Fatalf("init: %v", err)
 	}
-	run := Run{
+	run := ds.Run{
 		Image: "b6b9590f1a97",
 		Path: "/bin/ls",
 		Args: []string{"/"},

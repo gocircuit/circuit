@@ -24,6 +24,7 @@ type Run struct {
 	Env []string `json:"env"`
 	Path string `json:"path"`
 	Args []string `json:"args"`
+	Scrub bool `json:"scrub"`
 }
 
 func ParseRun(src string) (*Run, error) {

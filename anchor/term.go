@@ -12,7 +12,9 @@ import (
 	"io"
 	"log"
 
+	ds "github.com/gocircuit/circuit/client/docker"
 	srv "github.com/gocircuit/circuit/element/server"
+	"github.com/gocircuit/circuit/element/docker"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/pubsub"
@@ -28,6 +30,7 @@ const (
 	Server = "server"
 	Chan = "chan"
 	Proc = "proc"
+	Docker = "docker"
 	OnJoin = "@join"
 	OnLeave = "@leave"
 )
@@ -115,6 +118,7 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 		}
 		t.carrier().Set(u)
 		return u.elem, nil
+
 	case Proc:
 		cmd, ok := arg.(proc.Cmd)
 		if !ok {
@@ -135,6 +139,32 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 			u.elem.(proc.Proc).Wait()
 		}()
 		return u.elem, nil
+
+	case Docker:
+		run, ok := arg.(ds.Run)
+		if !ok {
+			return nil, errors.New("invalid argument")
+		}
+		x, err := docker.MakeContainer(run)
+		if err != nil {
+			return nil, err
+		}
+		u := &urn{
+			kind: Docker,
+			elem: x,
+		}
+		t.carrier().Set(u)
+		go func() {
+			defer func() {
+				recover()
+			}()
+			if run.Scrub {
+				defer t.Scrub()
+			}
+			u.elem.(docker.Container).Wait()
+		}()
+		return u.elem, nil
+
 	case OnJoin:
 		u := &urn{
 			kind: OnJoin,
@@ -142,6 +172,7 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 		}
 		t.carrier().Set(u)
 		return u.elem, nil
+
 	case OnLeave:
 		u := &urn{
 			kind: OnLeave,

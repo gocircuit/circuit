@@ -14,6 +14,9 @@ import (
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/kit/pubsub"
+
+	edocker "github.com/gocircuit/circuit/element/docker"
+	cdocker "github.com/gocircuit/circuit/client/docker"
 )
 
 // An Anchor represents a location in the global anchor namespace of a circuit
@@ -60,6 +63,9 @@ type Anchor interface {
 	// If the anchor already stores an element, a non-nil error is returned.
 	// Panics indicate that the server hosting the anchor is gone.
 	MakeProc(cmd Cmd) (Proc, error)
+
+	// MakeDocker…
+	MakeDocker(run cdocker.Run) (cdocker.Container, error)
 
 	// MakeOnJoin…
 	MakeOnJoin() (Subscription, error)
@@ -135,6 +141,14 @@ func (t terminal) MakeProc(cmd Cmd) (Proc, error) {
 		return nil, err
 	}
 	return yprocProc{yproc.(proc.YProc)}, nil
+}
+
+func (t terminal) MakeDocker(run cdocker.Run) (cdocker.Container, error) {
+	ydkr, err := t.y.Make(anchor.Docker, run)
+	if err != nil {
+		return nil, err
+	}
+	return ydkr.(edocker.YContainer), nil
 }
 
 func (t terminal) MakeOnJoin() (Subscription, error) {

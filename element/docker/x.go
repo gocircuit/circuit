@@ -13,6 +13,7 @@ import (
 	xio "github.com/gocircuit/circuit/kit/x/io"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/errors"
+	ds "github.com/gocircuit/circuit/client/docker"
 )
 
 func init() {
@@ -23,7 +24,7 @@ type XContainer struct {
 	Container
 }
 
-func (x XContainer) Wait() (*Stat, error) {
+func (x XContainer) Wait() (*ds.Stat, error) {
 	stat, err := x.Container.Wait()
 	return stat, errors.Pack(err)
 }
@@ -44,7 +45,7 @@ func (x XContainer) Stderr() circuit.X {
 	return xio.NewXReadCloser(x.Container.Stderr())
 }
 
-func (x XContainer) Peek() (*Stat, error) {
+func (x XContainer) Peek() (*ds.Stat, error) {
 	stat, err := x.Container.Peek()
 	return stat, errors.Pack(err)
 }
@@ -53,9 +54,9 @@ type YContainer struct {
 	X circuit.X
 }
 
-func (y YContainer) Wait() (stat *Stat, err error) {
+func (y YContainer) Wait() (stat *ds.Stat, err error) {
 	r := y.X.Call("Wait")
-	stat, _ = r[0].(*Stat)
+	stat, _ = r[0].(*ds.Stat)
 	return stat, errors.Unpack(r[1])
 }
 
@@ -72,9 +73,9 @@ func (y YContainer) IsDone() bool {
 	return y.X.Call("IsDone")[0].(bool)
 }
 
-func (y YContainer) Peek() (stat *Stat, err error) {
+func (y YContainer) Peek() (stat *ds.Stat, err error) {
 	r := y.X.Call("Peek")
-	stat, _ = r[0].(*Stat)
+	stat, _ = r[0].(*ds.Stat)
 	return stat, errors.Unpack(r[1])
 }
 

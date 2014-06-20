@@ -144,7 +144,18 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
-		// proc-specific
+		// proc/dkr-specific
+		{
+			Name: "mkdkr",
+			Usage: "Create a docker container element",
+			Action: mkdkr,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
+				cli.BoolFlag{"scrub", "scrub the process anchor automatically on exit"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		{
 			Name: "mkproc",
 			Usage: "Create a process element",
