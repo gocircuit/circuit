@@ -11,12 +11,13 @@ import (
 	"os/exec"
 )
 
-func Init() (err error) {
+func Init() (_ string, err error) {
 	dkr, err = exec.LookPath("docker")
 	if err != nil {
-		return err
+		return "", err
 	}
-	return exec.Command("dkr", "version").Run()
+	err = exec.Command(dkr, "version").Run()
+	return dkr, err
 }
 
 var dkr string

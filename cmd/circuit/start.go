@@ -30,9 +30,11 @@ func server(c *cli.Context) {
 	var err error
 
 	if c.Bool("docker") {
-		if err = docker.Init(); err != nil {
+		cmd, err := docker.Init()
+		if err != nil {
 			log.Fatalf("cannot use docker: %v", err)
 		}
+		log.Printf("Enabling docker elements, using %s", cmd)
 	}
 	// parse arguments
 	var tcpaddr = parseAddr(c) // server bind address

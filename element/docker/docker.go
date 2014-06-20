@@ -77,12 +77,10 @@ func (con *container) Wait() (_ *ds.Stat, err error) {
 }
 
 func (con *container) Stdin() io.WriteCloser {
-	println("*stdin")
 	return con.stdin
 }
 
 func (con *container) Stdout() io.ReadCloser {
-	println("*stdout")
 	return con.stdout
 }
 

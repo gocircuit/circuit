@@ -15,7 +15,7 @@ import (
 )
 
 func TestDocker(t *testing.T) {
-	if err := Init(); err != nil {
+	if _, err := Init(); err != nil {
 		t.Fatalf("init: %v", err)
 	}
 	run := ds.Run{
