@@ -19,7 +19,7 @@ func TestDocker(t *testing.T) {
 		t.Fatalf("init: %v", err)
 	}
 	run := ds.Run{
-		Image: "b6b9590f1a97",
+		Image: "ubuntu",
 		Path: "/bin/ls",
 		Args: []string{"/"},
 	}

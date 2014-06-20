@@ -9,7 +9,6 @@ package docker
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os/exec"
 	"runtime"
@@ -48,12 +47,14 @@ func MakeContainer(run ds.Run) (_ Container, err error) {
 		name: "via-circuit-"+lang.ChooseReceiverID().String()[1:],
 		exit: ch,
 	}
+	println("dkr=", dkr)
+	dkr = "docker"
 	con.cmd = exec.Command(dkr, run.Arg(con.name)...)
-	println(fmt.Sprintf("%v", run.Arg(con.name)))
 	con.cmd.Stdin, con.stdin = interruptible.BufferPipe(StdBufferLen)
 	con.stdout, con.cmd.Stdout = interruptible.BufferPipe(StdBufferLen)
 	con.stderr, con.cmd.Stderr = interruptible.BufferPipe(StdBufferLen)
 	if err = con.cmd.Start(); err != nil {
+		println("eeeh")
 		return nil, err
 	}
 	go func() {
@@ -123,5 +124,5 @@ func (con *container) IsDone() bool {
 }
 
 func (con *container) X() circuit.X {
-	panic(0)
+	return circuit.Ref(XContainer{con})
 }

@@ -8,23 +8,28 @@
 package docker
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 )
 
+func init() {
+	gob.Register(Run{})
+}
+
 // Run parameterizes a container execution.
 type Run struct {
-	Image string `json:"img"`
-	Memory int64 `json:"mem"`
-	CpuShares int64 `json:"cpu"`
-	Lxc []string `json:"lxc"`
-	Volume []string `json:"vol"`
-	Dir string `json:"dir"`
-	Entry string `json:"entry"`
-	Env []string `json:"env"`
-	Path string `json:"path"`
-	Args []string `json:"args"`
-	Scrub bool `json:"scrub"`
+	Image string
+	Memory int64
+	CpuShares int64
+	Lxc []string
+	Volume []string
+	Dir string
+	Entry string
+	Env []string
+	Path string
+	Args []string
+	Scrub bool
 }
 
 func ParseRun(src string) (*Run, error) {
@@ -38,7 +43,9 @@ func ParseRun(src string) (*Run, error) {
 func (x *Run) Arg(name string) []string {
 	var r = []string{"run"}
 	r = append(r, "--name", name) // name
-	r = append(r, "-c", fmt.Sprintf("%d", x.CpuShares)) // cpu shares
+	if x.CpuShares > 0 {
+		r = append(r, "-c", fmt.Sprintf("%d", x.CpuShares))
+	}
 	if x.Memory > 0 {
 		r = append(r, "-m", fmt.Sprintf("%d", x.Memory))
 	}

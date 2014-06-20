@@ -12,6 +12,7 @@ import (
 
 	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/proc"
+	"github.com/gocircuit/circuit/element/docker"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -92,6 +93,8 @@ func (y YTerminal) Make(kind string, arg interface{}) (yelm interface{}, err err
 		return valve.YValve{r[0].(circuit.X)}, nil
 	case Proc:
 		return proc.YProc{r[0].(circuit.X)}, nil
+	case Docker:
+		return docker.YContainer{r[0].(circuit.X)}, nil
 	case OnJoin:
 		return pubsub.YSubscription{r[0].(circuit.X)}, nil
 	case OnLeave:
@@ -110,6 +113,8 @@ func (y YTerminal) Get() (kind string, yelm interface{}) {
 		return Chan, valve.YValve{r[1].(circuit.X)}
 	case Proc:
 		return Proc, proc.YProc{r[1].(circuit.X)}
+	case Docker:
+		return Docker, docker.YContainer{r[1].(circuit.X)}
 	case OnJoin:
 		return OnJoin, pubsub.YSubscription{r[1].(circuit.X)}
 	case OnLeave:

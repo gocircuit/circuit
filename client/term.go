@@ -179,6 +179,8 @@ func (t terminal) Get() interface{} {
 		return yvalveChan{y.(valve.YValve)}
 	case anchor.Proc:
 		return yprocProc{y.(proc.YProc)}
+	case anchor.Docker:
+		return y.(edocker.YContainer)
 	case anchor.OnJoin:
 		return ysubSub{y.(pubsub.YSubscription)}
 	case anchor.OnLeave:

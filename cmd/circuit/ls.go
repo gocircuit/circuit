@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/gocircuit/circuit/client"
+	"github.com/gocircuit/circuit/client/docker"
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
@@ -55,6 +56,8 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			} else {
 				e.k = "proc"
 			}
+		case docker.Container:
+			e.k = "docker"
 		case client.Subscription:
 			e.k = "@" + t.Peek().Source
 		default:
