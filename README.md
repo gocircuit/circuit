@@ -255,6 +255,8 @@ To create and execute a new docker container, using the tool:
 Most of these fields can be omitted analogously to their command-line option counterparts 
 of the `docker` command-line tool.
 
+![Docker elements are like processes](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/mkdkr.png)
+
 The remaining docker element commands are identical to those for processes:
 `stdin`, `stdout`, `stderr`, `peek` and `wait`. In one exception, `peek` will return
 a detailed description of the container, derived from `docker inspect`. 
