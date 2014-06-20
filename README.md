@@ -226,6 +226,39 @@ Remove the process element from the anchor hierarchy
 
 	circuit scrub /X88550014d4c82e4d/pippi
 
+### Example: Make a docker container ###
+
+Much like for the case of OS processes, the circuit can create, manage and synchronize [Docker](http://www.docker.com) containers,
+and attach the corresponding _docker elements_ to a path in the anchor file system.
+
+To allow creation of docker elements, any individual server must be started with the `-docker` switch. For instance:
+
+	circuit start -if eth0 -discover 228.8.8.8:7711 -docker
+
+To create and execute a new docker container, using the tool:
+
+	circuit mkdkr /X88550014d4c82e4d/docky << EOF
+	{
+		"Image": "ubuntu",
+		"Memory": 1000000000,
+		"CpuShares": 3,
+		"Lxc": ["lxc.cgroup.cpuset.cpus = 0,1"],
+		"Volume": ["/webapp", "/src/webapp:/opt/webapp:ro"],
+		"Dir": "/",
+		"Entry": "",
+		"Env": ["PATH=/usr/bin"],
+		"Path": "/bin/ls",
+		"Args": ["/"],
+	}
+	EOF
+
+Most of these fields can be omitted analogously to their command-line option counterparts 
+of the `docker` command-line tool.
+
+The remaining docker element commands are identical to those for processes:
+`stdin`, `stdout`, `stderr`, `peek` and `wait`. In one exception, `peek` will return
+a detailed description of the container, derived from `docker inspect`. 
+
 ### Example: Create a channel ###
 
 Again, take a look at what servers are available:
