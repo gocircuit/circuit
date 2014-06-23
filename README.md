@@ -2,6 +2,33 @@
 
 ![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
 
+Circuit is a programmable platform for management, discovery, synchronization and orchestration of services and 
+hosts comprising cloud applications.
+
+* Single- and multi-datacenter out-of-the-box
+* Authentication and security of system traffic
+* TCP- and UDP multicast-based (similarly to MDNS) internal node discovery
+* Zero-configuration/blind-restart for ease on the host provisioning side
+* Global, point-of-view consistent key/value space, where keys are hierarchical paths and 
+values are control objects for data, processes, synchronizations, and so on.
+* Consistency guarantees at ultra-high churn rates of physical hosts
+* Command-line and programmatic access to the API
+* Integration with Docker
+
+In a typical circuit scenaio: 
+
+* Provisioning engineers ensure newly provisioned
+machines start the zero-configuration circuit server as a daemon on startup.
+* Operations engineers program start-up as well as dynamic-response 
+behavior via command-line tool or lanuage bindings.
+
+Circuit programs (sequences of invocations of the circuit API) are not
+declarative (as in Puppet, Chef, etc.). They are effectively imperative
+programs in the [CSP](http://en.wikipedia.org/wiki/Communicating_sequential_processes) concurrency model,
+which allows engineers to encode complex dynamic response behavior, spanning multiple data centers.
+
+### Technical rewording
+
 The circuit is a tiny server process which runs instances on a cluster of
 machines to form an efficient, churn-resilient network, which enables distributed process orchestration
 and synchronization from any one machine.
