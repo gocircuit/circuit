@@ -34,6 +34,9 @@ declarative (as in Puppet, Chef, etc.). They are effectively imperative
 programs in the [CSP](http://en.wikipedia.org/wiki/Communicating_sequential_processes) concurrency model,
 which allows engineers to encode complex dynamic response behavior, spanning multiple data centers.
 
+Find comparisons to other technologies—like Zookeeper, etcd, CoreOS, raft, Consul, Puppet, Chef, and 
+so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
+
 ### Technical rewording
 
 The circuit is a tiny server process which runs instances on a cluster of
