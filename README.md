@@ -2,8 +2,15 @@
 
 ![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
 
-Circuit is a programmable platform for management, discovery, synchronization and orchestration of services and 
-hosts comprising cloud applications.
+Circuit is a programmable platform-as-a-service (PaaS) for management, discovery, synchronization and orchestration of services and 
+hosts comprising cloud applications. Users of circuit are
+
+* Operations engineers, who sustain cloud applications at host, process and network level
+* Data scientists, who develop distributed compute pipelines by linking together and distributing third-party utilities
+* Manufacturers of distributed software, who wish to codify installation and maintenance procedures in a standardized
+fashion instead of communicating them through documentation (viz. MySQL)
+
+A few technical features of circuit:
 
 * Single- and multi-datacenter out-of-the-box
 * Authentication and security of system traffic
