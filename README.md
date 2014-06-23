@@ -40,7 +40,9 @@ executable discovery, diagnosis, action and inaction recipes.
 * Circuit servers log all operations in their execution orders, enabling maximum visibility
 during post-factum debugging and analysis.
 
-Circuit programs (sequences of invocations of the circuit API) are not
+Programming environment:
+
+* Circuit programs (sequences of invocations of the circuit API) are not
 declarative (as in Puppet, Chef, etc.). They are effectively imperative
 programs in the [CSP](http://en.wikipedia.org/wiki/Communicating_sequential_processes) concurrency model,
 which allows engineers to encode complex dynamic response behavior, spanning multiple data centers.
