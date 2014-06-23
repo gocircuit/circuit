@@ -2,7 +2,8 @@
 
 ![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
 
-Circuit is a programmable platform-as-a-service (PaaS) for management, discovery, synchronization and orchestration of services and 
+Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
+for management, discovery, synchronization and orchestration of services and 
 hosts comprising cloud applications. Users of circuit are
 
 * Operations engineers, who sustain cloud applications at host, process and network level
@@ -14,7 +15,7 @@ A few technical features of circuit:
 
 * Single- and multi-datacenter out-of-the-box
 * Authentication and security of system traffic
-* TCP- and UDP multicast-based (similarly to MDNS) internal node discovery
+* TCP- and UDP multicast-based (similarly to [mDNS](http://en.wikipedia.org/wiki/Multicast_DNS)) internal node discovery
 * Zero-configuration/blind-restart for ease on the host provisioning side
 * Global, point-of-view consistent key/value space, where keys are hierarchical paths and 
 values are control objects for data, processes, synchronizations, and so on.
@@ -28,6 +29,16 @@ In a typical circuit scenario:
 machines start the zero-configuration circuit server as a daemon on startup.
 * Operations engineers program start-up as well as dynamic-response 
 behavior via command-line tool or language bindings.
+
+Adoption considerations:
+
+* Small footprint: Circuit daemons leave almost no communication and memory footprint when left idle.
+This makes circuit ideal for incremental adoption alongside pre-existing architectures
+* Immediate impact: Even short and simple circuit scripts save manual time going forward
+* Knowledge accounting: Circuit scripts can replace textual post-mortem reports with
+executable discovery, diagnosis, action and inaction recipes.
+* Circuit servers log all operations in their execution orders, enabling maximum visibility
+during post-factum debugging and analysis.
 
 Circuit programs (sequences of invocations of the circuit API) are not
 declarative (as in Puppet, Chef, etc.). They are effectively imperative
