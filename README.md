@@ -22,12 +22,12 @@ values are control objects for data, processes, synchronizations, and so on.
 * Command-line and programmatic access to the API
 * Integration with Docker
 
-In a typical circuit scenaio: 
+In a typical circuit scenario: 
 
 * Provisioning engineers ensure newly provisioned
 machines start the zero-configuration circuit server as a daemon on startup.
 * Operations engineers program start-up as well as dynamic-response 
-behavior via command-line tool or lanuage bindings.
+behavior via command-line tool or language bindings.
 
 Circuit programs (sequences of invocations of the circuit API) are not
 declarative (as in Puppet, Chef, etc.). They are effectively imperative
