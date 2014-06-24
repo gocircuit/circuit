@@ -81,6 +81,9 @@ type Anchor interface {
 	// Scrub aborts and abandons the circuit element stored at this anchor, if one is present.
 	// If the hosting server is dead, a panic will be issued.
 	Scrub()
+
+	// Path returns the path to this anchor
+	Path() string
 }
 
 // Split breaks up an anchor path into components.
@@ -116,6 +119,10 @@ func (t terminal) ServerID() string {
 
 func (t terminal) Walk(walk []string) Anchor {
 	return terminal{ y: t.y.Walk(walk), k: t.k }
+}
+
+func (t terminal) Path() string {
+	return t.y.Path()
 }
 
 func (t terminal) View() map[string]Anchor {

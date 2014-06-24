@@ -101,6 +101,10 @@ func (c *Client) Walk(walk []string) Anchor {
 	return t.Walk(walk[1:])
 }
 
+func (c *Client) Path() string {
+	return "/"
+}
+
 // View returns a map of all currently-live circuit server anchors.
 // Errors in communication are reported as panics.
 func (c *Client) View() map[string]Anchor {

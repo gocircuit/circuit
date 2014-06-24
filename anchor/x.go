@@ -27,6 +27,10 @@ type XTerminal struct {
 	t *Terminal
 }
 
+func (x XTerminal) Path() string {
+	return x.t.Path()
+}
+
 func (x XTerminal) Walk(walk []string) circuit.X {
 	t := x.t.Walk(walk)
 	if t == nil {
@@ -125,4 +129,8 @@ func (y YTerminal) Get() (kind string, yelm interface{}) {
 
 func (y YTerminal) Scrub() {
 	y.X.Call("Scrub")
+}
+
+func (y YTerminal) Path() string {
+	return y.X.Call("Path")[0].(string)
 }

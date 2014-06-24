@@ -66,6 +66,10 @@ func (t *Terminal) Walk(walk []string) *Terminal {
 	}
 }
 
+func (t *Terminal) Path() string {
+	return t.carrier().Path()
+}
+
 func (t *Terminal) View() map[string]*Terminal {
 	r := make(map[string]*Terminal)
 	for n, a := range t.carrier().View() {
