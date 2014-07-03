@@ -8,7 +8,7 @@ hosts comprising cloud applications.
 
 Circuit was designed to enable clear, accountable and safe interface between the human engineering
 roles in a technology enterprise, ultimately increasing productivity. Engineering role separation
-is illustrated above.
+in a typical circuit-based architecture is illustrated above.
 
 ![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
 
