@@ -1,10 +1,18 @@
 # The Circuit [![Build Status](https://travis-ci.org/gocircuit/circuit.svg?branch=master)](https://travis-ci.org/gocircuit/circuit) [![GoDoc](https://godoc.org/github.com/gocircuit/circuit/client?status.png)](https://godoc.org/github.com/gocircuit/circuit/client)
 
-![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
+![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
 
 Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
 for management, discovery, synchronization and orchestration of services and 
-hosts comprising cloud applications. Users of circuit are
+hosts comprising cloud applications. 
+
+Circuit was designed to enable clear, accountable and safe interface between the human engineering
+roles in a technology enterprise, ultimately increasing productivity. Engineering role separation
+is illustrated above.
+
+![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
+
+Users of circuit are
 
 * Operations engineers, who sustain cloud applications at host, process and network level
 * Data scientists, who develop distributed compute pipelines by linking together and distributing third-party utilities
