@@ -91,7 +91,7 @@ and a command-line client.
 
 The Circuit comprises one small binary. It can be built for Linux and Darwin.
 
-Given that the [Go Language](http://golang.org) compiler is installed,
+Given that the [Go Language](http://golang.org) compiler is [installed](http://golang.org/doc/install),
 you can build and install the circuit binary with one line:
 
 	go get github.com/gocircuit/circuit/cmd/circuit
