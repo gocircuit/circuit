@@ -471,4 +471,10 @@ gauge the interest in this unconventional idea.
 
 ## Sponsors
 
-* [DARPA XDATA](http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx) initiative, 2012-2014
+* [DARPA XDATA](http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx) initiative, 2012–2014
+
+## Featured
+
+* [DARPA Open Catalog](http://www.darpa.mil/opencatalog/), 2014
+* [GOPHERCON 2014](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures) Denver, CO
+* [STRANGELOOP 2013](http://blog.gocircuit.org/strangeloop-2013), St. Louis, MO
