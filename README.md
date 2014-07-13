@@ -468,3 +468,7 @@ me [@maymounkov](https://twitter.com/maymounkov).
 Please, tweet about the circuit (mention [@gocircuit](https://twitter.com/gocircuit)).
 Tweets are a much appreciated donation and they help us and our funders
 gauge the interest in this unconventional idea.
+
+## Sponsors
+
+* [DARPA XDATA](http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx) initiative, 2012-2014
