@@ -469,11 +469,12 @@ Please, tweet about the circuit (mention [@gocircuit](https://twitter.com/gocirc
 Tweets are a much appreciated donation and they help us and our funders
 gauge the interest in this unconventional idea.
 
-## Sponsors and awards
+## Sponsors and credits
 
 * [DARPA XDATA](http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx) initiative, 2012–2014
 * [Data Tactics Corp](http://www.data-tactics.com/), 2012-2014
 * [L3](http://www.l-3com.com/), 2014
+* [Tumblr, Inc.](http://tumblr.com), 2012
 
 ## Featured
 
