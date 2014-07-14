@@ -2,13 +2,14 @@ FROM ubuntu:precise
 MAINTAINER p@gocircuit.org
 
 RUN echo "Building a docker image for a child circuit in a container"
-ADD rebuild.sh /elektra/aux/bin/rebuild.sh
-ADD getlinkaddr.sh /elektra/aux/bin/getlinkaddr.sh
-ADD start-circuit.sh /elektra/aux/bin/start-circuit.sh
+
+# build.sh builds Golang's environment and installs the Circuit
+ADD build.sh /go/util/build.sh
+ADD start-circuit.sh /go/util/start-circuit.sh
 
 RUN apt-get update -qq
 RUN apt-get install -yqq mercurial git gcc
 
-RUN /elektra/aux/bin/rebuild.sh
+RUN /go/util/build.sh
 
-# CMD circuit start -a ??:?? 
+CMD ["/go/util/start-circuit.sh"]
