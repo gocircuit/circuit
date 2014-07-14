@@ -65,7 +65,7 @@ so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
 
 The circuit abstraction of a cluster is NOT Turing-compatible: From the point-of-view of the 
 circuit's programming (API) environment, there is no input and output. There
-is only appearanced and disappearances of unnamed (generically ID'd) objects (the hosts).
+are only emergences and disappearances of unnamed (generically ID'd) objects (the hosts).
 
 The circuit presents the world in a model called [Choiceless Computation](http://arxiv.org/pdf/math/9705225.pdf),
 introduced by 
