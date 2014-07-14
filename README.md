@@ -67,7 +67,7 @@ The circuit abstraction of a cluster is NOT Turing-compatible: From the point-of
 circuit's programming (API) environment, there is no input and output. There
 is only appearanced and disappearances of unnamed objects (the hosts).
 
-### Technical rewording
+## Practicalities
 
 The circuit is a tiny server process which runs instances on a cluster of
 machines to form an efficient, churn-resilient network, which enables distributed process orchestration
