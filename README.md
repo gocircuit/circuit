@@ -516,3 +516,10 @@ gauge the interest in this unconventional idea.
 
 * Circuit New York interest group, in preparation.
 * [GOPHERCON India 2015](http://www.gophercon.in), applying.
+
+## Bibliography
+
+* [Choiceless Polynomial Time](http://arxiv.org/pdf/math/9705225.pdf), 
+[Andreas Blass](http://www.math.lsa.umich.edu/~ablass/), 
+[Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
+[Sharon Shelah](http://shelah.logic.at/). 
