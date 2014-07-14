@@ -512,7 +512,7 @@ gauge the interest in this unconventional idea.
 * [GOPHERCON 2014](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures) Denver, CO
 * [STRANGELOOP 2013](http://blog.gocircuit.org/strangeloop-2013), St. Louis, MO
 
-## Upcoming presentations and events
+## Upcoming presentations and things
 
 * Circuit New York interest group, in preparation.
 * [GOPHERCON India 2015](http://www.gophercon.in), applying.
