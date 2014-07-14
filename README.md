@@ -61,6 +61,12 @@ which allows engineers to encode complex dynamic response behavior, spanning mul
 Find comparisons to other technologies—like Zookeeper, etcd, CoreOS, raft, Consul, Puppet, Chef, and 
 so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
 
+## Attention: Abstraction is non-Turing!
+
+The circuit abstraction of a cluster is NOT Turing-compatible: From the point-of-view of the 
+circuit's programming (API) environment, there is no input and output. There
+is only appearanced and disappearances of unnamed objects (the hosts).
+
 ### Technical rewording
 
 The circuit is a tiny server process which runs instances on a cluster of
