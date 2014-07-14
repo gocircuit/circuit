@@ -6,7 +6,7 @@
 
 **The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
 while being profoundly different—more powerful. If you are about to skim this document
-for keywords. Go home. You are not ready.**
+for keywords, you are not ready.**
 
 Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
 for management, discovery, synchronization and orchestration of services and 
