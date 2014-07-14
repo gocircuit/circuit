@@ -1,11 +1,12 @@
 # Circuit
+
 [![Build Status](https://travis-ci.org/gocircuit/circuit.svg?branch=master)](https://travis-ci.org/gocircuit/circuit) [![GoDoc](https://godoc.org/github.com/gocircuit/circuit/client?status.png)](https://godoc.org/github.com/gocircuit/circuit/client)
 
 ![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
 
-> The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
-> while being profoundly different—more powerful. If you are about to skim this document
-> for keywords. Go home. You are not ready.
+**The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
+while being profoundly different—more powerful. If you are about to skim this document
+for keywords. Go home. You are not ready.**
 
 Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
 for management, discovery, synchronization and orchestration of services and 
