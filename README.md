@@ -89,6 +89,11 @@ introduced by
 [Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
 [Sharon Shelah](http://shelah.logic.at/).
 
+Understanding the difference between Turing Machines and Choiceless Computation,
+while not entirely necessary, sheds much light on the profound difference between the
+Circuit and related software. The relevant publications are quoted in the 
+[bibliography](https://github.com/gocircuit/circuit#bibliography) at the end.
+
 ## Practicalities
 
 The circuit is a tiny server process which runs instances on a cluster of
