@@ -87,7 +87,8 @@ The circuit presents the world in a model called [Choiceless Computation](http:/
 introduced by 
 [Andreas Blass](http://www.math.lsa.umich.edu/~ablass/), 
 [Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
-[Sharon Shelah](http://shelah.logic.at/).
+[Sharon Shelah](http://shelah.logic.at/), the 
+latter—[one of the most prolific contemporary mathematicians](http://en.wikipedia.org/wiki/Saharon_Shelah).
 
 Understanding the difference between Turing Machines and Choiceless Computation,
 while not entirely necessary, sheds much light on the profound difference between the
