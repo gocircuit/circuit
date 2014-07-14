@@ -67,6 +67,12 @@ The circuit abstraction of a cluster is NOT Turing-compatible: From the point-of
 circuit's programming (API) environment, there is no input and output. There
 is only appearanced and disappearances of unnamed (generically ID'd) objects (the hosts).
 
+The circuit presents the world in a model called [Choiceless Computation](http://arxiv.org/pdf/math/9705225.pdf),
+introduced by 
+[Andreas Blass](http://www.math.lsa.umich.edu/~ablass/), 
+[Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
+[Sharon Shelah](http://shelah.logic.at/).
+
 ## Practicalities
 
 The circuit is a tiny server process which runs instances on a cluster of
