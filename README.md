@@ -61,7 +61,7 @@ which allows engineers to encode complex dynamic response behavior, spanning mul
 Find comparisons to other technologies—like Zookeeper, etcd, CoreOS, raft, Consul, Puppet, Chef, and 
 so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
 
-## Comparable and related products
+## Incomparable but related works
 
 * [Google Cloud Platform](https://github.com/GoogleCloudPlatform) and [Kubernetes](https://github.com/GoogleCloudPlatform/kubernetes)
 * [Hashicorp Consul](https://github.com/hashicorp/consul)
