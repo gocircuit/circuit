@@ -71,7 +71,7 @@ so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
 * [CoreOS](https://coreos.com/)
 * [Apache Zookeeper](http://zookeeper.apache.org/)
 * [Polymer (Google)](http://www.polymer-project.org/)
-* [Julia](http://julialang.org/)
+* [Julia (MIT)](http://julialang.org/)
 * and so on.
 
 None of these related products sees the cluster as a closed system. In this way,
