@@ -522,8 +522,8 @@ gauge the interest in this unconventional idea.
 * [Choiceless Polynomial Time](http://arxiv.org/pdf/math/9705225.pdf), 
 [Andreas Blass](http://www.math.lsa.umich.edu/~ablass/), 
 [Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
-[Saharon Shelah](http://shelah.logic.at/), published by Shelah Office,
-on (arXiv)[http://arxiv.org/abs/math/9705225]
+[Saharon Shelah](http://shelah.logic.at/), published by Shelah Office
+on [arXiv](http://arxiv.org/abs/math/9705225), 1997
 
 * [Choiceless Polynomial Time Logic: Inability to Express](http://link.springer.com/chapter/10.1007%2F3-540-44622-2_6),
 [Saharon Shelah](http://shelah.logic.at/), Springer Lecture Notes in Computer Science, Volume 1862, 2000, pp. 72-125
