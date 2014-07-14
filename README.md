@@ -502,7 +502,7 @@ me [@maymounkov](https://twitter.com/maymounkov).
 ## Donate with a tweet ##
 
 Please, tweet about the circuit (mention [@gocircuit](https://twitter.com/gocircuit)).
-Tweets are a much appreciated donation and they help us and our funders
+Tweets are a much appreciated donation and they help us and our sponsors
 gauge the interest in this unconventional idea.
 
 ## Sponsors and credits
