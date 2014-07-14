@@ -3,6 +3,8 @@
 
 ![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
 
+Notice the lack of OPS engineers in this picture!
+
 Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
 for management, discovery, synchronization and orchestration of services and 
 hosts comprising cloud applications. 
