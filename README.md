@@ -61,6 +61,20 @@ which allows engineers to encode complex dynamic response behavior, spanning mul
 Find comparisons to other technologies—like Zookeeper, etcd, CoreOS, raft, Consul, Puppet, Chef, and 
 so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
 
+## Comparable and related products
+
+* [Google Cloud Platform](https://github.com/GoogleCloudPlatform) and [Kubernetes](https://github.com/GoogleCloudPlatform/kubernetes)
+* [Hashicorp Consul](https://github.com/hashicorp/consul)
+* [Puppet](http://puppetlabs.com/)
+* [Chef](http://www.getchef.com/solutions/devops/)
+* [Ansible](http://www.ansible.com/home)
+* [CoreOS](https://coreos.com/)
+* [Zookeeper](http://zookeeper.apache.org/)
+* and so on.
+
+None of these related products sees the cluster as a closed system. In this way,
+the circuit is different than all. This is explained in precise terms in the next section.
+
 ## Attention: Abstraction is non-Turing!
 
 The circuit abstraction of a cluster is NOT Turing-compatible: From the point-of-view of the 
