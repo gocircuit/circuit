@@ -110,7 +110,7 @@ Math puzzle:
 > (c) “flip two caps along a side”
 
 > Upon action there is no guarantee as to which corner, diagonal
-> or side, respectively, the robot will choose to flip.> 
+> or side, respectively, the robot will choose to flip.
 
 > Devise a sequence of commands that forces the robot to turn all caps in a
 > conﬁguration where they all have the same orientation.
