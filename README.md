@@ -107,7 +107,7 @@ Math puzzle:
 > orientations. There is a robot on the table that acts upon three commands:
 > (a) “flip a corner cap”,
 > (b) “flip two diagonal caps” and
-> (c) “flip two caps along a side”> 
+> (c) “flip two caps along a side”
 
 > Upon action there is no guarantee as to which corner, diagonal
 > or side, respectively, the robot will choose to flip.> 
