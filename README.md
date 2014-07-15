@@ -115,6 +115,8 @@ Math puzzle:
 > Devise a sequence of commands that forces the robot to turn all caps in a
 > conﬁguration where they all have the same orientation.
 
+> Can you devise a sequence that ensures they all face up? Down?
+
 ## Practicalities
 
 The circuit is a tiny server process which runs instances on a cluster of
