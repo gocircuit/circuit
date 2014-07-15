@@ -103,17 +103,17 @@ Circuit and related software. The relevant publications are quoted in the
 The following puzzle demonstrates choiceless programming via a simple relatable highschool 
 Math puzzle:
 
-Four beer caps are placed on the corners of a square table with arbitrary
-orientations. There is a robot on the table that acts upon three commands:
-(a) “flip a corner cap”,
-(b) “flip two diagonal caps” and
-(c) “flip two caps along a side”
+> Four beer caps are placed on the corners of a square table with arbitrary
+> orientations. There is a robot on the table that acts upon three commands:
+> (a) “flip a corner cap”,
+> (b) “flip two diagonal caps” and
+> (c) “flip two caps along a side”> 
 
-Upon action there is no guarantee as to which corner, diagonal
-or side, respectively, the robot will choose to flip.
+> Upon action there is no guarantee as to which corner, diagonal
+> or side, respectively, the robot will choose to flip.> 
 
-Devise a sequence of commands that forces the robot to turn all caps in a
-conﬁguration where they all have the same orientation.
+> Devise a sequence of commands that forces the robot to turn all caps in a
+> conﬁguration where they all have the same orientation.
 
 ## Practicalities
 
