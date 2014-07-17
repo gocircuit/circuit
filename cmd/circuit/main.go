@@ -188,6 +188,16 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
+		{
+			Name: "waitall",
+			Usage: "Wait until a set of processes all exit",
+			Action: waitall,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		// stdin, stdout, stderr
 		{
 			Name: "stdin",

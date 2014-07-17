@@ -98,7 +98,7 @@ while not entirely necessary, sheds much light on the profound difference betwee
 Circuit and related software. The relevant publications are quoted in the 
 [bibliography](https://github.com/gocircuit/circuit#bibliography) at the end.
 
-### Choiceless programming by example
+### Choiceless programming, by example
 
 The following puzzle demonstrates choiceless programming via a simple relatable highschool 
 Math puzzle:
