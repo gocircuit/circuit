@@ -11,6 +11,7 @@ import (
 	"errors"
 	"io"
 	"runtime/pprof"
+	"os"
 	"time"
 
 	"github.com/gocircuit/circuit/kit/interruptible"
@@ -20,6 +21,7 @@ import (
 type Server interface {
 	Profile(string) (io.ReadCloser, error)
 	Peek() Stat
+	Suicide()
 	IsDone() bool
 	Scrub()
 	X() circuit.X
@@ -41,6 +43,10 @@ func New(addr string) Server {
 type Stat struct {
 	Addr string
 	Joined time.Time
+}
+
+func (s *server) Suicide() {
+	os.Exit(0)
 }
 
 func (s *server) Profile(name string) (io.ReadCloser, error) {

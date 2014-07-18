@@ -32,6 +32,7 @@ func srvStat(s srv.Stat) ServerStat {
 type Server interface {
 	Profile(string) (io.ReadCloser, error)
 	Peek() ServerStat
+	Suicide()
 }
 
 type ysrvSrv struct {

@@ -57,3 +57,7 @@ func (y YServer) IsDone() bool {
 func (y YServer) Scrub() {
 	y.X.Call("Scrub")
 }
+
+func (y YServer) Suicide() {
+	y.X.Call("Suicide")
+}

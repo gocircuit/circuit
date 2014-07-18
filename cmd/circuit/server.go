@@ -40,3 +40,22 @@ func stack(x *cli.Context) {
 		fatalf("not a server")
 	}
 }
+
+func suicide(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("suicide needs one server anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	u, ok := c.Walk(w).Get().(client.Server)
+	if !ok {
+		fatalf("not a server")
+	}
+	u.Suicide()
+}

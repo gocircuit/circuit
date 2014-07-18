@@ -83,6 +83,16 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
+		{
+			Name: "suicide",
+			Usage: "Kill a chosen circuit daemon",
+			Action: stack,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "", "Discover a server using UDP multicast, e.g. 228.8.8.8:8822"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		// channel-specific
 		{
 			Name: "mkchan",
