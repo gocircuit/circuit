@@ -83,11 +83,12 @@ func server(c *cli.Context) {
 
 func parseDiscover(c *cli.Context) *net.UDPAddr {
 	var src string
-	if c.IsSet("discover") {
+	switch {
+	case c.String("discover") != "":
 		src = c.String("discover")
-	} else if os.Getenv("CIRCUIT_DISCOVER") != "" {
+	case os.Getenv("CIRCUIT_DISCOVER") != "":
 		src = os.Getenv("CIRCUIT_DISCOVER")
-	} else {
+	default:
 		return nil
 	}
 	multicast, err := net.ResolveUDPAddr("udp", src)
@@ -99,7 +100,7 @@ func parseDiscover(c *cli.Context) *net.UDPAddr {
 
 func parseAddr(c *cli.Context) *net.TCPAddr {
 	switch {
-	case c.IsSet("addr"):
+	case c.String("addr") != "":
 		addr, err := net.ResolveTCPAddr("tcp", c.String("addr"))
 		if err != nil {
 			log.Fatalf("resolve %s (%s)\n", addr, err)
@@ -109,7 +110,7 @@ func parseAddr(c *cli.Context) *net.TCPAddr {
 		}
 		return addr
 
-	case c.IsSet("if"):
+	case c.String("if") != "":
 		ifc, err := net.InterfaceByName(c.String("if"))
 		if err != nil {
 			log.Fatalf("interface %s not found (%v)", c.String("if"), err)

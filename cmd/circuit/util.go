@@ -45,7 +45,7 @@ func readkey(x *cli.Context) (key []byte) {
 
 func dial(x *cli.Context) *client.Client {
 	switch {
-	case x.IsSet("dial"):
+	case x.String("dial") != "":
 		defer func() {
 			if r := recover(); r != nil {
 				fatalf("addressed server is gone or authentication failed")
@@ -53,7 +53,7 @@ func dial(x *cli.Context) *client.Client {
 		}()
 		return client.Dial(x.String("dial"), readkey(x))
 
-	case x.IsSet("discover"):
+	case x.String("discover") != "":
 		defer func() {
 			if r := recover(); r != nil {
 				fatalf("multicast address is unresponsive or authentication failed")
