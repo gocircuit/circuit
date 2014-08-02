@@ -28,7 +28,7 @@ func NewGather(addr *net.UDPAddr) *Gather {
 	}
 	var err error
 	if g.conn, err = net.ListenMulticastUDP("udp", nil, addr); err != nil {
-		log.Printf("problem listening to udp mulsticast: %v", err)
+		log.Printf("problem listening to udp multicast: %v", err)
 		os.Exit(1)
 	}
 	runtime.SetFinalizer(g, 
