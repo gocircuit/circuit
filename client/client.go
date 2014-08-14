@@ -84,7 +84,7 @@ func (c *Client) Addr() string {
 	return c.y.X.Addr().String()
 }
 
-// Walk traverses the global virtual anchor namespace and returns a handle dor the desired anchor.
+// Walk traverses the global virtual anchor namespace and returns a handle to the desired anchor.
 // The first element of walk should be the ID of a live circuit server.
 // An up to date list of available circuit servers in the cluster can be obtained by calling View.
 // The remainder of the walk slice is up to the user.

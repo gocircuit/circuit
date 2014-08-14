@@ -85,6 +85,7 @@ func statstat(s proc.Stat) ProcStat {
 type Proc interface {
 
 	// Wait blocks until the underlying OS process exits and returns the final status of the process.
+	// An error is returned only if the wait invocation is aborted by a concurring call to Scrub.
 	Wait() (ProcStat, error)
 
 	// Signal sends an OS signal to the process. The following are recognized signal names:
