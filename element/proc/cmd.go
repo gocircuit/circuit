@@ -14,6 +14,7 @@ import (
 // Cmd …
 type Cmd struct {
 	Env  []string `json:"env"`
+	Dir string `json:"dir"`
 	Path string   `json:"path"`
 	Args []string `json:"args"`
 	Scrub bool `json:"scrub"`

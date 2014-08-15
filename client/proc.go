@@ -19,6 +19,9 @@ type Cmd struct {
 	// Env, if set, is the desired OS execution environment. It corresponds to Cmd.Env from package "os/exec".
 	Env []string
 
+	// Dir, if non-empty, is the working directory for the process.
+	Dir string
+
 	// Path is the local file-system path, at the respective circuit server, to the process binary.
 	Path string
 
@@ -34,6 +37,7 @@ type Cmd struct {
 func retypeProcStat(c proc.Cmd) Cmd {
 	return Cmd{
 		Env: c.Env,
+		Dir: c.Dir,
 		Path: c.Path,
 		Args: c.Args,
 		Scrub: c.Scrub,
@@ -43,6 +47,7 @@ func retypeProcStat(c proc.Cmd) Cmd {
 func (cmd Cmd) retype() proc.Cmd {
 	return proc.Cmd{
 		Env: cmd.Env,
+		Dir: cmd.Dir,
 		Path: cmd.Path,
 		Args: cmd.Args,
 		Scrub: cmd.Scrub,

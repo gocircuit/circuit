@@ -63,6 +63,7 @@ func MakeProc(cmd Cmd) Proc {
 	p.abr, p.cmd.abr = abr, abr
 	// cmd
 	p.cmd.cmd.Env = cmd.Env
+	p.cmd.cmd.Dir = cmd.Dir
 	bin := strings.TrimSpace(cmd.Path)
 	p.cmd.cmd.Path = bin
 	p.cmd.cmd.Args = append([]string{bin}, cmd.Args...)
