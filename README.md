@@ -488,7 +488,7 @@ To generate a new private key for your circuit, use the command
 
 ## Networking ##
 
-From a newtworking and protocol standpoint, circuit servers and
+From a networking and protocol standpoint, circuit servers and
 clients are peers: All communications (server-server and server-client)
 use a common RPC framework which often entails a server
 being able to reverse-dial into a client.
