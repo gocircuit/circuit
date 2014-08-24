@@ -104,7 +104,7 @@ func (r *Runtime) exportPtr(v interface{}, importer n.Addr) interface{} {
 			}
 			defer conn.Close()
 
-			if conn.Write(&dontReplyMsg{}) != nil {
+			if err = conn.Write(&dontReplyMsg{}); err != nil {
 				log.Println("problem writing on lifeline to", importer.String(), err.Error())
 				return
 			}
