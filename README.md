@@ -5,8 +5,7 @@
 ![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
 
 **The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
-while being profoundly different—more powerful. If you are about to skim this document
-for keywords, you are not ready.**
+while being profoundly different.**
 
 Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
 for management, discovery, synchronization and orchestration of services and 
