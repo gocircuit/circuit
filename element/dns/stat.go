@@ -9,14 +9,11 @@ package dns
 
 import (
 	"encoding/json"
-	"strings"
-	"syscall"
 )
 
 type Stat struct {
-	Cmd Cmd `json:"cmd"`
-	Exit error `json:"exit"`
-	?
+	Address string `json:"addr"`
+	Records map[string][]string `json:"records"`
 }
 
 func (s Stat) String() string {

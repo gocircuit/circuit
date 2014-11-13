@@ -8,10 +8,7 @@
 package dns
 
 import (
-	"fmt"
-	"errors"
 	"net"
-	"strings"
 	"sync"
 
 	"github.com/gocircuit/circuit/github.com/miekg/dns"
@@ -20,8 +17,8 @@ import (
 
 type Nameserver interface {
 	Scrub()
-	Set(pattern, rr string) error
-	Unset(pattern string)
+	Set(rr string) error
+	Unset(name string)
 	Peek() Stat
 	X() circuit.X
 }
@@ -30,17 +27,17 @@ type nameserver struct {
 	sync.Mutex
 	server *dns.Server
 	addr net.Addr
-	rr map[string][]dns.RR // pattern -> rr
+	rr map[string][]dns.RR // name -> rr
 }
 
 func MakeNameserver() (_ Nameserver, err error) {
 	ns := &nameserver{
 		rr: make(map[string][]dns.RR),
 	}
-	if ns.server, _, err = ns.startUdpServer(); err != nil {
+	if err = ns.startUdpServer(); err != nil {
 		return nil, err
 	}
-	return ns
+	return ns, nil
 }
 
 func (ns *nameserver) startUdpServer() error {
@@ -48,7 +45,7 @@ func (ns *nameserver) startUdpServer() error {
 	if err != nil {
 		return err
 	}
-	ns.server = &Server{
+	ns.server = &dns.Server{
 		PacketConn: pc,
 		Handler: ns,
 	}
@@ -66,8 +63,8 @@ func (ns *nameserver) lookup(q string) []dns.RR {
 	return ns.rr[q]
 }
 
-func (ns *nameserver) Handle(w ResponseWriter, req *Msg) {
-	msg := new(Msg)
+func (ns *nameserver) ServeDNS(w dns.ResponseWriter, req *dns.Msg) {
+	msg := new(dns.Msg)
 	msg.SetReply(req)
 	q := msg.Question[0].Name // question, e.g. "miek.nl."
 
@@ -77,7 +74,7 @@ func (ns *nameserver) Handle(w ResponseWriter, req *Msg) {
 		return
 	}
 
-	msg.Answer = make([]RR, 1)
+	msg.Answer = make([]dns.RR, 1)
 	msg.Answer[0] = rr[0]
 	w.WriteMsg(msg)
 }
@@ -93,7 +90,7 @@ func (ns *nameserver) Scrub() {
 }
 
 func (ns *nameserver) X() circuit.X {
-	return circuit.Ref(XNamespace{ns})
+	return circuit.Ref(XNameserver{ns})
 }
 
 func (ns *nameserver) Set(rr string) error {
@@ -103,18 +100,27 @@ func (ns *nameserver) Set(rr string) error {
 	}
 	ns.Lock()
 	defer ns.Unlock()
-	ns.rr[ss.Name] = append(ns.rr[ss.Name], ss)
+	ns.rr[ss.Header().Name] = append(ns.rr[ss.Header().Name], ss)
+	return nil
 }
 
-func (ns *nameserver) Unset(pattern string) {
+func (ns *nameserver) Unset(name string) {
 	ns.Lock()
 	defer ns.Unlock()
-	delete(ns.rr, pattern)
+	delete(ns.rr, name)
 }
 
 func (ns *nameserver) Peek() Stat {
 	ns.Lock()
 	defer ns.Unlock()
-	??
-	return ns.peek()
+	var stat Stat
+	stat.Address = ns.addr.String()
+	for name, rr := range ns.rr {
+		var ss []string
+		for _, record := range rr {
+			ss = append(ss, record.String())
+		}
+		stat.Records[name] = ss
+	}
+	return stat
 }
