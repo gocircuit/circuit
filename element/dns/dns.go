@@ -115,6 +115,7 @@ func (ns *nameserver) Peek() Stat {
 	defer ns.Unlock()
 	var stat Stat
 	stat.Address = ns.addr.String()
+	stat.Records = make(map[string][]string)
 	for name, rr := range ns.rr {
 		var ss []string
 		for _, record := range rr {

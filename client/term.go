@@ -8,6 +8,8 @@
 package client
 
 import (
+	// "fmt"
+
 	"github.com/gocircuit/circuit/anchor"
 	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/proc"
@@ -154,20 +156,20 @@ func (t terminal) MakeProc(cmd Cmd) (Proc, error) {
 	return yprocProc{yproc.(proc.YProc)}, nil
 }
 
+func (t terminal) MakeNameserver() (Nameserver, error) {
+	ydns, err := t.y.Make(anchor.Nameserver, "")
+	if err != nil {
+		return nil, err
+	}
+	return yNameserver{ydns.(dns.YNameserver)}, nil
+}
+
 func (t terminal) MakeDocker(run cdocker.Run) (cdocker.Container, error) {
 	ydkr, err := t.y.Make(anchor.Docker, run)
 	if err != nil {
 		return nil, err
 	}
 	return ydkr.(edocker.YContainer), nil
-}
-
-func (t terminal) MakeNameserver() (Nameserver, error) {
-	ydns, err := t.y.Make(anchor.Nameserver, nil)
-	if err != nil {
-		return nil, err
-	}
-	return yNameserver{ydns.(dns.YNameserver)}, nil
 }
 
 func (t terminal) MakeOnJoin() (Subscription, error) {
@@ -198,6 +200,8 @@ func (t terminal) Get() interface{} {
 		return yvalveChan{y.(valve.YValve)}
 	case anchor.Proc:
 		return yprocProc{y.(proc.YProc)}
+	case anchor.Nameserver:
+		return yNameserver{y.(dns.YNameserver)}
 	case anchor.Docker:
 		return y.(edocker.YContainer)
 	case anchor.OnJoin:

@@ -120,6 +120,8 @@ func (y YTerminal) Get() (kind string, yelm interface{}) {
 		return Chan, valve.YValve{r[1].(circuit.X)}
 	case Proc:
 		return Proc, proc.YProc{r[1].(circuit.X)}
+	case Nameserver:
+		return Nameserver, dns.YNameserver{r[1].(circuit.X)}
 	case Docker:
 		return Docker, docker.YContainer{r[1].(circuit.X)}
 	case OnJoin:

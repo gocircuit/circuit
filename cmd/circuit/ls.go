@@ -51,11 +51,14 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 		case client.Chan:
 			e.k = "chan"
 		case client.Proc:
-			if t.GetCmd().Scrub {
-				e.k = "proc·autoscrub"
-			} else {
-				e.k = "proc"
-			}
+			e.k = "proc"
+			// if t.GetCmd().Scrub {
+			// 	e.k = "proc-autoscrub"
+			// } else {
+			// 	e.k = "proc"
+			// }
+		case client.Nameserver:
+			e.k = "dns"
 		case docker.Container:
 			e.k = "docker"
 		case client.Subscription:
