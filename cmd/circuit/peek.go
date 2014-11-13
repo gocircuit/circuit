@@ -40,6 +40,9 @@ func peek(x *cli.Context) {
 	case client.Proc:
 		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
 		fmt.Println(string(buf))
+	case client.Nameserver:
+		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
+		fmt.Println(string(buf))
 	case docker.Container:
 		stat, err := t.Peek()
 		if err != nil {
