@@ -155,6 +155,17 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
+		// nameserver
+		{
+			Name: "mkdns",
+			Usage: "Create a nameserver element",
+			Action: mkdns,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "228.8.8.8:8822", "Multicast address for peer server discovery"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		// proc/dkr-specific
 		{
 			Name: "mkdkr",

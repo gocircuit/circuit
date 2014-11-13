@@ -11,6 +11,7 @@ import (
 	"github.com/gocircuit/circuit/anchor"
 	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/proc"
+	"github.com/gocircuit/circuit/element/dns"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/kit/pubsub"
@@ -66,6 +67,9 @@ type Anchor interface {
 
 	// MakeDocker…
 	MakeDocker(run cdocker.Run) (cdocker.Container, error)
+
+	// MakeNameserver…
+	MakeNameserver() (Nameserver, error)
 
 	// MakeOnJoin…
 	MakeOnJoin() (Subscription, error)
@@ -156,6 +160,14 @@ func (t terminal) MakeDocker(run cdocker.Run) (cdocker.Container, error) {
 		return nil, err
 	}
 	return ydkr.(edocker.YContainer), nil
+}
+
+func (t terminal) MakeNameserver() (Nameserver, error) {
+	ydns, err := t.y.Make(anchor.Nameserver, nil)
+	if err != nil {
+		return nil, err
+	}
+	return yNameserver{ydns.(dns.YNameserver)}, nil
 }
 
 func (t terminal) MakeOnJoin() (Subscription, error) {

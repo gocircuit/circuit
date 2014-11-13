@@ -129,27 +129,32 @@ func (c *Client) ServerID() string {
 
 // MakeChan is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeChan(n int) (Chan, error) {
-	return nil, errors.New("cannot create elements outside of workers")
+	return nil, errors.New("cannot create elements outside of servers")
 }
 
 // MakeProc is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeProc(cmd Cmd) (Proc, error) {
-	return nil, errors.New("cannot create elements outside of workers")
+	return nil, errors.New("cannot create elements outside of servers")
 }
 
 // MakeDocker is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeDocker(run docker.Run) (docker.Container, error) {
-	return nil, errors.New("cannot create elements outside of workers")
+	return nil, errors.New("cannot create elements outside of servers")
+}
+
+// MakeNameserver…
+func (c *Client) MakeNameserver() (Nameserver, error) {
+	return nil, errors.New("cannot create elements outside of servers")
 }
 
 // MakeOnJoin is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeOnJoin() (Subscription, error) {
-	return nil, errors.New("cannot create elements outside of workers")
+	return nil, errors.New("cannot create elements outside of servers")
 }
 
 // MakeOnLeave is an Anchor interface method, not applicable to the root-level anchor.
 func (c *Client) MakeOnLeave() (Subscription, error) {
-	return nil, errors.New("cannot create elements outside of workers")
+	return nil, errors.New("cannot create elements outside of servers")
 }
 
 // Get is an Anchor interface method, not applicable to the root-level anchor.

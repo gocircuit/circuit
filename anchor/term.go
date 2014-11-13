@@ -15,6 +15,7 @@ import (
 	ds "github.com/gocircuit/circuit/client/docker"
 	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/docker"
+	"github.com/gocircuit/circuit/element/dns"
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/pubsub"
@@ -31,6 +32,7 @@ const (
 	Chan = "chan"
 	Proc = "proc"
 	Docker = "docker"
+	Nameserver = "dns"
 	OnJoin = "@join"
 	OnLeave = "@leave"
 )
@@ -167,6 +169,18 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 			}
 			u.elem.(docker.Container).Wait()
 		}()
+		return u.elem, nil
+
+	case Nameserver:
+		ns, err := dns.MakeNameserver()
+		if err != nil {
+			return nil, err
+		}
+		u := &urn{
+			kind: Nameserver,
+			elem: ns,
+		}
+		t.carrier().Set(u)
 		return u.elem, nil
 
 	case OnJoin:

@@ -14,6 +14,7 @@ import (
 	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/docker"
 	"github.com/gocircuit/circuit/element/valve"
+	"github.com/gocircuit/circuit/element/dns"
 	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
 	xerrors "github.com/gocircuit/circuit/use/errors"
@@ -99,6 +100,8 @@ func (y YTerminal) Make(kind string, arg interface{}) (yelm interface{}, err err
 		return proc.YProc{r[0].(circuit.X)}, nil
 	case Docker:
 		return docker.YContainer{r[0].(circuit.X)}, nil
+	case Nameserver:
+		return dns.YNameserver{r[0].(circuit.X)}, nil
 	case OnJoin:
 		return pubsub.YSubscription{r[0].(circuit.X)}, nil
 	case OnLeave:
