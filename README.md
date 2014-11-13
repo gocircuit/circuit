@@ -116,7 +116,7 @@ Math puzzle:
 
 > Can you devise a sequence that ensures they all face up? Down?
 
-## Practicalities
+## Integration
 
 The circuit is a tiny server process which runs instances on a cluster of
 machines to form an efficient, churn-resilient network, which enables distributed process orchestration
