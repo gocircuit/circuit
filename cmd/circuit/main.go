@@ -166,6 +166,26 @@ func main() {
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
+		{
+			Name: "set",
+			Usage: "Set a resource record in a nameserver element",
+			Action: nset,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "228.8.8.8:8822", "Multicast address for peer server discovery"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
+		{
+			Name: "unset",
+			Usage: "Remove all resource records for a name in a nameserver element",
+			Action: nunset,
+			Flags: []cli.Flag{
+				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
+				cli.StringFlag{"discover", "228.8.8.8:8822", "Multicast address for peer server discovery"},
+				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
+			},
+		},
 		// proc/dkr-specific
 		{
 			Name: "mkdkr",
