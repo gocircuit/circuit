@@ -143,7 +143,7 @@ func (c *Client) MakeDocker(run docker.Run) (docker.Container, error) {
 }
 
 // MakeNameserver…
-func (c *Client) MakeNameserver() (Nameserver, error) {
+func (c *Client) MakeNameserver(string) (Nameserver, error) {
 	return nil, errors.New("cannot create elements outside of servers")
 }
 

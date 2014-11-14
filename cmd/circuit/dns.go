@@ -21,11 +21,15 @@ func mkdns(x *cli.Context) {
 	}()
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
-		fatalf("mkdns needs an anchor argument")
+	if len(args) < 1 {
+		fatalf("mkdns needs an anchor and an optional address arguments")
+	}
+	var addr string
+	if len(args) == 2 {
+		addr = args[1]
 	}
 	w, _ := parseGlob(args[0])
-	_, err := c.Walk(w).MakeNameserver()
+	_, err := c.Walk(w).MakeNameserver(addr)
 	if err != nil {
 		fatalf("mkdns error: %s", err)
 	}

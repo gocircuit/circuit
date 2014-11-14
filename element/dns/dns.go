@@ -30,18 +30,18 @@ type nameserver struct {
 	rr map[string][]dns.RR // name -> rr
 }
 
-func MakeNameserver() (_ Nameserver, err error) {
+func MakeNameserver(addr string) (_ Nameserver, err error) {
 	ns := &nameserver{
 		rr: make(map[string][]dns.RR),
 	}
-	if err = ns.startUdpServer(); err != nil {
+	if err = ns.startUdpServer(addr); err != nil {
 		return nil, err
 	}
 	return ns, nil
 }
 
-func (ns *nameserver) startUdpServer() error {
-	pc, err := net.ListenPacket("udp", "") // empty-string address picks an available port on 0.0.0.0
+func (ns *nameserver) startUdpServer(addr string) error {
+	pc, err := net.ListenPacket("udp", addr) // empty-string address picks an available port on 0.0.0.0
 	if err != nil {
 		return err
 	}

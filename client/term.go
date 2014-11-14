@@ -71,7 +71,7 @@ type Anchor interface {
 	MakeDocker(run cdocker.Run) (cdocker.Container, error)
 
 	// MakeNameserver…
-	MakeNameserver() (Nameserver, error)
+	MakeNameserver(addr string) (Nameserver, error)
 
 	// MakeOnJoin…
 	MakeOnJoin() (Subscription, error)
@@ -156,8 +156,8 @@ func (t terminal) MakeProc(cmd Cmd) (Proc, error) {
 	return yprocProc{yproc.(proc.YProc)}, nil
 }
 
-func (t terminal) MakeNameserver() (Nameserver, error) {
-	ydns, err := t.y.Make(anchor.Nameserver, "")
+func (t terminal) MakeNameserver(addr string) (Nameserver, error) {
+	ydns, err := t.y.Make(anchor.Nameserver, addr)
 	if err != nil {
 		return nil, err
 	}

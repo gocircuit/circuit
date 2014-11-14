@@ -172,7 +172,7 @@ func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) 
 		return u.elem, nil
 
 	case Nameserver:
-		ns, err := dns.MakeNameserver()
+		ns, err := dns.MakeNameserver(arg.(string))
 		if err != nil {
 			return nil, err
 		}
