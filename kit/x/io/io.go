@@ -52,9 +52,9 @@ func (y YReader) Read(p []byte) (n int, err error) {
 		panic("corrupt i/o server")
 	}
 	copy(p, q)
-	// if err != nil {
-	// 	err = io.EOF
-	// }
+	if err != nil && err.Error() == "EOF" {
+		err = io.EOF
+	}
 	return len(q), err
 }
 
