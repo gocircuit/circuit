@@ -5,7 +5,7 @@
 ![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
 
 **The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
-while being profoundly different.**
+while being quite different.**
 
 Circuit is a programmable platform-as-a-service (PaaS) and/or Infrastructure-as-a-Service (IaaS), 
 for management, discovery, synchronization and orchestration of services and 
@@ -78,43 +78,6 @@ so forth—in [the wiki](https://github.com/gocircuit/circuit/wiki).
 
 None of these related products sees the cluster as a closed system. In this way,
 the circuit is different than all. This is explained in precise terms in the next section.
-
-## Attention: Abstraction is non-Turing!
-
-The circuit abstraction of a cluster is NOT Turing-compatible: From the point-of-view of the 
-circuit's programming (API) environment, there is no input and output. There
-are only emergences and disappearances of unnamed (generically ID'd) objects (the hosts).
-
-The circuit presents the world in a model called [Choiceless Computation](http://arxiv.org/pdf/math/9705225.pdf),
-introduced by 
-[Andreas Blass](http://www.math.lsa.umich.edu/~ablass/), 
-[Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
-[Sharon Shelah](http://shelah.logic.at/), the 
-latter—[one of the most prolific contemporary mathematicians](http://en.wikipedia.org/wiki/Saharon_Shelah).
-
-Understanding the difference between Turing Machines and Choiceless Computation,
-while not entirely necessary, sheds much light on the profound difference between the
-Circuit and related software. The relevant publications are quoted in the 
-[bibliography](https://github.com/gocircuit/circuit#bibliography) at the end.
-
-### Choiceless programming, by example
-
-The following puzzle demonstrates choiceless programming via a simple relatable highschool 
-Math puzzle:
-
-> Four beer caps are placed on the corners of a square table with arbitrary
-> orientations. There is a robot on the table that acts upon three commands:
-> (a) “flip a corner cap”,
-> (b) “flip two diagonal caps” and
-> (c) “flip two caps along a side”
-
-> Upon action there is no guarantee as to which corner, diagonal
-> or side, respectively, the robot will choose to flip.
-
-> Devise a sequence of commands that forces the robot to turn all caps in a
-> conﬁguration where they all have the same orientation.
-
-> Can you devise a sequence that ensures they all face up? Down?
 
 ## Integration
 
@@ -429,6 +392,64 @@ Receiving is accomplished with the command
 The received message will be produced on the standard output of 
 the command above.
 
+### Example: Make a DNS server element ###
+
+Circuit allows you to create and dynamically configure one or more DNS
+server elements on any circuit server.
+
+As before, pick an available circuit server, say `X88550014d4c82e4d`.
+Create a new DNS server element, like so
+
+	circuit mkdns /X88550014d4c82e4d/mydns
+
+This will start a new DNS server on the host of the given circuit server,
+binding it to an available port. Alternatively, you can supply an
+IP address argument specifying the bind address, as in
+
+	circuit mkdns /X88550014d4c82e4d/mydns 127.0.0.1:7711
+
+Either way, you can always retrieve the address on which the DNS server
+is listening by peeking into the corresponding circuit element:
+
+	circuit peek /X88550014d4c82e4d/mydns
+
+This command will produce an output similar to this
+
+	{
+	    "Address": "127.0.0.1:7711",
+	    "Records": {}
+	}
+
+Once the DNS server element has been created, you can add resource records
+to it, one at a time, using
+
+	circuit set /X88550014d4c82e4d/mydns "miek.nl. 3600 IN MX 10 mx.miek.nl."
+
+Resource records use the canonical syntax, described in various RFCs.
+You can find a list of such RFCs as well as examples in the DNS Go library
+that underlies our implementation: `github.com/miekg/dns/dns.go`
+
+All records, associated with a given name can be removed with a single command:
+
+	circuit unset /X88550014d4c82e4d/mydns miek.nl.
+
+The current set of active records can be retrieved by peeking into the element:
+
+	circuit peek /X88550014d4c82e4d/mydns
+
+Assuming that a name has multiple records associated with it, peeking would produce
+an output similar to this one:
+
+	{
+		"Address": "127.0.0.1:2324",
+		"Records": {
+			"miek.nl.": [
+				"miek.nl.\t3600\tIN\tMX\t10 mx.miek.nl.",
+				"miek.nl.\t3600\tIN\tMX\t20 mx2.miek.nl."
+			]
+		}
+	}
+
 ### Example: Listen on server join and leave announcements ###
 
 The circuit provides two special element types `@join` and `@leave`, 
@@ -539,18 +560,6 @@ gauge the interest in this unconventional idea.
 * [GOPHERCON 2014](http://confreaks.com/videos/3421-gophercon2014-the-go-circuit-towards-elastic-computation-with-no-failures) Denver, CO
 * [STRANGELOOP 2013](http://blog.gocircuit.org/strangeloop-2013), St. Louis, MO
 
-## Upcoming presentations and things
-
-* Circuit New York interest group, in preparation.
-* [GOPHERCON India 2015](http://www.gophercon.in), applying.
-
 ## Bibliography
 
-* [Choiceless Polynomial Time](http://arxiv.org/pdf/math/9705225.pdf), 
-[Andreas Blass](http://www.math.lsa.umich.edu/~ablass/), 
-[Yuri Gurevich](http://research.microsoft.com/en-us/um/people/gurevich/) and 
-[Saharon Shelah](http://shelah.logic.at/), published by Shelah Office
-on [arXiv](http://arxiv.org/abs/math/9705225), 1997
-
-* [Choiceless Polynomial Time Logic: Inability to Express](http://link.springer.com/chapter/10.1007%2F3-540-44622-2_6),
-[Saharon Shelah](http://shelah.logic.at/), Springer Lecture Notes in Computer Science, Volume 1862, 2000, pp. 72-125
+* [Old Circuit website, original white papers and design documents](http://gocircuit-org.appspot.com)
