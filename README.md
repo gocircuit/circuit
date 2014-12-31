@@ -441,7 +441,7 @@ Assuming that a name has multiple records associated with it, peeking would prod
 an output similar to this one:
 
 	{
-		"Address": "127.0.0.1:2324",
+		"Address": "127.0.0.1:7711",
 		"Records": {
 			"miek.nl.": [
 				"miek.nl.\t3600\tIN\tMX\t10 mx.miek.nl.",
