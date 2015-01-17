@@ -1,5 +1,7 @@
 # Circuit
 
+<script data-gratipay-username="petar"data-gratipay-widget="button"src="//grtp.co/v1.js"></script>
+
 [![Build Status](https://travis-ci.org/gocircuit/circuit.svg?branch=master)](https://travis-ci.org/gocircuit/circuit) [![GoDoc](https://godoc.org/github.com/gocircuit/circuit/client?status.png)](https://godoc.org/github.com/gocircuit/circuit/client)
 
 ![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
