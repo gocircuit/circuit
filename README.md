@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/gocircuit/circuit.svg?branch=master)](https://travis-ci.org/gocircuit/circuit) [![GoDoc](https://godoc.org/github.com/gocircuit/circuit/client?status.png)](https://godoc.org/github.com/gocircuit/circuit/client)
 
+<img src="//img.shields.io/gratipay/petar.svg">
+
 ![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
 
 **The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
