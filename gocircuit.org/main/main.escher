@@ -9,4 +9,5 @@ main {
 	x:5 = *BuildCommandPage
 
 	x:ep = *BuildElementProcessPage
+	x:ec = *BuildElementContainerPage
 }
