@@ -5,6 +5,6 @@ main {
 	x:1 = *BuildIndexPage
 	x:2 = *BuildInstallPage
 	x:3 = *BuildRunPage
-	x:4 = *BuildSyntaxPage
+	x:4 = *BuildMetaphorPage
 	x:5 = *BuildCommandPage
 }
