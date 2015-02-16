@@ -1,0 +1,306 @@
+
+BuildSyntaxPage {
+        wf *io.WriteFile
+        wf:Content = *SyntaxPage
+        wf:Name = "syntax.html"
+        : = wf:Ready
+}
+
+SyntaxPage {
+	h *Html
+	h: = :
+	h:Title = "Escher syntax"
+	h:Body = t:
+
+	f *e.Fork
+	f:Backquoted = "`\n\t\t&lt;html&gt;\n\t\t\t&lt;div&gt;abc&lt;/div&gt;\n\t\t&lt;/html&gt;\n\t`"
+	f:ImgNand = fig:
+
+	fig *FigurePngSvg
+	fig:Image = "NAND"
+	fig:Width = "500px"
+	fig:Caption = `
+		In this illustration, the depicted circuit has three valves at the super gate,
+		labeled as “X”, “Y” and “” (the empty string). 
+		The <a href="#links">source for this circuit</a> is given later below.`
+
+	t *text.QuickForm
+	t:Data = f:
+	t:Form = `
+<h1>Syntax and meaning</h1>
+
+<p>At heart Escher is a Go package that parses a simple written syntax
+into a labeled graph data structure, called a <em>circuit</em>. If you view
+XML as a syntax that represents labeled trees, then Escher would be a 
+syntax that represents labeled graphs.
+
+<h2 id="circuits">Circuits</h2>
+
+<p>A circuit consists of nodes, called <em>gates</em>, which have
+a <em>name</em> and a <em>value</em>. Names are strings or integers. Gates have unique names
+within a circuit. Values are anything representable by the underlying
+technology, which for our implementation means any Go value, equivalently, <code>interface{}</code>.
+
+<p>Additionally, a circuit has a set of <em>links</em> across pairs of gates.
+A link has two endpoints, called <em>vectors</em>.
+Each vector consists of a gate name and a <em>valve</em>
+name. Vectors do not overlap in the sense that all vectors with the
+same gate name have unique valve names.
+
+<h2 id="symbolism">Symbolism</h2>
+
+<p>Circuits have a standard visual representation that fully captures
+the <em>internal</em> structure of the circuit, which consists of the
+gate names and links and excludes the gate values—the <em>external</em> structure.
+
+<p>To draw a circuit we start with a solid black oval, denoting the circuit's internal name space.
+White ovals—contained inside the black one and mutually non-overlapping—denote gates.
+
+<p>Links are depicted as white lines that connect the outlines of gate ovals.
+Link endpoints connecting to the <a href="#links">super gate</a> are attached to 
+the outline of the surrounding black oval. 
+
+<p>Valve names are written in white within the black oval, next to their 
+respective visual connection point. Connection points where valve names
+are visually missing correspond to empty-string valves.
+
+<p>The visual space inside the white gate ovals is reserved for the visual symbolic representation
+of that value, whatever it might be. If that value is primitive (integer, float, complex, string, directive),
+we just write it out in black text in the center of the oval. If that value is a circuit, we draw
+the symbolism for that circuit within the white oval recursively, but this time we switch
+white and black colors everywhere.
+
+{{.Gate.ImgNand}}
+
+<h2 id="runtime">Go interface</h2>
+
+<p>Within the Go runtime, circuits are represented by a dedicated type <code>Circuit</code>,
+whose definition is
+
+<pre class="go">
+type Circuit struct {
+	Gate map[Name]Value
+	Flow map[Name]map[Name]Vector
+}
+
+type Vector struct {
+	Gate  Name
+	Valve Name
+}
+
+type Name interface{}
+
+type Value interface{}
+</pre>
+
+<p>Type <code>Name</code> designates <code>string</code> or <code>int</code>.
+Type <code>Value</code> designates any Go value.
+
+<p>Using the Escher parser is very simple, in three steps:
+
+<ul>
+<li>Import the parsing package <code>"github.com/gocircuit/escher/see"</code></li>
+<li>Create a parsing object for your source string</li>
+<li>Repeatedly parse one circuit definition at a time</li>
+</ul>
+
+<p>The following example illustrates this:
+
+<pre class="go">
+package main
+
+import (
+	"fmt"
+	"github.com/gocircuit/escher/see"
+)
+
+func main() {
+	src = "alpha { a 123; b 3.14; a: = b:}\n beta { 1, 2, 3, \"abc\" }"
+	p := see.NewSrcString(src) // create a parsing object
+	for {
+		n, v := see.See(p) // parse one circuit at a time
+		if v == nil {
+			break
+		}
+		fmt.Printf("%v %v\n", n, v)
+	}
+}
+</pre>
+
+Note that parsing errors result in panics.
+
+<h2 id="grammar">Grammar</h2>
+
+<p>A <em>definition</em> starts with a circuit name followed by a circuit description
+inside brackets. The name is an alpha-numeric identifier.
+For instance,
+
+<pre class="escher">
+alpha {
+	…
+}
+</pre>
+
+<p>Between the brackets, one can have any number of statements which are of two kinds:
+<em>gates</em> and <em>links</em>. Statements are separated by new lines, commas
+or semi-colons.
+
+<h3 id="comments">Comments</h3>
+
+<p>Go-style end-of-line comments are allowed everywhere.
+
+<pre class="escher">
+alpha {            // circuit definition
+	float 1.23 // gate named float with a floating-point value
+	beta {}    // gate named beta with an empty circuit value
+}
+</pre>
+
+<h3 id="gates">Gates</h3>
+
+<p>Gate statements begin on a new line with a gate name identifier, space, and a gate value expression.
+There are six value types that can be expressed:
+<ul>
+<li>Integers
+<li>Floating-point numbers
+<li>Complex numbers
+<li>Strings
+<li>Directives
+<li>Circuits
+</ul>
+
+<p>The first four correspond to the Go types <code>int</code>, <code>float64</code>, <code>complex128</code>
+and <code>string</code> and are expressed using the same syntax. 
+Addresses have a dedicated Go type <code>Address</code>. They represent a sequence of names and are
+written as dot-separated fully-qualified names. Finally, circuits—whose dedicated Go type is <code>Circuit</code>—
+can be values of gates as well.
+
+<p>For instance,
+
+<pre class="escher">
+alpha {
+	directive1 *fully.qualified.Name
+	directive2 @fully.qualified.Name
+	integral   123
+	floating   3.14
+	complex    (1-3i)
+	quoted     "abcd\n\tefgh"
+	backquoted {{ .Gate.Backquoted }}
+}
+</pre>
+
+<p>Gate values can be circuits themselves,
+
+<pre class="escher">
+alpha {
+	beta {
+		Hello World
+		Foo   "Bar"
+	}
+}
+</pre>
+
+<h4 id="series">Series</h4>
+
+<p>Gate names can be omitted in circuit definitions, in which case gates are
+assigned consequtive integral names, starting from zero. We call the resulting 
+circuits <em>series</em>.
+
+<pre class="escher">
+alpha {
+	*fully.qualified.Name
+	@fully.qualified.Name
+	123
+	3.14
+	(1-3i)
+	"abcd\n\tefgh"
+	{{ .Gate.Backquoted }}
+	{
+		A 1
+		B "C"
+	}
+}
+</pre>
+
+<h3 id="links">Links</h3>
+
+<p>Circuit links are semantically symmetric. A link is a pair of two
+vectors, and a vector consists of a gate name and a valve name.
+
+<p>Vectors are written as the gate name, followed by <code>:</code> (the colon sign),
+followed by the valve name. Links are written as a vector, followed by optional whitespace,
+followed by <code>=</code> (the equals sign), followed by another optional whitespace and
+the second vector. For instance,
+
+<pre class="escher">
+	and:XAndY = not:X
+</pre>
+
+<p>A few idioms are commonly useful:
+<ul>
+<li>Link vectors can refer to gates that are not present in the circuit with a value</li>
+<li>Gate names can be the empty string. The empty-string gate is called the <em>super</em> gate.
+While one cannot assign a value to it through syntax, it is possible to connect links to it.
+
+<p>The super gate has a distinguished role in some contexts. 
+For instance, when <a href="program.html">materializing circuits</a>, 
+the links connected to the super gate are exposed to the higher-level “super” circuit.</li>
+<li>Valve names can be the empty string. We call such valves <em>default</em>, as
+they are commonly refered to hereinafter in various idioms.
+
+<p>For instance, it is a common pattern to name the output valve of 
+materializable circuits after the empty string. The default valve of the super gate,
+on the other hand, is a way of taking advantage of Escher's <a href="#sugar">syntactic sugar rule</a>.
+</ul>
+
+<p>Here is a comprehensive example of link definitions:
+
+<pre class="escher">
+Nand {
+	and *binary.And
+	not *binary.Not
+
+	and:X = :X
+	and:Y = :Y
+	and:XAndY = not:Z
+	not:NotZ = :
+}
+</pre>
+
+<h4 id="sugar">Syntactic sugar</h4>
+
+<p>When circuits are used to represent <a href="program.html">programs</a>—in other words, 
+executable code—it is common to include a gate and then link to its default valve.
+To reduce verbosity in this case, link definitions support a piece of syntactic sugar.
+
+<p>Either (or both) vectors in a link definition can be substituted for a gate value.
+This will be expanded into a gate definition with an automatically-generated name
+and a link to its default gate in sugar-free syntax. For example,
+
+<pre class="escher">
+	sum:X = 123
+</pre>
+
+Will be expanded into
+
+<pre class="escher">
+	0 123
+	sum:Summand = 0:
+</pre>
+
+<p>In another example both sides of the equation are sugared:
+
+<pre class="escher">
+	*os.Scanln = *os.Println
+</pre>
+
+This will expand to:
+
+<pre class="escher">
+	0 *os.Scanln
+	1 *os.Println
+	0: = 1:
+</pre>
+
+        `
+}

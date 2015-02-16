@@ -1,0 +1,78 @@
+@font-face {
+    font-family: 'itc-franklin-condensed';
+    src: url('itc-franklin-0.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'itc-franklin-condensed';
+    src: url('itc-franklin-1.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'itc-franklin-condensed';
+    src: url('itc-franklin-2.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'itc-franklin-condensed';
+    src: url('itc-franklin-3.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'itc-franklin-condensed';
+    src: url('itc-franklin-4.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'itc-franklin-condensed';
+    src: url('itc-franklin-5.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'itc-franklin';
+    src: url('itc-franklin-6.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'itc-franklin';
+    src: url('itc-franklin-7.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'itc-franklin';
+    src: url('itc-franklin-8.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'itc-franklin';
+    src: url('itc-franklin-9.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'itc-franklin0';
+    src: url('itc-franklin-10.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'itc-franklin1';
+    src: url('itc-franklin-11.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+}

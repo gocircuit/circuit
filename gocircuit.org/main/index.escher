@@ -1,0 +1,103 @@
+BuildIndexPage {
+        wf *io.WriteFile
+        wf:Content = *IndexPage
+        wf:Name = "index.html"
+        : = wf:Ready
+}
+
+IndexPage {
+        h *Html
+        h: = :
+        h:Title = "The Escher language"
+        h:Body = `
+<h1>Escher language</h1>
+
+<p>Web pages and links form a graph. Datacenter computers and cables form a graph.
+Application processes and connections form a graph. Facebook users and
+friendships form a graph. Facebook groups and memberships form a graph.
+Neurons and synapses form a graph. Threads and shared data structures form a graph.
+Processes and sockets form a graph.
+
+<p>Not only are all of the above situations visually described by graphs, but also
+their essential behavior (as best as we understand it) is the same in all cases:
+Independent processing units, pairwise-interlinked by sequential channels—both channels
+and processors emerging and disappearing asynchronously.
+
+<p>Three decades ago, before the above examples were within practical reach,
+a British gentleman—named <a href="http://en.wikipedia.org/wiki/Tony_Hoare">Tony
+Hoare</a>—had noticed that this essential behavior was exhibited by virtually
+all identifiable interacting physical (as well as man-made abstract) entities: People interacting with people,
+people interacting with vending machines, components of vending
+machines interacting with each other, animals interacting with animals, 
+cells interacting with cells, proteins interacting with proteins, and so on.
+
+<p>He called this high-level behavioral model of the world (or discernable subsystems thereof)
+<a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">Communicating Sequential Processes</a>.
+Hoare's model is nothing more and nothing less than a minimal abstraction of how
+we see and understand (and subsequently will to control) the world from an 
+observer—i.e. third person—point of view.
+
+<p>I prefer to call such systems <em>circuits</em> both for brevity and for the fact that
+electrical circuits were probably the first man-made manifestation of communicating sequential
+processes that was rich, flexible and not present in untouched nature.
+
+<p>Today's connected Internet services and devices are no different than electrical components on
+a circuit: They are independent processing units communicating via sequential streams of
+data, as opposed to sequential streams of changes in electrical voltage. The difference
+between circuits analog and digital is entirely linguistic: It is the difference between a 
+floating-point number (the voltage) and a data structure (a digital message).
+
+<p>If it is indeed the case that most things that we program or that we program about
+are circuits at the end of the day, then it is only appropriate to complement Hoare's
+model of everything with an appropriate programming language. This is the goal of Escher.
+
+<h2>Sources</h2>
+
+<p>Find the source repository for <a href="https://github.com/gocircuit/escher">Escher on GitHub</a>. 
+Follow us on Twitter <a href="https://twitter.com/escherio">@escherio</a>.
+
+<h2>Documentation</h2>
+
+<ul>
+<li><a href="install.html">Building and installing</a></li>
+<li><a href="syntax.html">Circuit syntax</a></li>
+<li><a href="meaning.html">Interpretations of circuits</a></li>
+<li><a href="reflex.html">Implementing reflexes</a></li>
+<li><a href="program.html">Programs and materialization</a></li>
+<li><a href="basis.html">Reflex basis and faculties</a>
+<ul>
+<li><a href="basis-flow.html">Information flow faculty</a></li>
+<li><a href="basis-escher.html">Escher faculty</a></li>
+<li><a href="basis-os.html">POSIX faculty</a></li>
+</ul>
+</li>
+<li><a href="cmd.html">Command-line and runtime</a></li>
+<li><a href="debug.html">Debugging and panics</a></li>
+</ul>
+
+<h2>Case studies</h2>
+
+<ul>
+<li>This handbook is written by an Escher program</li>
+<li><a href="cloud.html">Paradigm for building clouds with Circuit and Escher</a></li>
+</ul>
+
+<!--h2>Faculties</h2>
+
+<ul>
+<li>Modelling</li>
+<li>Drawing</li>
+</ul>
+
+<h2>Case studies</h2>
+
+<ul>
+<li>Embedding Escher in applications</li>
+<li>Orchestrating circuits of Docker containers</li>
+<li>Auto-evolving bug tracking</li>
+</ul-->
+
+<p>
+
+        `
+}

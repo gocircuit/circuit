@@ -1,0 +1,59 @@
+
+BuildCommandPage {
+        wf *io.WriteFile
+        wf:Content = *CommandPage
+        wf:Name = "cmd.html"
+        : = wf:Ready
+}
+
+CommandPage {
+	h *Html
+	h: = :
+	h:Title = "Command-line and runtime"
+	h:Body = t:
+
+	t *text.QuickForm
+	t:Data = {}
+	t:Form = `
+
+<h1>Command-line and runtime</h1>
+
+<p>The Escher binary is intended to be a general-purpose execution environment for
+Escher programs. It is invoked with two parameters:
+
+<pre>
+escher -src SourceDirectory MainDirective
+</pre>
+
+The following steps are performed upon invocation:
+
+<ol>
+<li>A default (initially empty) startup index is created.</li>
+<li>Basis reflexes are registered in the startup index, as described in the <a href="reflex.html">reflex section</a>.
+<li>The supplied source directory is traversed recursively:
+	<ul>
+	<li>Files with extension <code>.escher</code> are parsed as Escher source files.
+	Circuits found therein are placed in the startup index, such that their location in the index
+	is the same as the path of their source file relative to the source directory, followed by their circuit names.
+	For instance, the source file <code>a/b/c.escher</code>, containing:
+	<pre>
+		CircuitName { … }
+	</pre>
+	Will be registered under the index address <code>a.b.c.CircuitName</code>.
+	</li>
+	<li>Files with other extensions will be converted into <code>SourceFile</code> reflex materializers,
+	located in the index at the path of their source file relative to the source directory. <code>SourceFile</code>
+	reflexes, when materialized, return an <code>io.ReadCloser</code> for the content of the source file.
+	</ul>
+</li>
+<li>Finally, the main directive is materialized.
+</ol>
+<p>The following command, for instance, will generate the contents of this handbook and place it in the
+current working directory where it is invoked:
+<pre>
+escher -src github.com/gocircuit/escher/src *handbook.main
+</pre>
+<p>The <code>-src</code> can be omitted in favor of setting the <code>ESCHER</code> environment variable.
+
+`
+}

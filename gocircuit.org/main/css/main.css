@@ -1,0 +1,89 @@
+*, body, li, ul, table, td, ul, ol, dt, dd {
+	/*background: rgb(240,255,255);*/
+	background:  rgb(245,255,255);
+	/*color: rgba(95,95,95, 0.8);*/
+	color: rgba(30,30,30, 0.7);
+	font-family: 'helvetica', sans-serif;
+	font-weight: 400;
+	line-height: 1.4em;
+	/*letter-spacing: -0.05em;*/
+}
+
+body, div {
+	padding: 0;
+	margin: 0;
+	font-size: 17px;
+}
+
+code, pre {
+	color: rgba(50, 50,180, 0.7);
+	font-family: menlo, monospace;
+	font-size: 14px;
+	font-weight: 100;
+	/*letter-spacing: -0.03em;*/
+	tab-size: 4;
+}
+
+ul {
+	list-style-type: filled-circle;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: helvetica, sans-serif;
+	color: rgba(95,95,95, 0.8);
+	font-weight: 400;
+}
+
+h1 { font-size: 32px; }
+h2 { font-size: 26px; }
+h3 { font-size: 22px; }
+h4 { font-size: 20px; }
+
+a {
+	font-family: inherit;
+	margin: 0;
+	color: rgba(0,0,230, 0.7);
+	text-decoration: none;
+	/*font-weight: 600;*/
+	/*border-bottom: 1px solid rgba(90,90,90,0.9);*/
+	/*background: rgb(215,235,245);*/
+	/*padding: 2px;*/
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/*pre.go {color: #333333; }
+pre.escher {color: rgb(200,100,120); }
+*/
+pre {
+	margin-left: 20px;
+}
+
+div.page {
+	margin: auto auto;
+	padding: 4em;
+	//width: 750px;
+}
+
+div.header {
+	font-family: helvetica, sans-serif;
+	padding: 20px;
+	left: 0;
+	right: 0;
+	background: rgba(220,250,255,0.9);
+	/*color: white;*/
+}
+
+div.header a {
+	background: none;
+	/*color: white;*/
+}
+
+div.footer {
+	font-family: helvetica, sans-serif;
+	text-align: center;
+	font-size: 13px;
+	padding: 20px;
+}
