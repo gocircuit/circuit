@@ -10,7 +10,8 @@ IndexPage {
         h: = :
         h:Title = "Circuit: Self-managed infrastructure, dynamic orchestration"
         h:Body = `
-<h1>Circuit: Self-managed infrastructure, dynamic orchestration</h1>
+
+<h1>Circuit: Self-managed cloud OS at the level of hosts, containers and links</h1>
 
 <p>??
 
