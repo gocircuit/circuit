@@ -1,6 +1,6 @@
 *, body, li, ul, table, td, ul, ol, dt, dd {
 	/*background: rgb(240,255,255);*/
-	background:  rgb(245,255,255);
+	/*background:  rgb(245,255,255);*/
 	/*color: rgba(95,95,95, 0.8);*/
 	color: rgba(30,30,30, 0.7);
 	font-family: 'helvetica', sans-serif;
@@ -64,7 +64,7 @@ pre {
 div.page {
 	margin: auto auto;
 	padding: 4em;
-	//width: 750px;
+	width: 800px;
 }
 
 div.header {
@@ -72,7 +72,7 @@ div.header {
 	padding: 20px;
 	left: 0;
 	right: 0;
-	background: rgba(220,250,255,0.9);
+	background: rgba(250,240,245,0.9);
 	/*color: white;*/
 }
 
@@ -86,4 +86,9 @@ div.footer {
 	text-align: center;
 	font-size: 13px;
 	padding: 20px;
+}
+
+figure {
+	margin-top: 50px;
+	margin-bottom: 50px;
 }

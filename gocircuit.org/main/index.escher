@@ -17,8 +17,8 @@ IndexPage {
 
 <h2>Sources</h2>
 
-<p>Find the source repository for <a href="https://github.com/gocircuit/escher">Escher on GitHub</a>. 
-Follow us on Twitter <a href="https://twitter.com/escherio">@escherio</a>.
+<p>Find the source repository for <a href="https://github.com/gocircuit/circuit">Circuit on GitHub</a>. 
+Follow us on Twitter <a href="https://twitter.com/gocircuit">@gocircuit</a>.
 
 <h2>Documentation</h2>
 
@@ -28,7 +28,7 @@ Follow us on Twitter <a href="https://twitter.com/escherio">@escherio</a>.
 <li><a href="metaphor.html">Programming metaphor</a></li>
 <li>Elements
 <ul>
-<li><a href="">Process</a></li>
+<li><a href="element-process.html">Process</a></li>
 <li><a href="">Container</a></li>
 <li><a href="">Subscription</a></li>
 <li><a href="">Name server</a></li>
@@ -40,10 +40,10 @@ Follow us on Twitter <a href="https://twitter.com/escherio">@escherio</a>.
 <h2>Tutorials</h2>
 
 <ul>
-<li><a href="">Starting a node.js and MySQL stack</a></li>
-<li><a href="">Starting a node.js, memcache and MySQL stack with co-location conditions</a></li>
-<li><a href="">Adding recovery logic for process failure</a></li>
-<li><a href="">Adding recovery from host failure</a></li>
+<li><a href="">Step 1: Starting a node.js and MySQL stack</a></li>
+<li><a href="">Step 2: Starting a node.js, memcache and MySQL stack with co-location conditions</a></li>
+<li><a href="">Step 3: Adding recovery logic for process failure</a></li>
+<li><a href="">Step 4: Adding recovery from host failure</a></li>
 </ul>
 
 <p>

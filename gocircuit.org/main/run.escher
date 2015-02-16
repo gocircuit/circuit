@@ -17,7 +17,7 @@ RunPage {
 
 	fig *FigurePngSvg
 	fig:Image = "servers"
-	fig:Width = "500px"
+	fig:Width = "400px"
 	fig:Caption = `A circuit system of two hosts (i.e. two circuit servers).`
 
 	t *text.QuickForm
