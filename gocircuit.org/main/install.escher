@@ -9,33 +9,22 @@ BuildInstallPage {
 InstallPage {
         h *Html
         h: = :
-        h:Title = "Building and installing Escher"
+        h:Title = "Building and installing Circuit"
         h:Body = t:
 
         t *text.QuickForm
         t:Data = {}
         t:Form = `
-<h1>Bulding and installing Escher</h1>
+<h1>Building and installing Circuit</h1>
 
-<p>Escher requires the <a href="http://golang.org">Go language toolchain</a> to be installed first.
-Fetching, building and installing Escher can then be accomplished with one command:
+<p>The Circuit comprises one small binary. It can be built for Linux and Darwin.
 
-<pre>
-	% go get github.com/gocircuit/escher/escher
-</pre>
-
-<p>To check that installation succeeded, run
+<p>Given that the <a href="http://golang.org">Go Language</a> compiler is <a href="http://golang.org/doc/install">installed</a>,
+you can build and install the circuit binary with one line:
 
 <pre>
-	% ESCHER=github.com/gocircuit/escher/src escher test.All
-	+ Test basic.TestFork (ok)
-	+ Test basic.TestFunc (ok)
-	+ Test text.TestForm (ok)
-	+ Test yield.TestValues (ok)
-	…
+	go get github.com/gocircuit/circuit/cmd/circuit
 </pre>
 
-<p>Note that the environment <code>ESCHER</code> must point to the <code>src</code>
-subdirectory of the main Escher repo on your host.
         `
 }
