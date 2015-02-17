@@ -45,7 +45,7 @@ Follow us on Twitter <a href="https://twitter.com/gocircuit">@gocircuit</a>.
 <li><a href="element-process.html">Process</a></li>
 <li><a href="element-container.html">Container</a></li>
 <li><a href="">Notifications subscription</a></li>
-<li><a href="">Name server (linking processes and containers)</a></li>
+<li><a href="element-dns.html">Name server (linking processes and containers)</a></li>
 </ul>
 </li>
 <li><a href="cmd.html">Command-line and runtime</a></li>
