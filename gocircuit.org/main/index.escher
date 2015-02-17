@@ -8,10 +8,10 @@ BuildIndexPage {
 IndexPage {
         h *Html
         h: = :
-        h:Title = "Circuit: Self-managed infrastructure, dynamic orchestration"
+        h:Title = "Circuit: Self-managed infrastructure, programmatic monitoring and orchestration"
         h:Body = `
 
-<h1>Circuit: Self-managed cloud OS at the level of hosts, containers and links</h1>
+<h1>Circuit: Self-managed cloud OS</h1>
 
 <p>??
 
@@ -30,8 +30,8 @@ Follow us on Twitter <a href="https://twitter.com/gocircuit">@gocircuit</a>.
 <ul>
 <li><a href="element-process.html">Process</a></li>
 <li><a href="element-container.html">Container</a></li>
-<li><a href="">Subscription</a></li>
-<li><a href="">Name server</a></li>
+<li><a href="">Notifications subscription</a></li>
+<li><a href="">Name server (linking processes and containers)</a></li>
 </ul>
 </li>
 <li><a href="cmd.html">Command-line and runtime</a></li>

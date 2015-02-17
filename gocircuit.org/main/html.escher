@@ -29,7 +29,7 @@ Html {
 	`
 	d:Header = `
 	<div class="header">
-	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure with an API for dynamic orchestration
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
 	</div>
 	`
 	: = t:
