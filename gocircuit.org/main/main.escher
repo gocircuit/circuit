@@ -10,5 +10,6 @@ main {
 
 	x:ep = *BuildElementProcessPage
 	x:ec = *BuildElementContainerPage
+	x:es = *BuildElementSubscriptionPage
 	x:ed = *BuildElementDnsPage
 }
