@@ -50,6 +50,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="element-container.html">Container</a></li>
 <li><a href="element-subscription.html">Subscription</a></li>
 <li><a href="element-dns.html">Name server</a></li>
+<li><a href="element-channel.html">Channel</a></li>
 </ul>
 </li>
 <li><a href="cmd.html">Command-line and runtime</a></li>
@@ -58,11 +59,18 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <h2>Tutorials</h2>
 
+<h3>A typical web stack</h3>
 <ul>
 <li><a href="">Step 1: Starting a node.js and MySQL stack</a></li>
 <li><a href="">Step 2: Starting a node.js, memcache and MySQL stack with co-location conditions</a></li>
 <li><a href="">Step 3: Adding recovery logic for process failure</a></li>
 <li><a href="">Step 4: Adding recovery from host failure</a></li>
+</ul>
+
+<h3>A server with a maintenance bot</h3>
+<ul>
+<li><a href="">Step 1: Starting a web server with a monitor-and-restart bot</a></li>
+<li><a href="">Step 2: Controling the state of the bot through channels</a></li>
 </ul>
 
 <p>
