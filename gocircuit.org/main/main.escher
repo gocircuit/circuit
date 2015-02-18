@@ -7,7 +7,8 @@ main {
 	x:3 = *BuildRunPage
 	x:4 = *BuildMetaphorPage
 	x:5 = *BuildCommandPage
-	x:6 = *BuildHistoryPage
+	x:6 = *BuildSecurityPage
+	x:7 = *BuildHistoryPage
 
 	x:ep = *BuildElementProcessPage
 	x:ec = *BuildElementContainerPage
