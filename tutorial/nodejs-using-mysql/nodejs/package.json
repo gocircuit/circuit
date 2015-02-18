@@ -1,0 +1,9 @@
+{
+	"name": "nodejs-using-mysql",
+	"version": "0.0.1",
+	"description": "An example node.js server using a downstream MySQL server.",
+	"dependencies": {
+		"express": "^4.10.6",
+		"mysql": "^2.5.4"
+	}
+}
