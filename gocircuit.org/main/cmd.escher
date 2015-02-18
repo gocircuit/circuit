@@ -9,51 +9,107 @@ BuildCommandPage {
 CommandPage {
 	h *Html
 	h: = :
-	h:Title = "Command-line and runtime"
+	h:Title = "Command-line client"
 	h:Body = t:
 
+	f *e.Fork
+	f:FigClient = fig:
+	f:FigServerAnchor = fig2:
+
+	fig *FigurePngSvg
+	fig:Image = "client"
+	fig:Width = "500px"
+	fig:Caption = `Circuit client connected to a server.`
+
+	fig2 *FigurePngSvg
+	fig2:Image = "serveranchor"
+	fig2:Width = "500px"
+	fig2:Caption = `Circuit servers correspond to root-level anchors.`
+
 	t *text.QuickForm
-	t:Data = {}
+	t:Data = f:
 	t:Form = `
 
-<h1>Command-line and runtime</h1>
+<h2>Using the command-line client</h2>
 
-<p>The Escher binary is intended to be a general-purpose execution environment for
-Escher programs. It is invoked with two parameters:
+<p>Once the circuit servers are started, you can create, observe and control
+circuit elements (i) interactively—using the circuit binary which doubles as a command-line client—as
+well as (ii) programmatically—using the circuit Go client package <code>github.com/gocircuit/circuit/client</code>.
+In fact, the circuit command-line tool is simply a front-end for the Go client library.
+
+<p>Clients (the tool or your own) <em>dial into</em> a circuit server in order to
+interact with the entire system. All servers are equal citizens in every respect and,
+in particular, any one can be used as a choice for dial-in.
+
+{{.Gates.FigClient}}
+
+<p>The tool (described in more detail later) is essentially a set of commands that
+allow you to traverse the global hierarchical namespace of circuit elements,
+and interact with them, somewhat similarly to how one uses the Zookeeper
+namespace.
+
+<p>For example, to list the entire circuit cluster anchor hierarchy, type in
 
 <pre>
-escher -src SourceDirectory MainDirective
+	circuit ls /
 </pre>
 
-The following steps are performed upon invocation:
+<p>So, you might get something like this in response
 
-<ol>
-<li>A default (initially empty) startup index is created.</li>
-<li>Basis reflexes are registered in the startup index, as described in the <a href="reflex.html">reflex section</a>.
-<li>The supplied source directory is traversed recursively:
-	<ul>
-	<li>Files with extension <code>.escher</code> are parsed as Escher source files.
-	Circuits found therein are placed in the startup index, such that their location in the index
-	is the same as the path of their source file relative to the source directory, followed by their circuit names.
-	For instance, the source file <code>a/b/c.escher</code>, containing:
-	<pre>
-		CircuitName { … }
-	</pre>
-	Will be registered under the index address <code>a.b.c.CircuitName</code>.
-	</li>
-	<li>Files with other extensions will be converted into <code>SourceFile</code> reflex materializers,
-	located in the index at the path of their source file relative to the source directory. <code>SourceFile</code>
-	reflexes, when materialized, return an <code>io.ReadCloser</code> for the content of the source file.
-	</ul>
-</li>
-<li>Finally, the main directive is materialized.
-</ol>
-<p>The following command, for instance, will generate the contents of this handbook and place it in the
-current working directory where it is invoked:
 <pre>
-escher -src github.com/gocircuit/escher/src *handbook.main
+	/X88550014d4c82e4d
+	/X938fe923bcdef2390
 </pre>
-<p>The <code>-src</code> can be omitted in favor of setting the <code>ESCHER</code> environment variable.
+
+<p>The two root-level anchors correspond to the two circuit servers.
+
+{{.Gates.FigServerAnchor}}
+
+<h3>Pointing the tool to your circuit cluster</h3>
+
+<p>Before you can use the <code>circuit</code> tool, you need to tell it how to locate
+one circuit server for us a <em>dial-in</em> point.
+
+<p>There are two ways to provide the dial-in server address to the tool:
+
+<p>1. If the circuit servers were started with the <code>-discover</code> option or the
+<code>CIRCUIT_DISCOVER</code> environment variable, the command-line tool
+can use the same methods for finding a circuit server. E.g.
+
+<pre>
+	circuit ls -discover 228.8.8.8:7711 /...
+</pre>
+
+<p>Or,
+
+<pre>
+	export CIRCUIT_DISCOVER=228.8.8.8:7711
+	circuit ls /...
+</pre>
+
+<p>2. With the command-line option <code>-d</code>, like e.g.
+
+<pre>
+		circuit ls -d circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d /
+</pre>
+
+<p>Or, equivalently, by setting the environment variable <code>CIRCUIT</code> to point to a file
+whose contents is the desired dial-in address. For example, (in bash):
+
+<pre>
+		echo circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d > ~/.circuit
+		export CIRCUIT="~/.circuit"
+		circuit ls /
+</pre>
+
+<p>A list of available tool commands is shown on the help screen
+
+<pre>
+	circuit help
+</pre>
+
+<p>A more detailed explanation of their meaning and function can be found
+in the documentation of the client package, <code>github.com/gocircuit/client</code>.
 
 `
 }

@@ -1,0 +1,6 @@
+
+https://docs.docker.com/installation/mac/
+
+boot2docker init
+boot2docker start
+$(boot2docker shellinit)
