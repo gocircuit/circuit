@@ -1,15 +1,8 @@
 package main
 
-BuildCommandPage {
-        wf *io.WriteFile
-        wf:Content = *CommandPage
-        wf:Name = "cmd.html"
-        : = wf:Ready
-}
-
 func RenderCommandPage() string {
 	figs := A{
-		"FigClient": RenderFigurePngSvg("Circuit client connected to a server.", "client", "500px"),
+		"FigClient":       RenderFigurePngSvg("Circuit client connected to a server.", "client", "500px"),
 		"FigServerAnchor": RenderFigurePngSvg("Circuit servers correspond to root-level anchors.", "serveranchor", "500px"),
 	}
 	return RenderHtml("Command-line client", Render(commandBody, figs))

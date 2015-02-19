@@ -1,20 +1,10 @@
+package main
 
-BuildInstallPage {
-        wf *io.WriteFile
-        wf:Content = *InstallPage
-        wf:Name = "install.html"
-        : = wf:Ready
+func RenderInstallPage() string {
+	return RenderHtml("Building and installing Circuit", Render(installBody, nil))
 }
 
-InstallPage {
-        h *Html
-        h: = :
-        h:Title = "Building and installing Circuit"
-        h:Body = t:
-
-        t *text.QuickForm
-        t:Data = {}
-        t:Form = `
+const installBody = `
 <h1>Building and installing Circuit</h1>
 
 <p>The Circuit comprises one small binary. It can be built for Linux and Darwin.
@@ -27,4 +17,3 @@ you can build and install the circuit binary with one line:
 </pre>
 
         `
-}
