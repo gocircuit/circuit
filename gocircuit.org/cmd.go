@@ -1,3 +1,4 @@
+package main
 
 BuildCommandPage {
         wf *io.WriteFile
@@ -6,29 +7,15 @@ BuildCommandPage {
         : = wf:Ready
 }
 
-CommandPage {
-	h *Html
-	h: = :
-	h:Title = "Command-line client"
-	h:Body = t:
+func RenderCommandPage() string {
+	figs := A{
+		"FigClient": RenderFigurePngSvg("Circuit client connected to a server.", "client", "500px"),
+		"FigServerAnchor": RenderFigurePngSvg("Circuit servers correspond to root-level anchors.", "serveranchor", "500px"),
+	}
+	return RenderHtml("Command-line client", Render(commandBody, figs))
+}
 
-	f *e.Fork
-	f:FigClient = fig:
-	f:FigServerAnchor = fig2:
-
-	fig *FigurePngSvg
-	fig:Image = "client"
-	fig:Width = "500px"
-	fig:Caption = `Circuit client connected to a server.`
-
-	fig2 *FigurePngSvg
-	fig2:Image = "serveranchor"
-	fig2:Width = "500px"
-	fig2:Caption = `Circuit servers correspond to root-level anchors.`
-
-	t *text.QuickForm
-	t:Data = f:
-	t:Form = `
+const commandBody = `
 
 <h2>Using the command-line client</h2>
 
@@ -41,7 +28,7 @@ In fact, the circuit command-line tool is simply a front-end for the Go client l
 interact with the entire system. All servers are equal citizens in every respect and,
 in particular, any one can be used as a choice for dial-in.
 
-{{.Gates.FigClient}}
+{{.FigClient}}
 
 <p>The tool (described in more detail later) is essentially a set of commands that
 allow you to traverse the global hierarchical namespace of circuit elements,
@@ -63,7 +50,7 @@ namespace.
 
 <p>The two root-level anchors correspond to the two circuit servers.
 
-{{.Gates.FigServerAnchor}}
+{{.FigServerAnchor}}
 
 <h3>Pointing the tool to your circuit cluster</h3>
 
@@ -112,4 +99,3 @@ whose contents is the desired dial-in address. For example, (in bash):
 in the documentation of the client package, <code>github.com/gocircuit/client</code>.
 
 `
-}

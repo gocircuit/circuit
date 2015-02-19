@@ -15,4 +15,6 @@ main {
 	x:es = *BuildElementSubscriptionPage
 	x:ed = *BuildElementDnsPage
 	x:eh = *BuildElementChannelPage
+
+	x:tut = *
 }

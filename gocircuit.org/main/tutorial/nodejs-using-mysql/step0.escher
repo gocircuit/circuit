@@ -1,0 +1,23 @@
+
+BuildStep0Page {
+        wf *io.WriteFile
+        wf:Content = *Step0Page
+        wf:Name = "step0.html"
+        : = wf:Ready
+}
+
+Step0Page {
+        h *Html
+        h: = :
+        h:Title = "Step 0: Prepare host VM images with the application software"
+        h:Body = t:
+
+        t *text.QuickForm
+        t:Data = {}
+        t:Form = `
+
+<h1>Step 0: Prepare host VM images with the application software</h1>
+
+
+        `
+}
