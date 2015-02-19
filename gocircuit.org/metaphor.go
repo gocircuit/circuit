@@ -1,20 +1,10 @@
+package main
 
-BuildMetaphorPage {
-        wf *io.WriteFile
-        wf:Content = *MetaphorPage
-        wf:Name = "metaphor.html"
-        : = wf:Ready
+func RenderMetaphorPage() string {
+	return RenderHtml("Programming metaphor", Render(metaphorBody, nil))
 }
 
-MetaphorPage {
-        h *Html
-        h: = :
-        h:Title = "Programming metaphor"
-        h:Body = t:
-
-        t *text.QuickForm
-        t:Data = {}
-        t:Form = `
+const metaphorBody = `
 
 <h1>Programming metaphor </h1>
 
@@ -57,4 +47,3 @@ circuit cluster, while their data structure lives on the circuit server hosting
 their anchor.
 
         `
-}

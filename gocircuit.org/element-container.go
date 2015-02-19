@@ -1,28 +1,13 @@
+package main
 
-BuildElementContainerPage {
-        wf *io.WriteFile
-        wf:Content = *ElementContainerPage
-        wf:Name = "element-container.html"
-        : = wf:Ready
+func RenderElementContainerPage() string {
+	figs := A{
+		"FigMkDkr": RenderFigurePngSvg("Docker elements are similar to processes.", "mkdkr", "600px"),
+	}
+	return RenderHtml("Circuit container element", Render(containerBody, figs))
 }
 
-ElementContainerPage {
-	h *Html
-	h: = :
-	h:Title = "Circuit container element"
-	h:Body = t:
-
-	f *e.Fork
-	f:FigMkDkr = fig:
-
-	fig *FigurePngSvg
-	fig:Image = "mkdkr"
-	fig:Width = "600px"
-	fig:Caption = `Docker elements are similar to processes.`
-
-	t *text.QuickForm
-	t:Data = f:
-	t:Form = `
+const containerBody = `
 
 <h2>Example: Make a docker container</h2>
 
@@ -59,7 +44,7 @@ with the <code>-docker</code> switch. For instance:
 <p>Most of these fields can be omitted analogously to their command-line option counterparts 
 of the <code>docker</code> command-line tool.
 
-{{.Gates.FigMkDkr}}
+{{.FigMkDkr}}
 
 <p>The remaining docker element commands are identical to those for processes:
 <code>stdin</code>, <code>stdout</code>, <code>stderr</code>, <code>peek</code> and 
@@ -67,4 +52,3 @@ of the <code>docker</code> command-line tool.
 a detailed description of the container, derived from <code>docker inspect</code>. 
 
         `
-}

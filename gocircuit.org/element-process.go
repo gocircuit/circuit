@@ -1,28 +1,13 @@
+package main
 
-BuildElementProcessPage {
-        wf *io.WriteFile
-        wf:Content = *ElementProcessPage
-        wf:Name = "element-process.html"
-        : = wf:Ready
+func RenderElementProcessPage() string {
+	figs := A{
+		"FigMkProc": RenderFigurePngSvg("Process elements execute OS processes on behalf of the user.", "mkproc", "600px"),
+	}
+	return RenderHtml("Circuit process element", Render(processBody, figs))
 }
 
-ElementProcessPage {
-	h *Html
-	h: = :
-	h:Title = "Circuit process element"
-	h:Body = t:
-
-	f *e.Fork
-	f:FigMkProc = fig:
-
-	fig *FigurePngSvg
-	fig:Image = "mkproc"
-	fig:Width = "600px"
-	fig:Caption = `Process elements execute OS processes on behalf of the user.`
-
-	t *text.QuickForm
-	t:Data = f:
-	t:Form = `
+const processBody = `
 
 <h2>Example: Make a process</h2>
 
@@ -46,7 +31,7 @@ cluster machine, first see what machines are available:
 	EOF
 </pre>
 
-{{.Gate.FigMkProc}}
+{{.FigMkProc}}
 
 <p>See what happened:
 
@@ -74,4 +59,3 @@ the standard input first, as shown above):
 </pre>
 
         `
-}

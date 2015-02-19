@@ -1,20 +1,10 @@
+package main
 
-BuildElementSubscriptionPage {
-        wf *io.WriteFile
-        wf:Content = *ElementSubscriptionPage
-        wf:Name = "element-subscription.html"
-        : = wf:Ready
+func RenderElementSubscriptionPage() string {
+	return RenderHtml("Circuit subscription element", Render(subscriptionBody, nil))
 }
 
-ElementSubscriptionPage {
-	h *Html
-	h: = :
-	h:Title = "Circuit DNS element"
-	h:Body = t:
-
-	t *text.QuickForm
-	t:Data = {}
-	t:Form = `
+const subscriptionBody = `
 
 <h2>Example: Listen on server join and leave announcements</h2>
 
@@ -43,4 +33,3 @@ a circuit server disappears from the system.
 </pre>
 
         `
-}

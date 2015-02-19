@@ -1,20 +1,10 @@
+package main
 
-BuildElementDnsPage {
-        wf *io.WriteFile
-        wf:Content = *ElementDnsPage
-        wf:Name = "element-dns.html"
-        : = wf:Ready
+func RenderElementDnsPage() string {
+	return RenderHtml("Circuit DNS element", Render(dnsBody, nil))
 }
 
-ElementDnsPage {
-	h *Html
-	h: = :
-	h:Title = "Circuit DNS element"
-	h:Body = t:
-
-	t *text.QuickForm
-	t:Data = {}
-	t:Form = `
+const dnsBody = `
 
 <h2>Example: Make a DNS server element</h2>
 
@@ -91,4 +81,3 @@ an output similar to this one:
 </pre>
 
         `
-}

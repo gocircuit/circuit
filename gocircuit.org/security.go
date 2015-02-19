@@ -1,20 +1,10 @@
+package main
 
-BuildSecurityPage {
-        wf *io.WriteFile
-        wf:Content = *SecurityPage
-        wf:Name = "security.html"
-        : = wf:Ready
+func RenderSecurityPage() string {
+	return RenderHtml("Security and networking", Render(securityBody, nil))
 }
 
-SecurityPage {
-        h *Html
-        h: = :
-        h:Title = "Security and networking"
-        h:Body = t:
-
-        t *text.QuickForm
-        t:Data = {}
-        t:Form = `
+const securityBody = `
 
 <h2>Security</h2>
 
@@ -55,6 +45,4 @@ being able to reverse-dial into a client.
 <p>For this reason, circuit clients (the circuit tool or your apps) CANNOT
 be behind a firewall with respect to the servers they are dialing into.
 
-
         `
-}

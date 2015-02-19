@@ -1,28 +1,13 @@
+package main
 
-BuildElementChannelPage {
-        wf *io.WriteFile
-        wf:Content = *ElementChannelPage
-        wf:Name = "element-channel.html"
-        : = wf:Ready
+func RenderElementChannelPage() string {
+	figs := A{
+		"FigMkChan": RenderFigurePngSvg("Channel elements reside in the memory of a circuit server.", "mkchan", "600px"),
+	}
+	return RenderHtml("Circuit channel element", Render(elementChannelBody, figs))
 }
 
-ElementChannelPage {
-	h *Html
-	h: = :
-	h:Title = "Circuit channel element"
-	h:Body = t:
-
-	f *e.Fork
-	f:FigMkChan = fig:
-
-	fig *FigurePngSvg
-	fig:Image = "mkchan"
-	fig:Width = "600px"
-	fig:Caption = `Channel elements reside in the memory of a circuit server.`
-
-	t *text.QuickForm
-	t:Data = f:
-	t:Form = `
+const elementChannelBody = `
 
 <h2>Example: Create a channel</h2>
 
@@ -44,7 +29,7 @@ let's create a channel on <code>X88550014d4c82e4d</code>:
 <p>The last argument of this line is the channel buffer capacity,
 analogously to the way channels are created in Go.
 
-{{.Gates.FigMkChan}}
+{{.FigMkChan}}
 
 <p>Verify the channel was created:
 
@@ -89,4 +74,3 @@ it for an eventual receiver) but only up to 32K bytes.
 the command above.
 
         `
-}
