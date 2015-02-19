@@ -1,28 +1,13 @@
+package main
 
-BuildRunPage {
-        wf *io.WriteFile
-        wf:Content = *RunPage
-        wf:Name = "run.html"
-        : = wf:Ready
+func RenderRunPage() string {
+	figs := A{
+		"FigTwoHosts": RenderFigurePngSvg("A circuit system of two hosts (i.e. two circuit servers).", "servers", "400px"),
+	}
+	return RenderHtml("Running Circuit servers", Render(runBody, figs))
 }
 
-RunPage {
-	h *Html
-	h: = :
-	h:Title = "Running Circuit servers"
-	h:Body = t:
-
-	f *e.Fork
-	f:FigTwoHosts = fig:
-
-	fig *FigurePngSvg
-	fig:Image = "servers"
-	fig:Width = "400px"
-	fig:Caption = `A circuit system of two hosts (i.e. two circuit servers).`
-
-	t *text.QuickForm
-	t:Data = f:
-	t:Form = `
+const runBody = `
 
 <h1>Running Circuit servers</h1>
 
@@ -70,7 +55,7 @@ This time, use the <code>-j</code> option to tell the new server to join the fir
 <p>You now have two mutually-aware circuit servers, running on two different
 hosts in your cluster. 
 
-{{.Gate.FigTwoHosts}}
+{{.FigTwoHosts}}
 
 <p>You can join any number of additional hosts to the circuit environment in a
 similar fashion, even billions.  The circuit uses a modern 
@@ -80,4 +65,3 @@ It uses communication and connectivity sparingly, hardly leaving a footprint
 when idle.
 
         `
-}

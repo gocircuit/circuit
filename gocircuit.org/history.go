@@ -1,20 +1,10 @@
+package main
 
-BuildHistoryPage {
-        wf *io.WriteFile
-        wf:Content = *HistoryPage
-        wf:Name = "history.html"
-        : = wf:Ready
+func RenderHistoryPage() string {
+	return RenderHtml("History, links and bibliography", Render(historyBody, nil))
 }
 
-HistoryPage {
-        h *Html
-        h: = :
-        h:Title = "History, links and bibliography"
-        h:Body = t:
-
-        t *text.QuickForm
-        t:Data = {}
-        t:Form = `
+const historyBody = `
 
 <h3>Sponsors and credits</h3>
 
@@ -40,4 +30,3 @@ HistoryPage {
 </ul>
 
         `
-}
