@@ -1,20 +1,20 @@
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-	host: 'localhost', // argument?
-	user: 'charlie',
-	password : 'brown',
-	database : 'charlie-brown'
+	host: "localhost:3306", // argument?
+	user: "tutorial",
+	password : "",
+	database : "tutorial"
 });
 
 connection.connect();
 
-connection.query('SELECT * from Friends',
+connection.query('SELECT * from Events',
 	function(err, rows, fields) {
 		if (!err)
 			console.log('The solution is: ', rows);
 		else
-			console.log('Error while performing Query.');
+			console.log('Error while performing query.');
 	});
 
 connection.end();

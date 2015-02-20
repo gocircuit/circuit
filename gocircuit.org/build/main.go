@@ -4,29 +4,30 @@ import (
 	"os"
 	"path"
 
-	. "github.com/gocircuit/circuit/gocircuit.org/man"
+	"github.com/gocircuit/circuit/gocircuit.org/man"
+	"github.com/gocircuit/circuit/gocircuit.org/tutorial"
 )
 
 func main() {
 	Build("index.html", RenderIndexPage())
-	Build("install.html", RenderInstallPage())
-	Build("cmd.html", RenderCommandPage())
-	Build("history.html", RenderHistoryPage())
-	Build("security.html", RenderSecurityPage())
-	Build("metaphor.html", RenderMetaphorPage())
-	Build("run.html", RenderRunPage())
+	Build("install.html", man.RenderInstallPage())
+	Build("cmd.html", man.RenderCommandPage())
+	Build("history.html", man.RenderHistoryPage())
+	Build("security.html", man.RenderSecurityPage())
+	Build("metaphor.html", man.RenderMetaphorPage())
+	Build("run.html", man.RenderRunPage())
 
-	Build("element-process.html", RenderElementProcessPage())
-	Build("element-container.html", RenderElementContainerPage())
-	Build("element-subscription.html", RenderElementSubscriptionPage())
-	Build("element-dns.html", RenderElementDnsPage())
-	Build("element-channel.html", RenderElementChannelPage())
+	Build("element-process.html", man.RenderElementProcessPage())
+	Build("element-container.html", man.RenderElementContainerPage())
+	Build("element-subscription.html", man.RenderElementSubscriptionPage())
+	Build("element-dns.html", man.RenderElementDnsPage())
+	Build("element-channel.html", man.RenderElementChannelPage())
 
-	// 	x:tut = *
+	Build("tutorial-step0.html", tutorial.RenderStep0Page())
 }
 
 func Build(file string, content string) {
-	dir, file := path.Split(file)
+	dir, _ := path.Split(file)
 	if len(dir) > 0 {
 		if err := os.MkdirAll(dir, 0777); err != nil {
 			panic(err)

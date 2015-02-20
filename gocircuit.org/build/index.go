@@ -55,7 +55,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <h3>A typical web stack</h3>
 <ul>
-<li><a href="tutorial/nodejs-using-mysql/step0.html">Step 0: Prepare host VM images with the application software</a></li>
+<li><a href="tutorial-step0.html">Step 0: Install app software on host images</a></li>
 <li>Step 1: Starting a node.js and MySQL stack</li>
 <li>Step 2: Starting a node.js, memcache and MySQL stack with co-location conditions</li>
 <li>Step 3: Adding recovery logic for process failure</li>
