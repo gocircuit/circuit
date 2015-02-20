@@ -6,7 +6,20 @@ import (
 )
 
 func main() {
+	Build("index.html", RenderIndexPage())
+	Build("install.html", RenderInstallPage())
 	Build("cmd.html", RenderCommandPage())
+	Build("history.html", RenderHistoryPage())
+	Build("security.html", RenderSecurityPage())
+	Build("metaphor.html", RenderMetaphorPage())
+	Build("run.html", RenderRunPage())
+
+	// 	x:ep = *BuildElementProcessPage
+	// 	x:ec = *BuildElementContainerPage
+	// 	x:es = *BuildElementSubscriptionPage
+	// 	x:ed = *BuildElementDnsPage
+	// 	x:eh = *BuildElementChannelPage
+	// 	x:tut = *
 }
 
 func Build(file string, content string) {
@@ -23,20 +36,3 @@ func Build(file string, content string) {
 	defer f.Close()
 	f.Write([]byte(content))
 }
-
-// 	x:1 = *BuildIndexPage
-// 	x:2 = *BuildInstallPage
-// 	x:3 = *BuildRunPage
-// 	x:4 = *BuildMetaphorPage
-// 	x:5 = *BuildCommandPage
-// 	x:6 = *BuildSecurityPage
-// 	x:7 = *BuildHistoryPage
-
-// 	x:ep = *BuildElementProcessPage
-// 	x:ec = *BuildElementContainerPage
-// 	x:es = *BuildElementSubscriptionPage
-// 	x:ed = *BuildElementDnsPage
-// 	x:eh = *BuildElementChannelPage
-
-// 	x:tut = *
-// }

@@ -1,29 +1,18 @@
-BuildIndexPage {
-        wf *io.WriteFile
-        wf:Content = *IndexPage
-        wf:Name = "index.html"
-        : = wf:Ready
+package main
+
+func RenderIndexPage() string {
+	figs := A{
+		"FigFacade": RenderFigurePngSvg("Circuit API view into a cluster.", "facade", "700px"),
+	}
+	return RenderHtml(
+		"Circuit: Self-managed infrastructure, programmatic monitoring and orchestration",
+		Render(indexBody, figs),
+	)
 }
 
-IndexPage {
-	h *Html
-	h: = :
-	h:Title = "Circuit: Self-managed infrastructure, programmatic monitoring and orchestration"
-	h:Body = t:
+const indexBody = `
 
-	f *e.Fork
-	f:FigFacade = fig:
-
-	fig *FigurePngSvg
-	fig:Image = "facade"
-	fig:Width = "700px"
-	fig:Caption = `Circuit API view into a cluster.`
-
-        	t *text.QuickForm
-	t:Data = f:
-	t:Form = `
-
-{{.Gates.FigFacade}}
+{{.FigFacade}}
 
 <h1>Circuit: Self-managed cloud OS</h1>
 
@@ -78,4 +67,3 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <p>
 
         `
-}
