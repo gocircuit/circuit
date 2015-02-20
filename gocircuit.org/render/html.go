@@ -1,7 +1,12 @@
 package render
 
 func RenderHtml(title, body string) string {
-	return Render(sourceHtml, A{"Header": sourceHeader, "Footer": sourceFooter})
+	return Render(sourceHtml, A{
+		"Title":  title,
+		"Body":   body,
+		"Header": sourceHeader,
+		"Footer": sourceFooter,
+	})
 }
 
 const sourceHtml = `<!doctype html><html>

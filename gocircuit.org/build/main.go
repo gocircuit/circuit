@@ -16,11 +16,12 @@ func main() {
 	Build("metaphor.html", RenderMetaphorPage())
 	Build("run.html", RenderRunPage())
 
-	// 	x:ep = *BuildElementProcessPage
-	// 	x:ec = *BuildElementContainerPage
-	// 	x:es = *BuildElementSubscriptionPage
-	// 	x:ed = *BuildElementDnsPage
-	// 	x:eh = *BuildElementChannelPage
+	Build("element-process.html", RenderElementProcessPage())
+	Build("element-container.html", RenderElementContainerPage())
+	Build("element-subscription.html", RenderElementSubscriptionPage())
+	Build("element-dns.html", RenderElementDnsPage())
+	Build("element-channel.html", RenderElementChannelPage())
+
 	// 	x:tut = *
 }
 
