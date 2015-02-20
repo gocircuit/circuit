@@ -1,20 +1,36 @@
-var mysql = require('mysql');
+var express = require("express");
+var mysql = require("mysql");
 
-var connection = mysql.createConnection({
-	host: "localhost:3306", // argument?
+var app = express();
+
+var pool = mysql.createPool({
+	connectionLimit: 100, //important
+	host: "localhost",
+	port: 3306,
 	user: "tutorial",
-	password : "",
-	database : "tutorial"
+	password: "",
+	database: 'tutorial',
+	debug:  false
 });
 
-connection.connect();
+// on HTTP request
+app.get("/pop", function(req, resp) {
 
-connection.query('SELECT * from Events',
-	function(err, rows, fields) {
-		if (!err)
-			console.log('The solution is: ', rows);
-		else
+	// SELECT must be "pop"
+	pool.query('SELECT * from Messages', function(err, rows, fields) {
+		if (!err) {
+			console.log('Popped: ', rows);
+			resp.json(rows);
+		} else {
 			console.log('Error while performing query.');
+			resp.json({
+				"code": 100,
+				"status": "Database problem."
+			});
+		}
 	});
 
-connection.end();
+});
+
+app.listen(3000); // argument?
+console.log("Listening.");

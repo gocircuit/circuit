@@ -50,7 +50,7 @@ const installBody = `
 
 <pre>
 	# mysql -u tutorial
-	mysql> CREATE TABLE Messages (at DATE, from VARCHAR(100), to VARCHAR(100), subject VARCHAR(1024), body TEXT);
+	mysql> CREATE TABLE Messages (id INT NOT NULL AUTO_INCREMENT, at DATE, source VARCHAR(100), sink VARCHAR(100), body TEXT, PRIMARY KEY (id));
 </pre>
 
 <h2>Install node.js and a simple app that uses MySQL</h2>
@@ -59,6 +59,7 @@ const installBody = `
 
 <pre>
 	# apt-get install nodejs
+	# apt-get install npm
 </pre>
 
 <p>Install dependencies:
