@@ -1,4 +1,8 @@
-package main
+package man
+
+import (
+	. "github.com/gocircuit/circuit/gocircuit.org/render"
+)
 
 func RenderHistoryPage() string {
 	return RenderHtml("History, links and bibliography", Render(historyBody, nil))

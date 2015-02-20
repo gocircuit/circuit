@@ -1,4 +1,8 @@
-package main
+package man
+
+import (
+	. "github.com/gocircuit/circuit/gocircuit.org/render"
+)
 
 func RenderCommandPage() string {
 	figs := A{

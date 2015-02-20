@@ -1,4 +1,8 @@
-package main
+package man
+
+import (
+	. "github.com/gocircuit/circuit/gocircuit.org/render"
+)
 
 func RenderElementDnsPage() string {
 	return RenderHtml("Circuit DNS element", Render(dnsBody, nil))

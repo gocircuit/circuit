@@ -1,4 +1,8 @@
-package main
+package man
+
+import (
+	. "github.com/gocircuit/circuit/gocircuit.org/render"
+)
 
 func RenderSecurityPage() string {
 	return RenderHtml("Security and networking", Render(securityBody, nil))

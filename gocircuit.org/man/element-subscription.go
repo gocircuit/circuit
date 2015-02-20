@@ -1,4 +1,8 @@
-package main
+package man
+
+import (
+	. "github.com/gocircuit/circuit/gocircuit.org/render"
+)
 
 func RenderElementSubscriptionPage() string {
 	return RenderHtml("Circuit subscription element", Render(subscriptionBody, nil))

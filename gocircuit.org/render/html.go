@@ -1,4 +1,4 @@
-package main
+package render
 
 func RenderHtml(title, body string) string {
 	return Render(sourceHtml, A{"Header": sourceHeader, "Footer": sourceFooter})

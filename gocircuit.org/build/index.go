@@ -1,5 +1,9 @@
 package main
 
+import (
+	. "github.com/gocircuit/circuit/gocircuit.org/render"
+)
+
 func RenderIndexPage() string {
 	figs := A{
 		"FigFacade": RenderFigurePngSvg("Circuit API view into a cluster.", "facade", "700px"),

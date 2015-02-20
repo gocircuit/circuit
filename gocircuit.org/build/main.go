@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"path"
+
+	. "github.com/gocircuit/circuit/gocircuit.org/man"
 )
 
 func main() {
