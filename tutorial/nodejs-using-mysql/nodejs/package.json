@@ -3,6 +3,7 @@
 	"version": "0.0.1",
 	"description": "An example node.js server using a downstream MySQL server.",
 	"dependencies": {
+		"commander": "^2.6.0",
 		"express": "^4.10.6",
 		"mysql": "^2.5.4"
 	}

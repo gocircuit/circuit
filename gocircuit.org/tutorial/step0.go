@@ -50,7 +50,7 @@ const installBody = `
 
 <pre>
 	# mysql -u tutorial
-	mysql> CREATE TABLE Messages (id INT NOT NULL AUTO_INCREMENT, at DATE, source VARCHAR(100), sink VARCHAR(100), body TEXT, PRIMARY KEY (id));
+	mysql> CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
 </pre>
 
 <h2>Install node.js and a simple app that uses MySQL</h2>
