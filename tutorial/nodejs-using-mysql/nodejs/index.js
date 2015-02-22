@@ -26,26 +26,51 @@ var pool = mysql.createPool({
 	debug:  false
 });
 
+// PUT request
+app.get("/put/:name/:value", function(req, resp) {
+	var name = req.params.name;
+	var value = req.params.value;
+	pool.query('REPLACE INTO NameValue SET name = ' + mysql.escape(name) + ', value = ' + mysql.escape(value),
+		function(err, rows, fields) {
+			if (!err) {
+				console.log('put ok');
+				resp.json({status: "ok"});
+			} else {
+				console.log('put error');
+				resp.json({status: "error"});
+			}
+		}
+	);
+});
 
 // DELETE request
-
-// GET request
-app.get("/pop", function(req, resp) {
-
-	// SELECT must be "pop"
-	pool.query('SELECT * from Messages', function(err, rows, fields) {
+app.get("/del/:name", function(req, resp) {
+	var name = req.params.name;
+	pool.query('DELETE FROM NameValue WHERE name = ' + mysql.escape(name), function(err, rows, fields) {
 		if (!err) {
-			console.log('/pop ok');
-			resp.json(rows);
+			console.log('del ok');
+			resp.json({status: "ok"});
 		} else {
-			console.log('/pop error');
-			resp.json({
-				"code": 100,
-				"status": "Database problem."
-			});
+			console.log('del error');
+			resp.json({status: "error"});
 		}
 	});
+});
 
+// GET request
+app.get("/get/:name", function(req, resp) {
+	var name = req.params.name;
+	pool.query('SELECT * from NameValue WHERE name = ' + mysql.escape(name),
+		function(err, rows, fields) {
+			if (!err) {
+				console.log('get ok');
+				resp.json({status: "ok", result: rows});
+			} else {
+				console.log('get error');
+				resp.json({status: "error"});
+			}
+		}
+	);
 });
 
 app.listen(program.api_port, program.api_host);

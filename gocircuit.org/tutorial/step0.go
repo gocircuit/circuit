@@ -15,7 +15,7 @@ const installBody = `
 
 <pre>
 	# apt-get update
-	# apt-get install vim
+	# apt-get install vim curl
 </pre>
 
 <h2>Install MySQL server</h2>
