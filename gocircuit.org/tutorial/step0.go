@@ -22,6 +22,30 @@ const installBody = `
 
 <h3>Install the circuit</h3>
 
+<p>Start by installing the Go compiler and Git:
+
+<pre>
+	# apt-get install git golang
+</pre>
+
+<p>Create a temporary directory for building the circuit:
+
+<pre>
+	# mkdir -p /tmp/0/src && cd /tmp/0/src
+	# declare -x GOPATH=/tmp/0
+</pre>
+
+<p>Fetch and build the circuit, then place the circuit executable in the system path:
+
+<pre>
+	# go get github.com/gocircuit/circuit/cmd/circuit
+	# cp $GOPATH/bin/circuit /usr/local/bin
+</pre>
+
+<p>Next, configure the system to start the circuit daemon during the system booting sequence.
+
+<p>??
+
 <h3>Install MySQL server</h3>
 
 <p>The installation will prompt you for a root user password — let's use <code>charlie</code>:
@@ -57,7 +81,7 @@ const installBody = `
 	mysql> CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
 </pre>
 
-<h2>Install node.js and a simple app that uses MySQL</h2>
+<h3>Install node.js and the tutorial node.js app</h3>
 
 <p>Install node.js:
 
