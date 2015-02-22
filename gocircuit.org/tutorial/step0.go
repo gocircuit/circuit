@@ -4,21 +4,25 @@ import (
 	. "github.com/gocircuit/circuit/gocircuit.org/render"
 )
 
-func RenderStep0Page() string {
-	return RenderHtml("Step 0: Install app software on host images", Render(installBody, nil))
+func RenderMysqlNodejsPage() string {
+	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(installBody, nil))
 }
 
 const installBody = `
-<h1>Step 0: Install app software on host images</h1>
+<h1>Starting a MySQL and node.js stack using a circuit app</h1>
 
-<p>Assuming an Ubuntu base image. Install Vim and node.js first.
+<p>Start a fresh EC2 instance with an ubuntu base image. 
+
+<h2>Prepare a host image</h2>
 
 <pre>
 	# apt-get update
 	# apt-get install vim curl
 </pre>
 
-<h2>Install MySQL server</h2>
+<h3>Install the circuit</h3>
+
+<h3>Install MySQL server</h3>
 
 <p>The installation will prompt you for a root user password — let's use <code>charlie</code>:
 

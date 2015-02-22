@@ -23,7 +23,7 @@ func main() {
 	Build("element-dns.html", man.RenderElementDnsPage())
 	Build("element-channel.html", man.RenderElementChannelPage())
 
-	Build("tutorial-step0.html", tutorial.RenderStep0Page())
+	Build("tutorial-mysql-nodejs.html", tutorial.RenderMysqlNodejsPage())
 }
 
 func Build(file string, content string) {
