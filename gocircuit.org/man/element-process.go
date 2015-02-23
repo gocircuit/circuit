@@ -11,6 +11,17 @@ func RenderElementProcessPage() string {
 	return RenderHtml("Circuit process element", Render(processBody, figs))
 }
 
+// <h2>Using the Go API for process elements</h2>
+
+// <p>To create and manipulate process elements, one needs to import the circuit's Go client API:
+
+// <pre>
+// 	import "github.com/gocircuit/circuit/client"
+// </pre>
+
+// <p>Let <code>client</code>, of type <code>*client.Client</code>, be an already established
+// connection to the circuit cluster.
+
 const processBody = `
 
 <h2>Example: Make a process</h2>

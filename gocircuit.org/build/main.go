@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/gocircuit/circuit/gocircuit.org/api"
 	"github.com/gocircuit/circuit/gocircuit.org/man"
 	"github.com/gocircuit/circuit/gocircuit.org/tutorial"
 )
@@ -22,6 +23,8 @@ func main() {
 	Build("element-subscription.html", man.RenderElementSubscriptionPage())
 	Build("element-dns.html", man.RenderElementDnsPage())
 	Build("element-channel.html", man.RenderElementChannelPage())
+
+	Build("api-process.html", api.RenderProcessPage())
 
 	Build("tutorial-mysql-nodejs.html", tutorial.RenderMysqlNodejsPage())
 }

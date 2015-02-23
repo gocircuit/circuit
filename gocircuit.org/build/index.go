@@ -37,8 +37,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="install.html">Building and installing</a></li>
 <li><a href="run.html">Running Circuit servers</a></li>
 <li><a href="metaphor.html">Programming metaphor</a></li>
-<li><a href="cmd.html">Command-line client</a></li>
-<li>Elements
+<li><a href="cmd.html">Command-line client</a>
 <ul>
 <li><a href="element-process.html">Process</a></li>
 <li><a href="element-container.html">Container</a></li>
@@ -46,6 +45,18 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="element-dns.html">Name server</a></li>
 <li><a href="element-channel.html">Channel</a></li>
 </ul>
+
+<li>Go client
+<ul>
+<li>Navigating the circuit's virtual file system</li>
+<li><a href="api-process.html">Process</a></li>
+<li>Container</li>
+<li>Subscription</li>
+<li>Name server</li>
+<li>Channel</li>
+</ul>
+</li>
+
 </li>
 <li><a href="security.html">Security and networking</a></li>
 <li><a href="history.html">History and bibliography</a></li>
