@@ -39,12 +39,33 @@ connection to the circuit cluster. (<a href="api-client.html">How to connect a G
 anchor for this virtual path:
 
 <pre>
-	a := cli.Walk([]string{"X88550014d4c82e4d", "jobs", "scrapy"})
+	a := cli.Walk([]string{"X88550014d4c82e4d", "jobs", "ls"})
 </pre>
 
 <p>The invocation of <code>Walk</code> always succeeds, as virtual paths are created
 as needed (or otherwise they already exist as a circuit element is occupying them). The
-invocation may only fail in panic, which is an indicator that this circuit client's connection
-to the circuit cluster has been lost irrecoverably.
+invocation may only fail in panic, which is an indicator that this circuit server being
+accessed, in this case <code>X88550014d4c82e4d</code>, has died or otherwise dropped
+out of the cluster.
+
+<p>Each anchor (virtual path) can have at most one circuit element (i.e. process, container, etc.)
+attached to it. An anchor's <code>MakeProc</code> method will create a new
+process element and attach it to the anchor:
+
+<pre>
+	proc, err := a.MakeProc(
+		cli.Cmd{
+			Env: []string{"TERM=xterm"},
+			Dir: "/",
+			Path: "/bin/ls",
+			Args: []string{"-l", "/"},
+			Scrub: true,
+		},
+	)
+</pre>
+
+<p>The returned error is non-nil if an element is already attached to the anchor <code>a</code> (i.e. to the path
+<code>/X88550014d4c82e4d/jobs/ls</code> in our example).
+Otherwise, 
 
         `
