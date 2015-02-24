@@ -135,6 +135,7 @@ GRANT ALL ON tutorial.*  TO tutorial;
 
 	// Create key/value table within tutorial database
 	const m2 = `
+USE tutorial;
 CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
 `
 	if _, err := runShellStdin(host, "/usr/bin/mysql -u tutorial", m2); err != nil {
