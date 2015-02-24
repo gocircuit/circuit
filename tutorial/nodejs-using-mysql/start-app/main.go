@@ -61,7 +61,11 @@ func pickHosts(c *client.Client, n int) (hosts []client.Anchor) {
 // runShell executes the shell command on the given host,
 // waits until the command completes and returns its output
 // as a string. The error value is non-nil if the process exited in error.
-func runShell(host client.Anchor, shcmd string) (string, error) {
+func runShell(host client.Anchor, cmd string) (string, error) {
+	return runShellStdin(host, cmd, "")
+}
+
+func runShellStdin(host client.Anchor, cmd, stdin string) (string, error) {
 	defer func() {
 		if recover() != nil {
 			fatalf("connection to host lost")
@@ -71,10 +75,13 @@ func runShell(host client.Anchor, shcmd string) (string, error) {
 	proc, _ := job.MakeProc(client.Cmd{
 		Path:  "/bin/sh",
 		Dir:   "/tmp",
-		Args:  []string{"-c", shcmd},
+		Args:  []string{"-c", cmd},
 		Scrub: true,
 	})
-	proc.Stdin().Close()  // Must close the standard input of the shell process.
+	go func() {
+		io.Copy(proc.Stdin(), bytes.NewBufferString(stdin))
+		proc.Stdin().Close() // Must close the standard input of the shell process.
+	}()
 	proc.Stderr().Close() // Close to indicate discarding standard error
 	var buf bytes.Buffer
 	io.Copy(&buf, proc.Stdout())
@@ -107,7 +114,40 @@ func getUbuntuHostIP(host client.Anchor) string {
 }
 
 func startMysql(host client.Anchor) (ip, port string) {
-	// ??
+	// Start MySQL server
+	if _, err := runShell(host, "sudo /etc/init.d/mysql start"); err != nil {
+		fatalf("mysql start error: %v", err)
+	}
+
+	// Remove old database and user
+	runShell(host, "sudo /usr/bin/mysql", "DROP USER tutorial;")
+	runShell(host, "sudo /usr/bin/mysql", "DROP DATABASE tutorial;")
+
+	// Create tutorial user and database within MySQL
+	const m1 = `
+CREATE USER tutorial;
+CREATE DATABASE tutorial;
+GRANT ALL ON tutorial.*  TO tutorial;
+`
+	if _, err := runShellStdin(host, "sudo /usr/bin/mysql", m1); err != nil {
+		fatalf("problem creating database and user: %v", err)
+	}
+
+	// Create key/value table within tutorial database
+	const m2 = `
+CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
+`
+	if _, err := runShellStdin(host, "/usr/bin/mysql -u tutorial", m2); err != nil {
+		fatalf("problem creating table: %v", err)
+	}
+
+	// Retrieve the IP address of this host within the cluster's private network.
+	ip = getUbuntuHostIP(host)
+
+	// We use the default MySQL server port
+	port = strconv.Itoa(3306)
+
+	return
 }
 
 func main() {
@@ -118,6 +158,10 @@ func main() {
 	host := pickHosts(c, 1) // ??
 
 	mysqlIP, mysqlPort := startMysql(host[0])
+	println(mysqlIP, mysqlPort)
+
+	// out, _ := runShellStdin(host[0], "cat", "abc\ndef\n")
+	// println(out)
 
 	// nodejsIP, nodejsPort := startNodejs(host[1], mysqlIP, mysqlPort)
 
