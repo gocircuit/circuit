@@ -74,10 +74,18 @@ const installBody = `
 
 <h3>Install MySQL server</h3>
 
-<p>The installation will prompt you for a root user password — let's use <code>charlie</code>:
+<p>The installation will prompt you for a root user password — use the empty string:
 
 <pre>
 	# apt-get install mysql-server
+</pre>
+
+<p>As a side-effect, the installer will put MySQL in the boot sequence. We would like 
+to disable that as we plan to manage (start/stop) the service through our circuit application.
+Disable automatic boot startup of MySQL using:
+
+<pre>
+	echo manual | sudo tee /etc/init/mysql.override
 </pre>
 
 <p>Start the server, so we can create a tutorial user and database:
@@ -104,6 +112,7 @@ const installBody = `
 
 <pre>
 	# mysql -u tutorial
+	mysql> USE tutorial;
 	mysql> CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
 </pre>
 

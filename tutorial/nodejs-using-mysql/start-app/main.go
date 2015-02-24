@@ -14,8 +14,10 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"net"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gocircuit/circuit/client"
 )
@@ -27,27 +29,33 @@ func fatalf(format string, arg ...interface{}) {
 	os.Exit(1)
 }
 
+// connect establishes a client connection to the circuit cluster (via the given circuit server address)
+// and returns a connected client object.
 func connect(addr string) *client.Client {
 	defer func() {
 		if r := recover(); r != nil {
 			fatalf("could not connect: %v", r)
 		}
 	}()
-	// Connect the client to a circuit server
 	return client.Dial(addr, nil)
 }
 
-func pickHosts(c *client.Client) (mysqlHost, nodejsHost client.Anchor) {
+func pickHosts(c *client.Client, n int) (hosts []client.Anchor) {
 	defer func() {
 		if recover() != nil {
 			fatalf("client connection lost")
 		}
 	}()
-	for _, s := range c.View() {
-		return s, s // ???
+	for _, a := range c.View() {
+		if len(hosts) >= n {
+			break
+		}
+		hosts = append(hosts, a)
 	}
-	fatalf("no available circuit hosts")
-	return nil, nil
+	if len(hosts) != n {
+		fatalf("not enough available hosts found")
+	}
+	return
 }
 
 // runShell executes the shell command on the given host,
@@ -74,17 +82,44 @@ func runShell(host client.Anchor, shcmd string) (string, error) {
 	return buf.String(), stat.Exit
 }
 
+func getDarwinHostIP(host client.Anchor) string {
+	out, err := runShell(host, `ifconfig en0 | awk '/inet / {print $2}'`)
+	if err != nil {
+		fatalf("get ip error: %v", err)
+	}
+	out = strings.TrimSpace(out)
+	if _, err := net.ResolveIPAddr("ip", out); err != nil {
+		fatalf("ip %q unrecognizable: %v", out, err)
+	}
+	return out
+}
+
+func getUbuntuHostIP(host client.Anchor) string {
+	out, err := runShell(host, `ifconfig eth0 | awk '/inet addr/ {split($2, a, ":"); print a[2] }'`)
+	if err != nil {
+		fatalf("get ip error: %v", err)
+	}
+	out = strings.TrimSpace(out)
+	if _, err := net.ResolveIPAddr("ip", out); err != nil {
+		fatalf("ip %q unrecognizable: %v", out, err)
+	}
+	return out
+}
+
+func startMysql(host client.Anchor) (ip, port string) {
+	// ??
+}
+
 func main() {
 	flag.Parse()
 
 	c := connect(*flagAddr)
 
-	mysqlHost, _ /*, nodejsHost*/ := pickHosts(c)
+	host := pickHosts(c, 1) // ??
 
-	out, err := runShell(mysqlHost, "ls -l /")
-	if err != nil {
-		println("err:", err)
-	} else {
-		println("ok:", out)
-	}
+	mysqlIP, mysqlPort := startMysql(host[0])
+
+	// nodejsIP, nodejsPort := startNodejs(host[1], mysqlIP, mysqlPort)
+
+	// println(getDarwinHostIP(hosts[0]))
 }

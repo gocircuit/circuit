@@ -11,15 +11,15 @@ import (
 	// "fmt"
 
 	"github.com/gocircuit/circuit/anchor"
-	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/element/proc"
 	"github.com/gocircuit/circuit/element/dns"
+	"github.com/gocircuit/circuit/element/proc"
+	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/valve"
-	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/kit/pubsub"
+	"github.com/gocircuit/circuit/tissue"
 
-	edocker "github.com/gocircuit/circuit/element/docker"
 	cdocker "github.com/gocircuit/circuit/client/docker"
+	edocker "github.com/gocircuit/circuit/element/docker"
 )
 
 // An Anchor represents a location in the global anchor namespace of a circuit
@@ -53,7 +53,7 @@ type Anchor interface {
 	// Errors in communication or a missing circuit server condition are reported via panics.
 	Walk(walk []string) Anchor
 
-	// View returns the set of its sub-anchors.
+	// View returns the set of this anchor's sub-anchors.
 	View() map[string]Anchor
 
 	// MakeChan creates a new circuit channel element at this anchor with a given capacity n.
@@ -79,8 +79,8 @@ type Anchor interface {
 	// MakeOnLeave…
 	MakeOnLeave() (Subscription, error)
 
-	// Get returns a handle for the circuit element (Chan, Proc, Subscription, Server, etc) 
-	// stored at this anchor, and nil otherwise. 
+	// Get returns a handle for the circuit element (Chan, Proc, Subscription, Server, etc)
+	// stored at this anchor, and nil otherwise.
 	// Panics indicate that the server hosting the anchor and its element has already died.
 	Get() interface{}
 
@@ -99,12 +99,12 @@ func Split(walk string) (r []string) {
 		if c != '/' {
 			continue
 		}
-		if i - j > 0 {
+		if i-j > 0 {
 			r = append(r, walk[j:i])
 		}
-		j = i+1
+		j = i + 1
 	}
-	if len(walk) - j > 0 {
+	if len(walk)-j > 0 {
 		r = append(r, walk[j:])
 	}
 	return
@@ -124,7 +124,7 @@ func (t terminal) ServerID() string {
 }
 
 func (t terminal) Walk(walk []string) Anchor {
-	return terminal{ y: t.y.Walk(walk), k: t.k }
+	return terminal{y: t.y.Walk(walk), k: t.k}
 }
 
 func (t terminal) Path() string {
@@ -135,7 +135,7 @@ func (t terminal) View() map[string]Anchor {
 	v := t.y.View()
 	w := make(map[string]Anchor)
 	for name, y := range v {
-		w[name] = terminal{ y: y, k: t.k }
+		w[name] = terminal{y: y, k: t.k}
 	}
 	return w
 }
