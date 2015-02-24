@@ -1,7 +1,7 @@
 {
 	"name": "nodejs-using-mysql",
 	"version": "0.0.1",
-	"description": "An example node.js server using a downstream MySQL server.",
+	"description": "An example node.js key/value server using a downstream MySQL server.",
 	"dependencies": {
 		"commander": "^2.6.0",
 		"express": "^4.10.6",
