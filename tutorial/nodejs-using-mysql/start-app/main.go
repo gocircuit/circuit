@@ -120,8 +120,8 @@ func startMysql(host client.Anchor) (ip, port string) {
 	}
 
 	// Remove old database and user
-	runShell(host, "sudo /usr/bin/mysql", "DROP USER tutorial;")
-	runShell(host, "sudo /usr/bin/mysql", "DROP DATABASE tutorial;")
+	runShellStdin(host, "sudo /usr/bin/mysql", "DROP USER tutorial;")
+	runShellStdin(host, "sudo /usr/bin/mysql", "DROP DATABASE tutorial;")
 
 	// Create tutorial user and database within MySQL
 	const m1 = `
