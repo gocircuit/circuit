@@ -141,6 +141,19 @@ func getEc2PrivateIP(host client.Anchor) string {
 }
 
 func startMysql(host client.Anchor) (ip, port string) {
+
+	// Retrieve the IP address of this host within the cluster's private network.
+	ip = getEc2PrivateIP(host)
+
+	// We use the default MySQL server port
+	port = strconv.Itoa(3306)
+
+	// Rewrite MySQL config to bind to the private host address
+	cfg := fmt.Sprintf(`sudo sed -i 's/^bind-address\s*=.*$/bind-address = %s/' /etc/mysql/my.cnf`, ip)
+	if err := runShell(host, cfg); err != nil {
+		fatalf("mysql configuration error: %v", err)
+	}
+
 	// Start MySQL server
 	if _, err := runShell(host, "sudo /etc/init.d/mysql start"); err != nil {
 		fatalf("mysql start error: %v", err)
@@ -168,12 +181,6 @@ CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
 	if _, err := runShellStdin(host, "/usr/bin/mysql -u tutorial", m2); err != nil {
 		fatalf("problem creating table: %v", err)
 	}
-
-	// Retrieve the IP address of this host within the cluster's private network.
-	ip = getUbuntuHostIP(host)
-
-	// We use the default MySQL server port
-	port = strconv.Itoa(3306)
 
 	return
 }
