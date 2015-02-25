@@ -10,17 +10,20 @@ package server
 import (
 	"errors"
 	"io"
-	"runtime/pprof"
 	"os"
+	"runtime/pprof"
 	"time"
 
 	"github.com/gocircuit/circuit/kit/interruptible"
+	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/gocircuit/circuit/use/n"
 )
 
 type Server interface {
 	Profile(string) (io.ReadCloser, error)
 	Peek() Stat
+	Rejoin(string) error // circuit address to join to
 	Suicide()
 	IsDone() bool
 	Scrub()
@@ -29,20 +32,30 @@ type Server interface {
 
 // server
 type server struct {
-	addr string
+	addr   string
+	kin    *tissue.Kin
 	joined time.Time
 }
 
-func New(addr string) Server {
+func New(kin *tissue.Kin) Server {
 	return &server{
-		addr: addr,
+		addr:   kin.Avatar().X.Addr().String(),
+		kin:    kin,
 		joined: time.Now(),
 	}
 }
 
 type Stat struct {
-	Addr string
+	Addr   string
 	Joined time.Time
+}
+
+func (s *server) Rejoin(addr string) error {
+	a, err := n.ParseAddr(addr)
+	if err != nil {
+		return err
+	}
+	return s.kin.ReJoin(a)
 }
 
 func (s *server) Suicide() {
@@ -73,7 +86,7 @@ func (nopCloser) Close() error {
 
 func (s *server) Peek() Stat {
 	return Stat{
-		Addr: s.addr,
+		Addr:   s.addr,
 		Joined: s.joined,
 	}
 }

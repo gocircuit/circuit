@@ -8,6 +8,7 @@
 package main
 
 import (
+	"github.com/gocircuit/circuit/use/n"
 	// "bytes"
 	"io"
 	"os"
@@ -58,4 +59,31 @@ func suicide(x *cli.Context) {
 		fatalf("not a server")
 	}
 	u.Suicide()
+}
+
+func join(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 2 {
+		fatalf("join needs one anchor argument and one circuit address argument")
+	}
+	// Verify the target circuit address is valid
+	if _, err := n.ParseAddr(args[1]); err != nil {
+		fatalf("argument %q is not a valid circuit address", args[1])
+	}
+	//
+	w, _ := parseGlob(args[0])
+	switch u := c.Walk(w).Get().(type) {
+	case client.Server:
+		if err := u.Rejoin(args[1]); err != nil {
+			fatalf("error: %v", err)
+		}
+	default:
+		fatalf("not a server")
+	}
 }

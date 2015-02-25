@@ -16,13 +16,13 @@ import (
 
 // ServerStat encloses subscription state information.
 type ServerStat struct {
-	Addr string
+	Addr   string
 	Joined time.Time
 }
 
 func srvStat(s srv.Stat) ServerStat {
 	return ServerStat{
-		Addr: s.Addr,
+		Addr:   s.Addr,
 		Joined: s.Joined,
 	}
 }
@@ -32,6 +32,7 @@ func srvStat(s srv.Stat) ServerStat {
 type Server interface {
 	Profile(string) (io.ReadCloser, error)
 	Peek() ServerStat
+	Rejoin(string) error
 	Suicide()
 }
 

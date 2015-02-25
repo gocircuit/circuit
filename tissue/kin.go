@@ -8,7 +8,6 @@
 package tissue
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"sync"
@@ -19,23 +18,23 @@ import (
 	"github.com/gocircuit/circuit/use/n"
 )
 
-// Kin is the tissue system server.
+// Kin is a service that maintains connectivity to a small set of 'neighbor' circuits.
 type Kin struct {
-	kinav KinAvatar // Permanent circuit-wide unique ID for this kin
+	kinav        KinAvatar // Permanent cluster-wide unique ID for this kin
 	neighborhood *Neighborhood
-	rip chan KinAvatar // denouncements of newly discovered deceased kins
+	rip          chan KinAvatar // denouncements of newly discovered deceased kins
 	sync.Mutex
 	topic map[string]FolkAvatar // topic -> yfolk
-	folk []*Folk
+	folk  []*Folk
 }
 
 const ServiceName = "kin"
 
 func NewKin() (k *Kin, xkin XKin, rip <-chan KinAvatar) {
 	k = &Kin{
-		neighborhood:   NewNeighborhood(),
-		rip:   make(chan KinAvatar, ExpansionHigh),
-		topic: make(map[string]FolkAvatar),
+		neighborhood: NewNeighborhood(),
+		rip:          make(chan KinAvatar, ExpansionHigh),
+		topic:        make(map[string]FolkAvatar),
 	}
 	// Create a KinAvatar for this system.
 	k.kinav = KinAvatar(Avatar{
@@ -45,7 +44,8 @@ func NewKin() (k *Kin, xkin XKin, rip <-chan KinAvatar) {
 	return k, XKin{k}, k.rip
 }
 
-// ReJoin contacts the peering kin service join and joins its circuit network.
+// ReJoin contacts the peering service at the circuit worker with address join
+// and joins into its circuit network.
 func (k *Kin) ReJoin(join n.Addr) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -57,18 +57,14 @@ func (k *Kin) ReJoin(join n.Addr) (err error) {
 			X: circuit.Dial(join, ServiceName),
 		},
 	}
-	var w bytes.Buffer
 	for _, peer := range ykin.Join(k.chooseBoundary(Spread), Spread) {
 		peer = k.remember(peer)
-		w.WriteString(peer.X.Addr().String())
-		w.WriteByte(' ')
 	}
-	// if w.Len() > 0 {
-	// 	log.Println("Remembering offered server(s):", w.String())
-	// }
 	return nil
 }
 
+// chooseBoundary samples spread-many random nodes from the circuit network
+// and returns them discarding duplicates.
 func (k *Kin) chooseBoundary(spread int) []KinAvatar {
 	defer func() {
 		recover()
@@ -76,12 +72,14 @@ func (k *Kin) chooseBoundary(spread int) []KinAvatar {
 	m := make(map[lang.ReceiverID]KinAvatar)
 	m[k.kinav.ID] = k.kinav // add self in boundary offering
 	for i := 0; i+1 < spread; i++ {
+		// Take a random walk starting from this node and save the terminal node.
+		// This simulates a random node sample from the network.
 		peerAvatar := XKin{k}.Walk(Depth)
 		if Avatar(peerAvatar).IsNil() {
 			continue
 		}
+		// Don't put duplicate nodes in the boundary set.
 		if _, ok := m[peerAvatar.ID]; ok {
-			// Duplicate
 			continue
 		}
 		m[peerAvatar.ID] = peerAvatar
@@ -93,10 +91,14 @@ func (k *Kin) chooseBoundary(spread int) []KinAvatar {
 	return r
 }
 
+// remember saves the peer in the neighborhood set and returns a re-written
+// handle to it, which will remove it from the neighborhood set if any future calls
+// to that peer result in panic.
 func (k *Kin) remember(peer KinAvatar) KinAvatar {
+	// Provision peer so that any future calls to it that panic will remove it from the neighborhood set.
 	peer.X = ForwardPanic(
 		peer.X,
-		func (interface{}) {
+		func(interface{}) {
 			k.forget(peer.ID)
 		},
 	)
@@ -105,7 +107,7 @@ func (k *Kin) remember(peer KinAvatar) KinAvatar {
 		p := YKin{peer}.Attach(folk.topic)
 		p.X = ForwardPanic(
 			p.X,
-			func (interface{}) {
+			func(interface{}) {
 				k.forget(p.ID)
 			},
 		)
@@ -118,7 +120,7 @@ func (k *Kin) remember(peer KinAvatar) KinAvatar {
 
 // If the neighborhood is too big, shrink shrinks it to size ExpansionHigh.
 func (k *Kin) shrink() {
-	for i := 0; i < k.neighborhood.Len() - ExpansionHigh; i++ {
+	for i := 0; i < k.neighborhood.Len()-ExpansionHigh; i++ {
 		av, ok := k.neighborhood.ScrubRandom()
 		if !ok {
 			return
@@ -132,7 +134,7 @@ func (k *Kin) forget(key lang.ReceiverID) {
 	for _, folk := range k.users() { // Remove peer from all users
 		folk.removePeer(key)
 	}
-	peer, ok := k.neighborhood.Scrub(key) 
+	peer, ok := k.neighborhood.Scrub(key)
 	if !ok {
 		return
 	}
@@ -150,8 +152,8 @@ func (k *Kin) expand() {
 	if k.neighborhood.Len() < ExpansionLow {
 		return
 	}
-	for i := 0; i < ExpansionHigh - k.neighborhood.Len(); i++ {
-		w := XKin{k}.Walk(Depth) // Choose a random peer, using a random walk
+	for i := 0; i < ExpansionHigh-k.neighborhood.Len(); i++ {
+		w := XKin{k}.Walk(Depth)                        // Choose a random peer, using a random walk
 		if Avatar(w).IsNil() || w.ID == k.Avatar().ID { // Compare just IDs, in case we got pointers to ourselves from elsewhere
 			continue // If peer is nil or self, ignore it
 		}
@@ -183,10 +185,10 @@ func (k *Kin) Attach(topic string, folkAvatar FolkAvatar) *Folk {
 		panic("dup attach")
 	}
 	folk := &Folk{
-		topic: topic,
+		topic:        topic,
 		neighborhood: NewNeighborhood(),
-		kin: k,
-		ch: make(chan FolkAvatar, len(peers)), // make sure initial set can be sent unblocked
+		kin:          k,
+		ch:           make(chan FolkAvatar, len(peers)), // make sure initial set can be sent unblocked
 	}
 	for i, peer := range peers {
 		// Rig the peers to be removed from the folk when their method calls cause panic
@@ -194,7 +196,7 @@ func (k *Kin) Attach(topic string, folkAvatar FolkAvatar) *Folk {
 		peer.ID = key
 		peer.X = ForwardPanic(
 			peer.X,
-			func (interface{}) {
+			func(interface{}) {
 				k.forget(key)
 			},
 		)

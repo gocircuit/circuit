@@ -1,23 +1,15 @@
 PROJECTS
 ========
 
-data item, change notifications
+* join two servers:
+	circuit join -d ... /X123 circuit://...
+* amz scripts for connecting the cluster
 
-summary of features
-circuit vs zookeeper
-circuit vs coreos
-circuit vs etcd
+* tutorial doc
+* element go api doc
 
-
-* docker image for compiling/playing with the circuit
-* per-server log subscription element
-* docker-based stress test
 
 test coverage
 job scheduler ala mesos
-automatic visualisation of circuit dynamics history and live (log -> viz)
 add mutex element
-add docker image-compiler
-Circuit Apps infrastructure (mention in talk)
 tty element; interactive shell
-broadcast, reduce, allreduce elements (for apps like vowpal wabbit)

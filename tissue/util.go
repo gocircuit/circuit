@@ -20,15 +20,15 @@ func init() {
 }
 
 const (
-	// Expansion is the number of peers that each circuit worker is continuously connected to  
+	// Expansion is the number of peers that each circuit worker is continuously connected to
 	// for the purposes of dynamically maintaining node presence using the tissue
 	// collaborative protocol.
-	ExpansionLow = 7
+	ExpansionLow  = 7
 	ExpansionHigh = 11
-	Spread = 5
+	Spread        = 5
 
 	// Depth is the number of random walk steps taken when sampling for a random circuit worker.
-	Depth  = 3*2  // Lazy random walk with stay-put probability one half
+	Depth = 3 * 2 // Lazy random walk with stay-put probability one half
 )
 
 // Avatar is a pair of a permanent cross-interface and an ID, identifying its underlying receiver uniquely.
@@ -54,7 +54,9 @@ func (av Avatar) IsNil() bool {
 	return av.X == nil
 }
 
-// ForwardPanic…
+// ForwardPanic replaces the cross-interface x with one that
+// captures panics during method calls and passes them to the fwd func in a separate goroutine,
+// while also propagating the original panic through the stack.
 func ForwardPanic(x circuit.PermX, fwd func(recov interface{})) circuit.PermX {
 	return &forwardPanic{PermX: x, fwd: fwd}
 }
@@ -74,7 +76,7 @@ func (fp *forwardPanic) Call(proc string, in ...interface{}) []interface{} {
 	return fp.PermX.Call(proc, in...)
 }
 
-// ForwardAvatarPanic…
+// ForwardAvatarPanic is like ForwardPanic but for Avatar objects.
 func ForwardAvatarPanic(av Avatar, fwd func(recov interface{})) Avatar {
 	av.X = ForwardPanic(av.X, fwd)
 	return av

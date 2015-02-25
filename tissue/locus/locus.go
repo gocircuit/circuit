@@ -14,17 +14,17 @@ import (
 
 	"github.com/gocircuit/circuit/anchor"
 	srv "github.com/gocircuit/circuit/element/server"
+	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/tissue/tube"
-	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
 )
 
 // Locus is a device that listens to the join/leave events reported by the tissue social
 // system, and maintains an asynchronously-readable current list of known peers.
 type Locus struct {
-	Peer  *Peer      // Client peer enclosure for this circuit locus
-	tube  *tube.Tube        // Kinfolk broadcasting system
+	Peer *Peer      // Client peer enclosure for this circuit locus
+	tube *tube.Tube // Kinfolk broadcasting system
 }
 
 // NewLocus creates a new locus device.
@@ -33,14 +33,14 @@ func NewLocus(kin *tissue.Kin, rip <-chan tissue.KinAvatar) XLocus {
 		tube: tube.NewTube(kin, "locus"),
 	}
 	term, xterm := anchor.NewTerm(kin.Avatar().ID.String(), locus)
-	term.Attach(anchor.Server, srv.New(kin.Avatar().X.Addr().String()))
+	term.Attach(anchor.Server, srv.New(kin))
 	locus.Peer = &Peer{
 		// It is crucial to use permanent cross-references, and not
 		// "plain" ones within values stored inside the tube table. If
 		// cross-references are used, they are managed by the cross-
 		// garbage collection system and therefore connections to ALL
 		// underlying workers are maintained superfluously.
-		Kin:    kin.Avatar(),
+		Kin:  kin.Avatar(),
 		Term: xterm,
 	}
 	go locus.loopRIP(rip)

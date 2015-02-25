@@ -8,7 +8,7 @@
 package tissue
 
 import (
-	"bytes"
+
 	//"log"
 	"math/rand"
 )
@@ -43,29 +43,23 @@ func (x XKin) Attach(topic string) FolkAvatar {
 	return x.k.topic[topic]
 }
 
-// Join …
+// Join accepts calls from other peers who want to join the network of this one.
 func (x XKin) Join(boundary []KinAvatar, spread int) []KinAvatar {
 	offer := x.k.chooseBoundary(spread) // compute boundary before merge happens
-	var w bytes.Buffer
 	for _, q := range boundary {
 		q = x.k.remember(q)
-		w.WriteString(q.X.Addr().String())
-		w.WriteByte(' ')
 	}
-	// if len(boundary) > 0 {
-	// 	log.Println("Remembering merging server(s):", w.String())
-	// }
 	return offer
 }
 
 // Walk performs a random walk through the expander-graph network of circuit workers
-// of length t steps and returns the tissue Avatar of the terminal node.
+// of length t steps and returns the terminal node.
 func (x XKin) Walk(t int) KinAvatar {
 	if t <= 0 {
 		return x.k.Avatar()
 	}
 	if rand.Intn(2) < 1 { // Lazy random walk
-		return x.Walk(t-1)
+		return x.Walk(t - 1)
 	}
 	hop := KinAvatar(x.k.neighborhood.Choose())
 	if hop.X == nil {

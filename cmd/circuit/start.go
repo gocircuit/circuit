@@ -15,8 +15,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/gocircuit/circuit/kit/assemble"
 	"github.com/gocircuit/circuit/element/docker"
+	"github.com/gocircuit/circuit/kit/assemble"
 	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/tissue/locus"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -26,7 +26,7 @@ import (
 )
 
 func server(c *cli.Context) {
-	println("CIRCUIT 2014 gocircuit.org")
+	println("CIRCUIT 2015 gocircuit.org")
 	var err error
 
 	if c.Bool("docker") {
@@ -38,7 +38,7 @@ func server(c *cli.Context) {
 	}
 	// parse arguments
 	var tcpaddr = parseAddr(c) // server bind address
-	var join n.Addr // join address of another circuit server
+	var join n.Addr            // join address of another circuit server
 	if c.IsSet("join") {
 		if join, err = n.ParseAddr(c.String("join")); err != nil {
 			log.Fatalf("join address does not parse (%s)", err)

@@ -33,6 +33,10 @@ func (x XServer) Profile(name string) (circuit.X, error) {
 	return xio.NewXReadCloser(r), nil
 }
 
+func (x XServer) Rejoin(addr string) error {
+	return errors.Pack(x.server.Rejoin(addr))
+}
+
 // YServer…
 type YServer struct {
 	X circuit.X
@@ -48,6 +52,10 @@ func (y YServer) Profile(name string) (rc io.ReadCloser, err error) {
 
 func (y YServer) Peek() Stat {
 	return y.X.Call("Peek")[0].(Stat)
+}
+
+func (y YServer) Rejoin(addr string) error {
+	return errors.Unpack(y.X.Call("Rejoin", addr)[0])
 }
 
 func (y YServer) IsDone() bool {
