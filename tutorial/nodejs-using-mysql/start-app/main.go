@@ -46,14 +46,17 @@ func pickHosts(c *client.Client, n int) (hosts []client.Anchor) {
 			fatalf("client connection lost")
 		}
 	}()
-	for _, a := range c.View() {
-		if len(hosts) >= n {
-			break
-		}
-		hosts = append(hosts, a)
+	view := c.View()
+	if len(view) == 0 {
+		fatalf("no hosts in cluster")
 	}
-	if len(hosts) != n {
-		fatalf("not enough available hosts found")
+	for len(hosts) < n {
+		for _, a := range view {
+			if len(hosts) >= n {
+				break
+			}
+			hosts = append(hosts, a)
+		}
 	}
 	return
 }
@@ -183,7 +186,7 @@ func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string
 	}()
 
 	// Start node.js application
-	port = 8080
+	port = "8080"
 	job := host.Walk([]string{"nodejs"})
 	shell := fmt.Sprintf(
 		"sudo /usr/bin/nodejs index.js "+
