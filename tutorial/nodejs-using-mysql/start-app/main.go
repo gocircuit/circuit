@@ -155,7 +155,7 @@ func startMysql(host client.Anchor) (ip, port string) {
 	}
 
 	// Start MySQL server
-	if _, err := runShell(host, "sudo /etc/init.d/mysql restart"); err != nil {
+	if _, err := runShell(host, "sudo /etc/init.d/mysql start"); err != nil {
 		fatalf("mysql start error: %v", err)
 	}
 
