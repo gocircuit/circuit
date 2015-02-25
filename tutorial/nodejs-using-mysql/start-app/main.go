@@ -113,6 +113,30 @@ func getUbuntuHostIP(host client.Anchor) string {
 	return out
 }
 
+func getEc2PublicIP(host client.Anchor) string {
+	out, err := runShell(host, `curl http://169.254.169.254/latest/meta-data/public-ipv4`)
+	if err != nil {
+		fatalf("get ec2 public ip error: %v", err)
+	}
+	out = strings.TrimSpace(out)
+	if _, err := net.ResolveIPAddr("ip", out); err != nil {
+		fatalf("ip %q unrecognizable: %v", out, err)
+	}
+	return out
+}
+
+func getEc2PrivateIP(host client.Anchor) string {
+	out, err := runShell(host, `curl http://169.254.169.254/latest/meta-data/local-ipv4`)
+	if err != nil {
+		fatalf("get ec2 public ip error: %v", err)
+	}
+	out = strings.TrimSpace(out)
+	if _, err := net.ResolveIPAddr("ip", out); err != nil {
+		fatalf("ip %q unrecognizable: %v", out, err)
+	}
+	return out
+}
+
 func startMysql(host client.Anchor) (ip, port string) {
 	// Start MySQL server
 	if _, err := runShell(host, "sudo /etc/init.d/mysql start"); err != nil {
@@ -151,20 +175,51 @@ CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
 	return
 }
 
+func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string) {
+	defer func() {
+		if recover() != nil {
+			fatalf("connection to host lost")
+		}
+	}()
+
+	// Start node.js application
+	port = 8080
+	job := host.Walk([]string{"nodejs"})
+	shell := fmt.Sprintf(
+		"sudo /usr/bin/nodejs index.js "+
+			"--mysql_host %s --mysql_port %s --api_host %s --api_port %s "+
+			"&> /tmp/tutorial-nodejs.log",
+		mysqlIP, mysqlPort,
+		getEc2PublicIP(host), port,
+	)
+	proc, err := job.MakeProc(client.Cmd{
+		Path:  "/bin/sh",
+		Dir:   "/home/ubuntu/nodejs",
+		Args:  []string{"-c", shell},
+		Scrub: true,
+	})
+	if err != nil {
+		fatalf("nodejs app already running")
+	}
+	proc.Stdin().Close()
+	proc.Stdout().Close()
+	proc.Stderr().Close()
+
+	return
+}
+
 func main() {
 	flag.Parse()
 
 	c := connect(*flagAddr)
 
-	host := pickHosts(c, 1) // ??
+	host := pickHosts(c, 2)
 
 	mysqlIP, mysqlPort := startMysql(host[0])
-	println(mysqlIP, mysqlPort)
+	println("Started MySQL on private address:", mysqlIP, mysqlPort)
 
-	// out, _ := runShellStdin(host[0], "cat", "abc\ndef\n")
-	// println(out)
-
-	// nodejsIP, nodejsPort := startNodejs(host[1], mysqlIP, mysqlPort)
+	nodejsIP, nodejsPort := startNodejs(host[1], mysqlIP, mysqlPort)
+	println("Started Node.js service on public address:", nodejsIP, nodejsPort)
 
 	// println(getDarwinHostIP(hosts[0]))
 }
