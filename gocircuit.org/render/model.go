@@ -46,24 +46,24 @@ func (c *Compute) compute() {
 	c.result = c.logic()
 }
 
-// Page
-type Page struct {
-	Url    Unknown
-	Render Unknown
-}
+// // Page
+// type Page struct {
+// 	Url    Unknown
+// 	Render Unknown
+// }
 
-type PageRender func(*Page) string
+// type PageRender func(*Page) string
 
-func NewPage(url Unknown, renderer PageRender) *Page {
-	p := &Page{Url: url}
-	p.Render = NewCompute(func() interface{} { return renderer(p) })
-	return p
-}
+// func NewPage(url Unknown, renderer PageRender) *Page {
+// 	p := &Page{Url: url}
+// 	p.Render = NewCompute(func() interface{} { return renderer(p) })
+// 	return p
+// }
 
-type Index struct {
-	page   []*Page
-	Render Unknown
-}
+// type Index struct {
+// 	page   []*Page
+// 	Render Unknown
+// }
 
-func NewIndex(page ...*Page) *Index {
-}
+// func NewIndex(page ...*Page) *Index {
+// }

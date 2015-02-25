@@ -186,6 +186,7 @@ func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string
 	}()
 
 	// Start node.js application
+	ip = getEc2PublicIP(host)
 	port = "8080"
 	job := host.Walk([]string{"nodejs"})
 	shell := fmt.Sprintf(
@@ -193,7 +194,7 @@ func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string
 			"--mysql_host %s --mysql_port %s --api_host %s --api_port %s "+
 			"&> /tmp/tutorial-nodejs.log",
 		mysqlIP, mysqlPort,
-		getEc2PublicIP(host), port,
+		"0.0.0.0", port,
 	)
 	proc, err := job.MakeProc(client.Cmd{
 		Path:  "/bin/sh",
