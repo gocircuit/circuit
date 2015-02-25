@@ -150,7 +150,7 @@ func startMysql(host client.Anchor) (ip, port string) {
 
 	// Rewrite MySQL config to bind to the private host address
 	cfg := fmt.Sprintf(`sudo sed -i 's/^bind-address\s*=.*$/bind-address = %s/' /etc/mysql/my.cnf`, ip)
-	if err := runShell(host, cfg); err != nil {
+	if _, err := runShell(host, cfg); err != nil {
 		fatalf("mysql configuration error: %v", err)
 	}
 
