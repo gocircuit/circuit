@@ -64,16 +64,14 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <h2>Tutorials</h2>
 
-<h3>A typical web stack</h3>
+<h3>A typical web app: Node.js service using MySQL running on Amazon EC2</h3>
 <ul>
-<li><a href="tutorial-mysql-nodejs.html">Starting a MySQL and node.js stack using a circuit app</a></li>
+<li><a href="tutorial-mysql-nodejs-overview.html">Overview</a></li>
+<li><a href="tutorial-mysql-nodejs-image.html">Prepare host images</a></li>
+<li><a href="tutorial-mysql-nodejs-boot.html">Boot the circuit cluster</a></li>
+<li><a href="tutorial-mysql-nodejs-app.html">Write the circuit app</a></li>
+<li><a href="tutorial-mysql-nodejs-run.html">Run the app on the cluster</a></li>
 </ul>
-
-<!--h3>A server with a maintenance bot</h3>
-<ul>
-<li><a href="">Step 1: Starting a web server with a monitor-and-restart bot</a></li>
-<li><a href="">Step 2: Controling the state of the bot through channels</a></li>
-</ul-->
 
 <p>
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gocircuit/circuit/gocircuit.org/api"
 	"github.com/gocircuit/circuit/gocircuit.org/man"
-	"github.com/gocircuit/circuit/gocircuit.org/tutorial"
+	"github.com/gocircuit/circuit/gocircuit.org/tutorial/mysql-nodejs"
 )
 
 func main() {
@@ -26,7 +26,11 @@ func main() {
 
 	Build("api-process.html", api.RenderProcessPage())
 
-	Build("tutorial-mysql-nodejs.html", tutorial.RenderMysqlNodejsPage())
+	Build("tutorial-mysql-nodejs-overview.html", mysql_nodejs.RenderMysqlNodejsOverview())
+	Build("tutorial-mysql-nodejs-image.html", mysql_nodejs.RenderMysqlNodejsImage())
+	Build("tutorial-mysql-nodejs-boot.html", mysql_nodejs.RenderMysqlNodejsBoot())
+	Build("tutorial-mysql-nodejs-app.html", mysql_nodejs.RenderMysqlNodejsApp())
+	Build("tutorial-mysql-nodejs-run.html", mysql_nodejs.RenderMysqlNodejsRun())
 }
 
 func Build(file string, content string) {

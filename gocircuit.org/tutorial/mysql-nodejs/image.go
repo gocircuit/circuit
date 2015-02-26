@@ -1,14 +1,14 @@
-package tutorial
+package mysql_nodejs
 
 import (
 	. "github.com/gocircuit/circuit/gocircuit.org/render"
 )
 
-func RenderMysqlNodejsPage() string {
-	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(installBody, nil))
+func RenderMysqlNodejsImage() string {
+	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(imageBody, nil))
 }
 
-const installBody = `
+const imageBody = `
 <h1>Starting a MySQL and node.js stack using a circuit app</h1>
 
 <p>Start a fresh EC2 instance with an ubuntu base image. 
