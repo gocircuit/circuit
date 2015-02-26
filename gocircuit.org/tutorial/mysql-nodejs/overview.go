@@ -5,10 +5,20 @@ import (
 )
 
 func RenderMysqlNodejsOverview() string {
-	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(overviewBody, nil))
+	figs := A{
+		"FigOverview": RenderFigurePngSvg(
+			`A cloud service comprised of a Node.js HTTP RESTful public API for a key/value store, 
+			backed by MySQL database.`,
+			"tutorial/mysql-nodejs",
+			"600px",
+		),
+	}
+	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(overviewBody, figs))
 }
 
 const overviewBody = `
-<h1>Starting a MySQL and node.js stack using a circuit app</h1>
+<h1>Overview</h1>
+
+{{.FigOverview}}
 
         `
