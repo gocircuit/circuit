@@ -1,8 +1,7 @@
 PROJECTS
 ========
 
-* join two servers:
-	circuit join -d ... /X123 circuit://...
+* document join
 * amz scripts for connecting the cluster
 
 * tutorial doc
