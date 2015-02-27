@@ -5,34 +5,46 @@ import (
 )
 
 func RenderMysqlNodejsImage() string {
-	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(imageBody, nil))
+	return RenderHtml("Prepare host images", Render(imageBody, nil))
 }
 
 const imageBody = `
-<h1>Starting a MySQL and node.js stack using a circuit app</h1>
+<h1>Prepare host images</h1>
 
-<p>Start a fresh EC2 instance with an ubuntu base image. 
+<p>We are going to describe here a sequence of steps that will
+result in creating a new Amazon Machine Image (AMI), preloaded
+with software needed for this tutorial.
 
-<h2>Prepare a host image</h2>
+<p>Start a fresh EC2 instance with an Ubuntu Linux base image. The plan
+is to install the needed software in a few simple manual steps and then
+save the state of the machine into the resulting image.
+
+<h3>Install a few generic tools</h3>
+
+<p>Begin by updating the packaging system and installing a few handy
+generic tools:
 
 <pre>
-	# apt-get update
-	# apt-get install vim curl
+	# sudo apt-get update
+	# sudo apt-get install vim curl git
 </pre>
 
 <h3>Install the circuit</h3>
 
-<p>Start by installing the Go compiler and Git:
+<p>Installing the Go compiler:
 
 <pre>
-	# apt-get install git golang
+	# sudo apt-get install golang
 </pre>
 
-<p>Create a temporary directory for building the circuit:
+<p>Next, we need to create a directory for building the circuit.
+This directory will serve as the <a href="https://golang.org/doc/code.html">GOPATH</a> directory
+that points the Go compiler to a source tree.
 
 <pre>
-	# mkdir -p /tmp/0/src && cd /tmp/0/src
-	# declare -x GOPATH=/tmp/0
+	# mkdir -p $HOME/0/src
+	# echo "declare -x GOPATH=$HOME/0" >> ~/.bash_profile
+	# source ~/.bash_profile
 </pre>
 
 <p>Fetch and build the circuit, then place the circuit executable in the system path:
@@ -42,94 +54,67 @@ const imageBody = `
 	# cp $GOPATH/bin/circuit /usr/local/bin
 </pre>
 
-<p>Next, configure the system to start the circuit daemon during the system booting sequence.
+<p>Make sure the installation succeeded by running <code>circuit start</code>, to
+start the circuit daemon, and then simply kill it with Control-C.
 
-<p>To keep things as simple as possible, we start the circuit from <code>/etc/rc.local</code>.
+<p>Finally, prepare a scratch directory which we will later use for the circuit daemon
+to write logging and other such information.
 
 <pre>
 	# mkdir /var/circuit
 </pre>
 
-<p>Add the following shell script <code>/usr/local/bin/start-first-server.sh</code>:
-
-<pre>
-	#!/bin/sh
-	# Save the EC2 private IP address of this host to a variable.
-	ip_address=` + "`" + `ifconfig eth0 | awk '/inet addr/ {split($2, a, ":"); print a[2] }'` + "`" + `
-	# Start the circuit server
-	/usr/local/bin/circuit start -a ${ip_address}:11022 1> /var/circuit/address 2> /var/circuit/log &
-</pre>
-
-<p>Add the following shell script <code>/usr/local/bin/start-joining-server.sh</code>:
-
-<pre>
-	#!/bin/sh
-	# Save the EC2 private IP address of this host to a variable.
-	ip_address=` + "`" + `ifconfig eth0 | awk '/inet addr/ {split($2, a, ":"); print a[2] }'` + "`" + `
-	# Start the circuit server
-	/usr/local/bin/circuit start -a ${ip_address}:11022 -j $1 1> /var/circuit/address 2> /var/circuit/log &
-</pre>
-
-
-
 <h3>Install MySQL server</h3>
 
-<p>The installation will prompt you for a root user password — use the empty string:
+<p>Install MySQL using the default packaged distribution.
+The installation will prompt you for a root user password — 
+feel free to use the empty string to simplify the tutorial:
 
 <pre>
-	# apt-get install mysql-server
+	# sudo apt-get install mysql-server
 </pre>
 
-<p>As a side-effect, the installer will put MySQL in the boot sequence. We would like 
-to disable that as we plan to manage (start/stop) the service through our circuit application.
-Disable automatic boot startup of MySQL using:
+<p>As a side-effect, the installer will put MySQL in the boot sequence of this machine.
+We would like to disable that as we plan to manage (start/stop) the service through 
+our circuit application. Thus, disable the automatic boot startup of MySQL using:
 
 <pre>
-	echo manual | sudo tee /etc/init/mysql.override
-</pre>
-
-<p>Start the server, so we can create a tutorial user and database:
-
-<pre>
-	# /etc/init.d/mysql start
-</pre>
-
-<p>Connect to the MySQL server as the administrator, using the password <code>charlie</code>:
-
-<pre>
-	# mysql -p
-</pre>
-
-<p>Create a user and a database, both named <code>tutorial</code>.
-
-<pre>
-	mysql> CREATE USER tutorial;
-	mysql> CREATE DATABASE tutorial;
-	mysql> GRANT ALL ON tutorial.*  TO tutorial;
-</pre>
-
-<p>Create table <code>Messages</code> for the tutorial application, after logging in as the <code>tutorial</code> user:
-
-<pre>
-	# mysql -u tutorial
-	mysql> USE tutorial;
-	mysql> CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
+	# echo manual | sudo tee /etc/init/mysql.override
 </pre>
 
 <h3>Install node.js and the tutorial node.js app</h3>
 
-<p>Install node.js:
+<p>Last, we need to install Node.js as well as the example Node.js app
+that we have prepared for this tutorial, to serve as a RESTful HTTP API
+front-end for the key/value store, backed by MySQL.
+
+<p>Install Node.js with:
 
 <pre>
-	# apt-get install nodejs
-	# apt-get install npm
+	# sudo apt-get install nodejs npm
 </pre>
 
-<p>Install dependencies:
+<p>The Node.js app for this tutorial is located in the circuit's source tree.
+We already have a local clone of the source tree (as a result of the <code>go get</code>
+command earlier). We are simply going to copy it out of the source tree
+and place it nearby for convenience:
 
 <pre>
+	# cd $HOME
+	# cp -R $GOPATH/src/github.com/gocircuit/circuit/tutorial/nodejs-using-mysql/nodejs-app .
+</pre>
+
+<p>And prepare the Node.js app for execution by fetching its Node.js package dependencies:
+
+<pre>
+	# cd $HOME
+	# cd nodejs-app
 	# npm install
 </pre>
 
+<h3>Save the image</h3>
+
+<p>We are done installing. It is best to now “stop” (rather than “terminate”) the Amazon host instance.
+Once the instance has stopped, use your Amazon EC2 console to save its current state to a new machine image.
 
         `
