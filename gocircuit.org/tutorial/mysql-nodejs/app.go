@@ -4,7 +4,7 @@ import (
 	. "github.com/gocircuit/circuit/gocircuit.org/render"
 )
 
-func RenderMysqlNodejsApp() string {
+func RenderApp() string {
 	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(appBody, nil))
 }
 

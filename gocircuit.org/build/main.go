@@ -26,11 +26,11 @@ func main() {
 
 	Build("api-process.html", api.RenderProcessPage())
 
-	Build("tutorial-mysql-nodejs-overview.html", mysql_nodejs.RenderMysqlNodejsOverview())
-	Build("tutorial-mysql-nodejs-image.html", mysql_nodejs.RenderMysqlNodejsImage())
-	Build("tutorial-mysql-nodejs-boot.html", mysql_nodejs.RenderMysqlNodejsBoot())
-	Build("tutorial-mysql-nodejs-app.html", mysql_nodejs.RenderMysqlNodejsApp())
-	Build("tutorial-mysql-nodejs-run.html", mysql_nodejs.RenderMysqlNodejsRun())
+	Build("tutorial-mysql-nodejs-overview.html", mysql_nodejs.RenderOverview())
+	Build("tutorial-mysql-nodejs-image.html", mysql_nodejs.RenderImage())
+	Build("tutorial-mysql-nodejs-boot.html", mysql_nodejs.RenderBoot()) //
+	Build("tutorial-mysql-nodejs-app.html", mysql_nodejs.RenderApp())
+	Build("tutorial-mysql-nodejs-run.html", mysql_nodejs.RenderRun())
 }
 
 func Build(file string, content string) {

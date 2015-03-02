@@ -4,7 +4,7 @@ import (
 	. "github.com/gocircuit/circuit/gocircuit.org/render"
 )
 
-func RenderMysqlNodejsOverview() string {
+func RenderOverview() string {
 	figs := A{
 		"FigOverview": RenderFigurePngSvg(
 			`Bubbles represent processes. The MySQL daemon and the left circuit are

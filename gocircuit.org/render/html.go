@@ -2,17 +2,37 @@ package render
 
 func RenderHtml(title, body string) string {
 	return Render(sourceHtml, A{
-		"Title":  title,
-		"Body":   body,
-		"Header": sourceHeader,
-		"Footer": sourceFooter,
+		"Title":      title,
+		"Body":       body,
+		"PathToRoot": "",
+		"Header":     sourceHeader,
+		"Footer":     sourceFooter,
 	})
+}
+
+func RenderHtml2(url []string, title, body string) string {
+	return Render(sourceHtml, A{
+		"Title":      title,
+		"Body":       body,
+		"PathToRoot": PathToRoot(url),
+		"Header":     sourceHeader,
+		"Footer":     sourceFooter,
+	})
+}
+
+// PathToRoot returns "", "../", "../../", etc.
+func PathToRoot(url []string) string {
+	r := ""
+	for range url {
+		r += "../"
+	}
+	return r
 }
 
 const sourceHtml = `<!doctype html><html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<link href="{{.PathToRoot}}css/main.css" rel="stylesheet" type="text/css" />
 		<title>{{.Title}}</title>
 	</head>
 	<body>

@@ -4,7 +4,7 @@ import (
 	. "github.com/gocircuit/circuit/gocircuit.org/render"
 )
 
-func RenderMysqlNodejsImage() string {
+func RenderImage() string {
 	return RenderHtml("Prepare host images", Render(imageBody, nil))
 }
 
