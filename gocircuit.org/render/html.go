@@ -34,6 +34,7 @@ const sourceHtml = `<!doctype html><html>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link href="{{.PathToRoot}}css/main.css" rel="stylesheet" type="text/css" />
 		<title>{{.Title}}</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
 	{{.Header}}

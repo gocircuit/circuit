@@ -46,14 +46,144 @@ func main() {
 	flag.Parse()
 	…
 }
-
 </pre>
+
+<p>Notable here is the import of the circuit client package <code>"github.com/gocircuit/circuit/client"</code>
+and the definition of function <code>fatalf()</code>, which we'll use to report terminal errors.
+
 
 <h2>Connecting to the cluster</h2>
 
-<p>
+<p>The next step is to connect into a circuit server (specified by a circuit address) and obtain a client
+object that will give us access to the circuit API.
+The following subroutine takes a circuit address as an argument and returns a connected client object
+as a result:
+
+<pre>
+func connect(addr string) *client.Client {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("could not connect: %v", r)
+		}
+	}()
+	return client.Dial(addr, nil)
+}
+</pre>
+
+<p>Note that by convention, the circuit client library universally reports loss 
+of connection (or inability to establish connection) conditions via panics,
+as they can occur anywhere in its methods.
+Such panics are normal error conditions, and can be recovered from.
+In our case, we prefer to terminate the program with an error message.
+
+<p>The <code>main</code> function can now be updated to:
+<pre>
+func main() {
+	flag.Parse()
+	c := connect(*flagAddr)
+	…
+}
+</pre>
+
+<h2>Selecting hosts</h2>
+
+<p>The next goal is to “list” the contents of the circuit cluster and to
+choose two hosts out of the inventory — one for the MySQL database
+and one for the Node.js front-end service.
+
+<p>The circuit Go API represents all cluster resources in the form of one
+big hierarchy of “anchors”. Each anchor can have any number of 
+uniquely-named sub-anchors, and it can be associated with one
+resource (process, server, container, etc.) Anchors are represented
+by the interface type <code>client.Anchor</code>.
+
+<p>The client object, of type <code>*client.Client</code>, is itself an
+anchor (it implements <code>client.Anchor</code>) and it is in fact 
+the root anchor of the circuit cluster's virtual hierarchy.
+
+<p>The root anchor is unique in that it is not associated with any 
+resource and its sub-anchors automatically exactly correspond
+to the circuit servers that are presently members of the cluster.
+
+<p>Every anchor has a <code>View</code> method:
+<pre>
+	View() map[string]client.Anchor
+</pre>
+which returns the sub-anchors of this anchor and their names.
+If we invoke the <code>View</code> method of the root anchor,
+we obtain a list of anchors corresponding to the currently live
+circuit servers.
+
+<p>We are going to use this to write a simple subroutine that blindly
+picks a fixed number of hosts out of the available ones, re-using 
+some hosts if necessary:
+
+<pre>
+func pickHosts(c *client.Client, n int) (hosts []client.Anchor) {
+	defer func() {
+		if recover() != nil {
+			fatalf("client connection lost")
+		}
+	}()
+	view := c.View()
+	if len(view) == 0 {
+		fatalf("no hosts in cluster")
+	}
+	for len(hosts) < n {
+		for _, a := range view {
+			if len(hosts) >= n {
+				break
+			}
+			hosts = append(hosts, a)
+		}
+	}
+	return
+}
+</pre>
+
+<p>Note again here that a panic ensuing from <code>c.View()</code> would
+indicate a broken connection between the client and the circuit server, in which
+case we prefer to exit the program.
+
+<p>We can further update <code>main</code> to:
+<pre>
+func main() {
+	flag.Parse()
+	c := connect(*flagAddr)
+	hosts := pickHosts(c, 2)
+	…
+}
+</pre>
+
+<h2>A versatile orchestration subroutine</h2>
 
 <p>
+
+<pre>
+func runShellStdin(host client.Anchor, cmd, stdin string) (string, error) {
+	defer func() {
+		if recover() != nil {
+			fatalf("connection to host lost")
+		}
+	}()
+	job := host.Walk([]string{"shelljob", strconv.Itoa(rand.Int())})
+	proc, _ := job.MakeProc(client.Cmd{
+		Path:  "/bin/sh",
+		Dir:   "/tmp",
+		Args:  []string{"-c", cmd},
+		Scrub: true,
+	})
+	go func() {
+		io.Copy(proc.Stdin(), bytes.NewBufferString(stdin))
+		proc.Stdin().Close() // Must close the standard input of the shell process.
+	}()
+	proc.Stderr().Close() // Close to indicate discarding standard error
+	var buf bytes.Buffer
+	io.Copy(&buf, proc.Stdout())
+	stat, _ := proc.Wait()
+	return buf.String(), stat.Exit
+}
+</pre>
 
 <h3>Start MySQL</h3>
 

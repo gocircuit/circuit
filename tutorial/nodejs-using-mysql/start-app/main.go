@@ -221,9 +221,7 @@ func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string
 
 func main() {
 	flag.Parse()
-
 	c := connect(*flagAddr)
-
 	host := pickHosts(c, 2)
 
 	mysqlIP, mysqlPort := startMysql(host[0])
