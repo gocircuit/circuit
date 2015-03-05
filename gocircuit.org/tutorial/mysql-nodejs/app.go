@@ -5,11 +5,55 @@ import (
 )
 
 func RenderApp() string {
-	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(appBody, nil))
+	return RenderHtml("Write the circuit app", Render(appBody, nil))
 }
 
 const appBody = `
-<h1>Starting a MySQL and node.js stack using a circuit app</h1>
+<h1>Write the circuit app</h1>
+
+<p>In this section we are going to write a Go program (the circuit app),
+which when executed will connect to the circuit cluster and deploy
+the tutorial's MySQL/Node.js-based web service using two hosts from
+the cluster.
+
+<p>The source of the finished app is located in:
+<pre>
+	$GOPATH/github.com/gocircuit/circuit/tutorial/nodejs-using-mysql/start-app/main.go
+</pre>
+
+<h2>First strokes</h2>
+
+<p>This is going to be a single source-file Go program, which will expect exactly one command-line
+parameter, <code>-addr</code>, specifying the circuit address to connect into. As
+a start, the program will look like this:
+
+<pre>
+package main
+
+import (
+	"flag"
+	"github.com/gocircuit/circuit/client"
+)
+
+var flagAddr = flag.String("addr", "", "circuit server address (looks like circuit://...)")
+
+func fatalf(format string, arg ...interface{}) {
+	println(fmt.Sprintf(format, arg...))
+	os.Exit(1)
+}
+
+func main() {
+	flag.Parse()
+	…
+}
+
+</pre>
+
+<h2>Connecting to the cluster</h2>
+
+<p>
+
+<p>
 
 <h3>Start MySQL</h3>
 

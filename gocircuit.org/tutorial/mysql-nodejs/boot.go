@@ -169,6 +169,6 @@ say from the second host:
 
 <p>At this stage the circuit cluster is connected and ready to be used.
 You should not have to restart and rejoin circuit servers unless a host 
-dies and you are adding a new one to the cluster.
+dies and/or you are adding a new one to the cluster.
 
         `
