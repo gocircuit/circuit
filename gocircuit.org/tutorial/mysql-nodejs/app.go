@@ -200,7 +200,71 @@ func runShellStdin(host client.Anchor, cmd, stdin string) (string, error) {
 }
 </pre>
 
-<h3>Start MySQL</h3>
+<p>Let's break down what this function accomplishes:
+
+<ul>
+
+<li>The <code>defer</code> statement catches panics that may arise from the circuit API calls.
+By convention, any such panic indicates that either (i) the particular host we are manipulating 
+(through the methods of the anchor object) has become disconnected from the cluster, or
+(ii) our client has lost connection to the circuit server that it initially connected to, using <code>client.Dial</code>.
+
+<p>In this example, we prefer to terminate the app if we encounter loss of connectivity of either kind.
+
+<p>In general, one could detect whether (i) or (ii) was the cause for the panic.
+For instance, if a subsequent call to a client method, like <code>View()</code>, also panics
+then the client itself has been disconnected, i.e. condition (ii). In this case, you need to discard
+the client object as well as any anchors derived from it. But if such a subsequent call does not panic, it implies
+that the initial panic was caused by condition (i). In this case, only the host that your anchor
+refers to has been disconnected and you can continue using the same client.
+
+<li>The next line, which invokes <code>host.Walk</code>, creates an anchor (i.e. a node in the 
+	circuit's virtual hierarchy) for the shell process that we about to execute.
+	For instance, if the host anchor corresponds to a path like <code>/Xfea8b5b798f2fc09</code>,
+	then the anchor <code>job</code> will correspond to a path like
+	<code>/Xfea8b5b798f2fc09/shelljob/1234</code>, where <code>1234</code> is an
+	integer that we pick randomly to make sure we arrive at an anchor that does not
+	already have a resource attached to it.
+
+<p>In general, calls to <code>anchor.Walk()</code> always succeed (as long as the implied
+	underlying host is connected). If the anchor we are “walking” to does not already exist,
+	it is automatically created. On the other hand, anchors that are not used by any clients
+	and have no resources attached to them are eventually garbage-collected for you.
+
+<li>
+
+</ul>
+
+<p>Often we won't be interested in passing any data to the standard input of the shell process,
+for which cases we add a shortcut subroutine:
+
+<pre>
+func runShell(host client.Anchor, cmd string) (string, error) {
+	return runShellStdin(host, cmd, "")
+}
+</pre>
+
+<h3>Retrieving EC2 host public and private IP addresses</h3>
+
+<pre>
+func getEc2PublicIP(host client.Anchor) string {
+	out, err := runShell(host, "curl http://169.254.169.254/latest/meta-data/public-ipv4")
+	if err != nil {
+		fatalf("get ec2 public ip error: %v", err)
+	}
+	out = strings.TrimSpace(out)
+	if _, err := net.ResolveIPAddr("ip", out); err != nil {
+		fatalf("ip %q unrecognizable: %v", out, err)
+	}
+	return out
+}
+</pre>
+
+<p>To retrieve the private host IP we implement a similar function <code>getEc2PrivateIP</code>,
+which only differs from the above in that <code>public-ipv4</code> is substituted with 
+<code>local-ipv4</code>.
+
+<h2>Start MySQL</h2>
 
 
 <p>Start the server, so we can create a tutorial user and database:
