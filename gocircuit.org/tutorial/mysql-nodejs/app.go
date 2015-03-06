@@ -155,9 +155,24 @@ func main() {
 }
 </pre>
 
+<p>Before we continue with the main app logic—starting MySQL and starting Node.js—we
+are going to make a small detour. We are going to implement a useful subroutine
+that executes shell commands and scripts on any desired host directly from the
+Go environment of our app.
+
 <h2>A versatile orchestration subroutine</h2>
 
-<p>
+<p>The function <code>runShellStdin</code> takes an anchor parameter <code>host</code>,
+which is expected to be an anchor corresponding to a circuit server. It
+executes a desired shell command <code>cmd</code> on the corresponding host,
+and it also supplies the string <code>stdin</code> as standard input to the
+shell process.
+
+<p>The function waits (blocks) until the shell process terminates and returns its
+standard output in the form of a string. If the shell process exits in error, this
+is reflected in a non-nil return error value. If the function fails due to loss of
+connection (as opposed to due to an unsuccessful exit from the shell process),
+<code>runShellStdin</code> will terminate the processes and exit with an error message.
 
 <pre>
 func runShellStdin(host client.Anchor, cmd, stdin string) (string, error) {
