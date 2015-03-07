@@ -203,8 +203,15 @@ func runShellStdin(host client.Anchor, cmd, stdin string) (string, error) {
 <p>Let's break down what this function accomplishes:
 
 <ol>
+<li><pre>
+	defer func() {
+		if recover() != nil {
+			fatalf("connection to host lost")
+		}
+	}()
+</pre>
 
-<li>The <code>defer</code> statement catches panics that may arise from the circuit API calls.
+<p>The <code>defer</code> statement catches panics that may arise from the circuit API calls.
 By convention, any such panic indicates that either (i) the particular host we are manipulating 
 (through the methods of the anchor object) has become disconnected from the cluster, or
 (ii) our client has lost connection to the circuit server that it initially connected to, using <code>client.Dial</code>.
@@ -218,7 +225,11 @@ the client object as well as any anchors derived from it. But if such a subseque
 that the initial panic was caused by condition (i). In this case, only the host that your anchor
 refers to has been disconnected and you can continue using the same client.
 
-<li>The next line, which invokes <code>host.Walk</code>, creates an anchor (i.e. a node in the 
+<li><pre>
+	job := host.Walk([]string{"shelljob", strconv.Itoa(rand.Int())})
+</pre>
+
+<p>The next line, which invokes <code>host.Walk</code>, creates an anchor (i.e. a node in the 
 	circuit's virtual hierarchy) for the shell process that we are about to execute.
 	For instance, if the host anchor corresponds to a path like <code>/Xfea8b5b798f2fc09</code>,
 	then the anchor <code>job</code> will correspond to a path like
@@ -226,12 +237,22 @@ refers to has been disconnected and you can continue using the same client.
 	integer that we pick randomly to make sure we arrive at an anchor that does not
 	already have a resource attached to it.
 
+
 <p>In general, calls to <code>anchor.Walk()</code> always succeed (as long as the implied
 	underlying host is connected). If the anchor we are “walking” to does not already exist,
 	it is automatically created. On the other hand, anchors that are not used by any clients
 	and have no resources attached to them are eventually garbage-collected for you.
 
-<li>The following call to <code>job.MakeProc</code> executes the shell process
+<li><pre>
+	proc, _ := job.MakeProc(client.Cmd{
+		Path:  "/bin/sh",
+		Dir:   "/tmp",
+		Args:  []string{"-c", cmd},
+		Scrub: true,
+	})
+</pre>
+
+<p>The following call to <code>job.MakeProc</code> executes the shell process
 and creates a process handle — which we call a <em>process element</em> — and 
 attaches the process element to the anchor <code>job</code>.
 The process element is represented by the returned value in <code>proc</code>.
@@ -247,7 +268,53 @@ the process anchor automatically when the process dies. (Normally anchors that
 have resources attached to them are not garbage-collected from the virtual hierarchy.
 They must be scrubbed explicitly by the user.)
 
-<li>
+<li><pre>
+	go func() {
+		io.Copy(proc.Stdin(), bytes.NewBufferString(stdin))
+		proc.Stdin().Close() // Must close the standard input of the shell process.
+	}()
+	proc.Stderr().Close() // Close to indicate discarding standard error
+	var buf bytes.Buffer
+	io.Copy(&buf, proc.Stdout())
+</pre>
+
+<p>As soon as <code>MakeProc</code> returns, the process is running.
+Our next goal is to take care of its standard streams: By POSIX convention,
+every process will block if (i) it tries to read from standard input and there is nothing
+to read and the descriptor is still open, or (ii) it tries to write to standard
+error or output and they are not being consumed.
+
+<p>We have direct access to the standard streams of the running process
+via the methods
+<pre>
+	Stdin() io.WriteCloser
+	Stdout() io.ReadCloser
+	Stderr() io.ReadCloser
+</pre>
+of the <code>proc</code> variable.
+
+<p>In a separate goroutine, we write the contents of the parameter <code>stdin</code>
+to the standard input of the shell process and then we close the stream, indicating that
+no more input is to be expected.
+
+<p>Meanwhile, in the main goroutine we first close the standard error stream.
+This tells the circuit that all output to that stream should be discarded. Closing
+a stream never blocks. 
+
+<p>Finally, we block on greedily reading the standard output of the shell process
+into a buffer until we encounter closure, i.e. an EOF condition. Closure of the
+standard output stream happens immediately before the process exits. At
+this point <code>io.Copy()</code> will unblock.
+
+<li><pre>
+	stat, _ := proc.Wait()
+	return buf.String(), stat.Exit
+</pre>
+
+<p>At last we invoke <code>proc.Wait</code> to wait for the death of the
+process and capture its exit state within the returned <code>stat</code> structure.
+If the error field <code>stat.Exit</code> is non-nil, it means the process
+exited in error.
 
 </ol>
 
