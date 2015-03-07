@@ -232,8 +232,22 @@ refers to has been disconnected and you can continue using the same client.
 	and have no resources attached to them are eventually garbage-collected for you.
 
 <li>The following call to <code>job.MakeProc</code> executes the shell process
-and creates a process object (which we sometimes call an <em>element</em>)
-that becomes attached to the anchor <code>job</code>.
+and creates a process handle — which we call a <em>process element</em> — and 
+attaches the process element to the anchor <code>job</code>.
+The process element is represented by the returned value in <code>proc</code>.
+(In general, elements attached to an anchor can be retrieved using the <code>Get</code> method.)
+
+<p>The function <code>MakeProc</code> returns as soon as the process is executed, it
+does not wait for the process to complete. The returned error value, ignored in our example,
+is non-nil only in the event that the binary to be executed is not found on the host.
+
+<p>The argument to <code>MakeProc</code> specifies the command, as usual.
+The field <code>Scrub</code>, when set to <code>true</code>, tells the circuit runtime to remove
+the process anchor automatically when the process dies. Normally anchors that
+have resources attached to them are not garbage-collected from the virtual hierarchy.
+They must be scrubbed explicitly by the user.
+
+<li>
 
 </ol>
 
