@@ -24,6 +24,7 @@ func main() {
 	Build("element-dns.html", man.RenderElementDnsPage())
 	Build("element-channel.html", man.RenderElementChannelPage())
 
+	Build("api.html", api.RenderMainPage())
 	Build("api-process.html", api.RenderProcessPage())
 
 	Build("tutorial-mysql-nodejs-overview.html", mysql_nodejs.RenderOverview())

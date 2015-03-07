@@ -46,7 +46,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="element-channel.html">Channel</a></li>
 </ul>
 
-<li>Go client
+<li><a href="api.html">Go client</a>
 <ul>
 <li>Navigating the circuit's virtual file system</li>
 <li><a href="api-process.html">Process</a></li>

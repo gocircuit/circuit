@@ -243,9 +243,9 @@ is non-nil only in the event that the binary to be executed is not found on the 
 
 <p>The argument to <code>MakeProc</code> specifies the command, as usual.
 The field <code>Scrub</code>, when set to <code>true</code>, tells the circuit runtime to remove
-the process anchor automatically when the process dies. Normally anchors that
+the process anchor automatically when the process dies. (Normally anchors that
 have resources attached to them are not garbage-collected from the virtual hierarchy.
-They must be scrubbed explicitly by the user.
+They must be scrubbed explicitly by the user.)
 
 <li>
 
