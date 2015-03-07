@@ -202,7 +202,7 @@ func runShellStdin(host client.Anchor, cmd, stdin string) (string, error) {
 
 <p>Let's break down what this function accomplishes:
 
-<ul>
+<ol>
 
 <li>The <code>defer</code> statement catches panics that may arise from the circuit API calls.
 By convention, any such panic indicates that either (i) the particular host we are manipulating 
@@ -219,7 +219,7 @@ that the initial panic was caused by condition (i). In this case, only the host 
 refers to has been disconnected and you can continue using the same client.
 
 <li>The next line, which invokes <code>host.Walk</code>, creates an anchor (i.e. a node in the 
-	circuit's virtual hierarchy) for the shell process that we about to execute.
+	circuit's virtual hierarchy) for the shell process that we are about to execute.
 	For instance, if the host anchor corresponds to a path like <code>/Xfea8b5b798f2fc09</code>,
 	then the anchor <code>job</code> will correspond to a path like
 	<code>/Xfea8b5b798f2fc09/shelljob/1234</code>, where <code>1234</code> is an
@@ -231,9 +231,11 @@ refers to has been disconnected and you can continue using the same client.
 	it is automatically created. On the other hand, anchors that are not used by any clients
 	and have no resources attached to them are eventually garbage-collected for you.
 
-<li>
+<li>The following call to <code>job.MakeProc</code> executes the shell process
+and creates a process object (which we sometimes call an <em>element</em>)
+that becomes attached to the anchor <code>job</code>.
 
-</ul>
+</ol>
 
 <p>Often we won't be interested in passing any data to the standard input of the shell process,
 for which cases we add a shortcut subroutine:
