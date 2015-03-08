@@ -229,6 +229,4 @@ func main() {
 
 	nodejsIP, nodejsPort := startNodejs(host[1], mysqlIP, mysqlPort)
 	println("Started Node.js service on public address:", nodejsIP, nodejsPort)
-
-	// println(getDarwinHostIP(hosts[0]))
 }

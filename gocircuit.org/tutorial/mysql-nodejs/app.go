@@ -327,7 +327,22 @@ func runShell(host client.Anchor, cmd string) (string, error) {
 }
 </pre>
 
+<p>We are now going to use <code>runShell</code> to fetch the public
+and private IP addresses of any host on the cluster.
+
 <h3>Retrieving EC2 host public and private IP addresses</h3>
+
+<p>On any Amazon EC2 host instance, by definition, one is able to 
+retrieve the public and private IP addresses of the host instance using
+the following command-lines, respectively:
+
+<pre>
+curl http://169.254.169.254/latest/meta-data/public-ipv4
+curl http://169.254.169.254/latest/meta-data/local-ipv4
+</pre>
+
+<p>Basing on that and using <code>runShell</code>, the following subroutine will
+fetch the public address of any host on the circuit cluster, specified by its anchor:
 
 <pre>
 func getEc2PublicIP(host client.Anchor) string {
@@ -347,7 +362,11 @@ func getEc2PublicIP(host client.Anchor) string {
 which only differs from the above in that <code>public-ipv4</code> is substituted with 
 <code>local-ipv4</code>.
 
-<h2>Start MySQL</h2>
+<p>The rest of the circuit app, admittedly its substance, will be implemented entirely in terms 
+of <code>runShell</code>, <code>runShellStdin</code>, <code>getEc2PublicIP</code>
+and <code>getEc2PrivateIP</code>.
+
+<h2>Starting the MySQL database on host A</h2>
 
 
 <p>Start the server, so we can create a tutorial user and database:
