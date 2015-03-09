@@ -362,39 +362,174 @@ func getEc2PublicIP(host client.Anchor) string {
 which only differs from the above in that <code>public-ipv4</code> is substituted with 
 <code>local-ipv4</code>.
 
-<p>The rest of the circuit app, admittedly its substance, will be implemented entirely in terms 
-of <code>runShell</code>, <code>runShellStdin</code>, <code>getEc2PublicIP</code>
-and <code>getEc2PrivateIP</code>.
-
 <h2>Starting the MySQL database on host A</h2>
 
-
-<p>Start the server, so we can create a tutorial user and database:
+<p>We would like to write a routine that starts a fresh MySQL server on a given host and
+returns its server address and port number as a result.
 
 <pre>
-	# /etc/init.d/mysql start
+	func startMysql(host client.Anchor) (ip, port string)
 </pre>
 
-<p>Connect to the MySQL server as the administrator, using the password <code>charlie</code>:
+<p>We are first going to describe the “manual” processs of starting a fresh
+MySQL server, assuming we have a shell session at the host.
 
+<p>Then we are going to show how this manual process can be codified
+into a Go subroutine that performs its steps directly from the client application.
+
+<h3>Manually starting MySQL at the host</h3>
+
+<p>Let's asume you are at the shell of the host machine. The following
+steps describe the way to start the MySQL server with a new database.
+
+<p>Obtain the private IP address of this host:
 <pre>
-	# mysql -p
+	$ IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 </pre>
 
-<p>Create a user and a database, both named <code>tutorial</code>.
-
+<p>Rewrite MySQL's configuration file to bind to the private IP address
+and the default port 3306:
 <pre>
+	$ sudo sed -i 's/^bind-address\s*=.*$/bind-address = '$IP:3306'/' /etc/mysql/my.cnf
+</pre>
+
+<p>Start the server:
+<pre>
+	$ sudo /etc/init.d/mysql start
+</pre>
+
+<p>Connect to MySQL as root to prepare the tutorial user and database:
+<pre>
+	$ sudo mysql
+	mysql> DROP USER tutorial;
+	mysql> DROP DATABASE tutorial;
 	mysql> CREATE USER tutorial;
 	mysql> CREATE DATABASE tutorial;
 	mysql> GRANT ALL ON tutorial.*  TO tutorial;
 </pre>
 
-<p>Create table <code>Messages</code> for the tutorial application, after logging in as the <code>tutorial</code> user:
-
+<p>Then connect as the <code>tutorial</code> user and set up the main table:
 <pre>
-	# mysql -u tutorial
+	$ mysql -u tutorial
 	mysql> USE tutorial;
 	mysql> CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
+</pre>
+
+<p>The database is now configured, up and accepting connections at <code>$IP:3306</code>.
+
+<h3>Programmatically starting MySQL from the app</h3>
+
+<p>Retracing the manual steps programmatically is straightforward, purely using the
+subroutines <code>getEc2PrivateIP</code>, <code>runShell</code> and <code>runShellStdin</code>
+that we created earlier.
+
+<pre>
+	func startMysql(host client.Anchor) (ip, port string) {
+
+		// Retrieve the IP address of this host within the cluster's private network.
+		ip = getEc2PrivateIP(host)
+
+		// We use the default MySQL server port
+		port = strconv.Itoa(3306)
+
+		// Rewrite MySQL config to bind to the private host address
+		cfg := fmt.Sprintf(` + "`" + `sudo sed -i 's/^bind-address\s*=.*$/bind-address = %s/' /etc/mysql/my.cnf` + "`" + `, ip)
+		if _, err := runShell(host, cfg); err != nil {
+			fatalf("mysql configuration error: %v", err)
+		}
+
+		// Start MySQL server
+		if _, err := runShell(host, "sudo /etc/init.d/mysql start"); err != nil {
+			fatalf("mysql start error: %v", err)
+		}
+
+		// Remove old database and user
+		runShellStdin(host, "sudo /usr/bin/mysql", "DROP USER tutorial;")
+		runShellStdin(host, "sudo /usr/bin/mysql", "DROP DATABASE tutorial;")
+
+		// Create tutorial user and database within MySQL
+		const m1 = ` + "`" + `
+	CREATE USER tutorial;
+	CREATE DATABASE tutorial;
+	GRANT ALL ON tutorial.*  TO tutorial;
+	` + "`" + `
+		if _, err := runShellStdin(host, "sudo /usr/bin/mysql", m1); err != nil {
+			fatalf("problem creating database and user: %v", err)
+		}
+
+		// Create key/value table within tutorial database
+		const m2 = ` + "`" + `
+	USE tutorial;
+	CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
+	` + "`" + `
+		if _, err := runShellStdin(host, "/usr/bin/mysql -u tutorial", m2); err != nil {
+			fatalf("problem creating table: %v", err)
+		}
+
+		return
+	}
+</pre>
+
+<p>We add a call to <code>startMysql</code> to the main logic:
+<pre>
+	func main() {
+		flag.Parse()
+		c := connect(*flagAddr)
+		host := pickHosts(c, 2)
+
+		mysqlIP, mysqlPort := startMysql(host[0])
+		println("Started MySQL on private address:", mysqlIP, mysqlPort)
+		…
+	}
+</pre>
+
+<h2>Starting the Node.js app on host B</h2>
+
+<p>Starting the Node.js app amounts to running the following command-line on the target host:
+<pre>
+	$ sudo /usr/bin/nodejs index.js \
+		--mysql_host $MYSQL_HOST --mysql_port $MYSQL_PORT \
+		--api_host $API_HOST --api_port $API_PORT \
+		&> /tmp/tutorial-nodejs.log
+</pre>
+<p>The app finds the backend MySQL server via the arguments <code>--mysql_host</code>
+and <code>--mysql_port</code>. While it binds its HTTP API server to the address given by
+the arguments <code>--api_host</code> and <code>--api_port</code>.
+
+<pre>
+	func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string) {
+		defer func() {
+			if recover() != nil {
+				fatalf("connection to host lost")
+			}
+		}()
+
+		// Start node.js application
+		ip = getEc2PublicIP(host)
+		port = "8080"
+		job := host.Walk([]string{"nodejs"})
+		shell := fmt.Sprintf(
+			"sudo /usr/bin/nodejs index.js "+
+				"--mysql_host %s --mysql_port %s --api_host %s --api_port %s "+
+				"&> /tmp/tutorial-nodejs.log",
+			mysqlIP, mysqlPort,
+			"0.0.0.0", port,
+		)
+		proc, err := job.MakeProc(client.Cmd{
+			Path:  "/bin/sh",
+			Dir:   "/home/ubuntu/nodejs",
+			Args:  []string{"-c", shell},
+			Scrub: true,
+		})
+		if err != nil {
+			fatalf("nodejs app already running")
+		}
+		proc.Stdin().Close()
+		proc.Stdout().Close()
+		proc.Stderr().Close()
+
+		return
+	}
 </pre>
 
 
