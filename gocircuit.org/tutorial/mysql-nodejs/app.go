@@ -487,7 +487,7 @@ that we created earlier.
 
 <p>Starting the Node.js app amounts to running the following command-line on the target host:
 <pre>
-	$ sudo /usr/bin/nodejs index.js \
+	$ sudo /usr/bin/nodejs nodejs-app/index.js \
 		--mysql_host $MYSQL_HOST --mysql_port $MYSQL_PORT \
 		--api_host $API_HOST --api_port $API_PORT \
 		&> /tmp/tutorial-nodejs.log
@@ -495,6 +495,10 @@ that we created earlier.
 <p>The app finds the backend MySQL server via the arguments <code>--mysql_host</code>
 and <code>--mysql_port</code>. While it binds its HTTP API server to the address given by
 the arguments <code>--api_host</code> and <code>--api_port</code>.
+
+<p>The function <code>startNodejs</code> takes a target host parameter, 
+as well as the host and port of the backing MySQL server. It starts the Node.js
+app on the target host and returns the public IP address and port of the HTTP API endpoint.
 
 <pre>
 	func startNodejs(host client.Anchor, mysqlIP, mysqlPort string) (ip, port string) {
@@ -517,7 +521,7 @@ the arguments <code>--api_host</code> and <code>--api_port</code>.
 		)
 		proc, err := job.MakeProc(client.Cmd{
 			Path:  "/bin/sh",
-			Dir:   "/home/ubuntu/nodejs",
+			Dir:   "/home/ubuntu/nodejs-app",
 			Args:  []string{"-c", shell},
 			Scrub: true,
 		})
@@ -532,5 +536,31 @@ the arguments <code>--api_host</code> and <code>--api_port</code>.
 	}
 </pre>
 
+<p>Note how we run the server. We execute a shell process, which itself executes the Node.js app. 
+The shell process, which is the one created by the circuit, is a long-running one. It will run
+for as long as the child Node.js server is running.
+
+<p>As soon as the process is executed <code>MakeProc</code> returns, but the process continues
+executing in the background. We then close all of its standard streams as we don't intend them to be used.
+
+<p>The process element is attached to anchor of the form <code>/X686ea8f7374e59a2/nodejs</code>.
+This will allow you to find it in the future and check its state, for instance, by using the command-lines
+<code>circuit ls</code> and <code>circuit peek</code>.
+
+<p>At last, we tie this function into the main logic, which completes our circuit app:
+
+<pre>
+	func main() {
+		flag.Parse()
+		c := connect(*flagAddr)
+		host := pickHosts(c, 2)
+
+		mysqlIP, mysqlPort := startMysql(host[0])
+		println("Started MySQL on private address:", mysqlIP, mysqlPort)
+
+		nodejsIP, nodejsPort := startNodejs(host[1], mysqlIP, mysqlPort)
+		println("Started Node.js service on public address:", nodejsIP, nodejsPort)
+	}
+</pre>
 
         `
