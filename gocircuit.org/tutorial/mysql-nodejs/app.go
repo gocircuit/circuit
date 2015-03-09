@@ -547,7 +547,7 @@ executing in the background. We then close all of its standard streams as we don
 This will allow you to find it in the future and check its state, for instance, by using the command-lines
 <code>circuit ls</code> and <code>circuit peek</code>.
 
-<p>At last, we tie this function into the main logic, which completes our circuit app:
+<p>At last, we tie this function into the main logic, which completes our circuit app implementation:
 
 <pre>
 	func main() {

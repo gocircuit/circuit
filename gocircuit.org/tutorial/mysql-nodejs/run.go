@@ -5,10 +5,12 @@ import (
 )
 
 func RenderRun() string {
-	return RenderHtml("Starting a MySQL and node.js stack using a circuit app", Render(runBody, nil))
+	return RenderHtml("Run the app on the cluster", Render(runBody, nil))
 }
 
 const runBody = `
-<h1>Starting a MySQL and node.js stack using a circuit app</h1>
+<h1>Run the app on the cluster</h1>
+
+
 
         `
