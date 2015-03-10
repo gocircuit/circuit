@@ -48,7 +48,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <li><a href="api.html">Go client</a>
 <ul>
-<li>Navigating the circuit's virtual file system</li>
+<li><a href="api-anchor.html">Navigating the anchor hierarchy</a></li>
 <li><a href="api-process.html">Process</a></li>
 <li>Container</li>
 <li>Subscription</li>
@@ -64,7 +64,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <h2>Tutorials</h2>
 
-<h3>Orchestrating a typical web app: A Node.js service using MySQL on the back, running on Amazon EC2</h3>
+<h3>Orchestrating a typical web app: Node.js using MySQL running on Amazon EC2</h3>
 <ul>
 <li><a href="tutorial-mysql-nodejs-overview.html">Overview</a></li>
 <li><a href="tutorial-mysql-nodejs-image.html">Prepare host images</a></li>

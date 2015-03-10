@@ -25,6 +25,7 @@ func main() {
 	Build("element-channel.html", man.RenderElementChannelPage())
 
 	Build("api.html", api.RenderMainPage())
+	Build("api-anchor.html", api.RenderAnchorPage())
 	Build("api-process.html", api.RenderProcessPage())
 
 	Build("tutorial-mysql-nodejs-overview.html", mysql_nodejs.RenderOverview())
