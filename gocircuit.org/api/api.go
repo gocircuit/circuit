@@ -79,4 +79,8 @@ DialDiscover(multicast string, authkey []byte) *Client
 
 <p>The argument <code>multicast</code> must equal the multicast discovery address for the
 circuit cluster.
+
+<h2>Physical placement of anchors and panics</h2>
+
+<p>
         `

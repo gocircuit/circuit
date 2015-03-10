@@ -18,10 +18,6 @@ const indexBody = `
 
 {{.FigFacade}}
 
-<h1>Circuit: Self-managed cloud OS</h1>
-
-<p>??
-
 <h2>Sources</h2>
 
 <p>Find the source repository for <a href="https://github.com/gocircuit/circuit">Circuit on GitHub</a>. 
@@ -48,7 +44,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <li><a href="api.html">Go client</a>
 <ul>
-<li><a href="api-anchor.html">Navigating the anchor hierarchy</a></li>
+<li><a href="api-anchor.html">Navigating and using the anchor hierarchy</a></li>
 <li><a href="api-process.html">Process</a></li>
 <li>Container</li>
 <li>Subscription</li>
