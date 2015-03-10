@@ -8,6 +8,8 @@ func RenderAnchorPage() string {
 	figs := A{
 		"FigHierarchy": RenderFigurePngSvg(
 			"Virtual anchor hierarchy and its mapping to Go <code>Anchor</code> objects.", "hierarchy", "600px"),
+		"FigResidence": RenderFigurePngSvg(
+			"Except for the root, every anchor physically resides on some circuit host.", "residence", "600px"),
 	}
 	return RenderHtml("Navigating and using the anchor hierarchy", Render(anchorBody, figs))
 }
@@ -64,6 +66,12 @@ element is not present in the hierarchy, the invokation will panic to indicate a
 a critical panic and one can safely recover from it and continue.
 
 <h3>Manipulating elements</h3>
+
+<p>
+
+<h3>Anchor residence and panics</h3>
+
+{{.FigResidence}}
 
 
         `
