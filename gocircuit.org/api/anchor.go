@@ -8,8 +8,6 @@ func RenderAnchorPage() string {
 	figs := A{
 		"FigHierarchy": RenderFigurePngSvg(
 			"Virtual anchor hierarchy and its mapping to Go <code>Anchor</code> objects.", "hierarchy", "600px"),
-		"FigResidence": RenderFigurePngSvg(
-			"Except for the root, every anchor physically resides on some circuit host.", "residence", "630px"),
 	}
 	return RenderHtml("Navigating and using the anchor hierarchy", Render(anchorBody, figs))
 }
@@ -67,34 +65,48 @@ a critical panic and one can safely recover from it and continue.
 
 <h3>Manipulating elements</h3>
 
-<p>
+<p>The <code>Anchor</code> interface has a set of <code>Make…</code> methods,
+each of which creates a new resource (process, container, etc.) and, if successful, atomically
+attaches it to the anchor. (These methods would fail with a non-nil error, if the anchor
+already has an element attached to it.) 
 <pre>
-	MakeChan(n int) (Chan, error)
-	MakeProc(cmd Cmd) (Proc, error)
-	MakeDocker(run cdocker.Run) (cdocker.Container, error)
-	MakeNameserver(addr string) (Nameserver, error)
+	MakeChan(int) (Chan, error)
+	MakeProc(Cmd) (Proc, error)
+	MakeDocker(cdocker.Run) (cdocker.Container, error)
+	MakeNameserver(string) (Nameserver, error)
 	MakeOnJoin() (Subscription, error)
 	MakeOnLeave() (Subscription, error)
 </pre>
+<p>The use of these methods is detailed in the following sections, dedicated to
+<a href="api-process.html">processes</a>, 
+<a href="api-container.html">containers</a>, 
+<a href="api-channel.html">channels</a>, 
+<a href="api-name.html">name servers</a> and
+<a href="api-subscription.html">subscriptions</a>.
 
-<p>
+<p>Anchors have two generic methods for manipulating elements as well:
 <pre>
 	Get() interface{}
 	Scrub()
 </pre>
+<p>The <code>Get</code> method will return the element currently associated with the
+anchor. (This would be an object of type <code>Chan</code>, <code>Proc</code>,
+	<code>Container</code>, <code>Nameserver</code>, <code>Server</code> or <code>Subscription</code>.)
+
+<p>The <code>Scrub</code> method will terminate the operation of the element
+attached to this anchor and will remove the element from the anchor.
 
 <h3>Auxiliary methods</h3>
 
-<p>
+<p>Anchors have a couple of auxiliary methods to facilitate programming:
 <pre>
 	Addr() string
-	ServerID() string
 	Path() string
 </pre>
+<p>The method <code>Addr</code> returns the circuit address of the server that is hosting this anchor.
+The returned value would be a string of the form <code>circuit://…</code>.
 
-<h3>Anchor residence and panics</h3>
-
-{{.FigResidence}}
-
+<p>The method <code>Path</code> will return the file-system notation of the anchor's path.
+This would be a string looking like <code>"/X50faec8c2b5f6418/mysql/shard/1"</code>, for instance.
 
         `

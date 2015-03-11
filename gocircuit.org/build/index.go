@@ -27,7 +27,7 @@ fail—only individual hosts can. In contrast, comparable systems
 <a href="https://coreos.com/">CoreOS</a>, 
 <a href="https://www.consul.io/">Consul</a> and 
 <a href="http://mesosphere.com/">Mesosphere</a>)
-can fail if the hardware hosting the system's own software fail. 
+can fail if the hardware hosting the system's own software fails.
 
 <h2>Sources</h2>
 
@@ -55,12 +55,13 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 
 <li><a href="api.html">Go client</a>
 <ul>
+<li><a href="api-connect.html">Connecting to a circuit cluster</a></li>
 <li><a href="api-anchor.html">Navigating and using the anchor hierarchy</a></li>
-<li><a href="api-process.html">Process</a></li>
-<li>Container</li>
-<li>Subscription</li>
-<li>Name server</li>
-<li>Channel</li>
+<li><a href="api-process.html">Using processes</a></li>
+<li>Using containers</li>
+<li>Using subscription</li>
+<li>Using name servers</li>
+<li>Using channels</li>
 </ul>
 </li>
 

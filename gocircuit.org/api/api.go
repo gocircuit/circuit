@@ -7,7 +7,11 @@ import (
 func RenderMainPage() string {
 	figs := A{
 		"FigHierarchy": RenderFigurePngSvg(
-			"Virtual anchor hierarchy and its mapping to Go <code>Anchor</code> objects.", "hierarchy", "600px"),
+			"Virtual anchor hierarchy, depicting elements attached to some of the anchors.", "hierarchy", "600px"),
+		"FigResidence": RenderFigurePngSvg(
+			"Except for the root, every anchor physically resides on some circuit host. "+
+				"The root anchor is a logical object representing your client's connection to the cluster.",
+			"residence", "630px"),
 	}
 	return RenderHtml("Go client API", Render(mainBody, figs))
 }
@@ -42,45 +46,23 @@ There are different kinds of elements, according to their underlying resource: p
 for traversing and inspecting its descendant anchors, as well as methods for creating or retrieving
 the element associated it. 
 
-<p>Circuit applications begin with a call to <code>Dial</code> which establishes connection
-to a circuit cluster and returns an <code>Anchor</code> object representing the root of the
-hierarchy. 
+<p>All circuit applications begin with a call to <code>Dial</code> (or <code>DialDiscover</code>)
+which establishes connection to a circuit cluster and returns an <code>Anchor</code>
+object representing the root of the hierarchy. (Programming details for connecting into a cluster
+are given below.)
 
-<h2>Connecting the client</h2>
+<h2>Anchor and element residence</h2>
 
-<p>The first step of every circuit client application is connecting to a circuit cluster.
-There are two alternative methods for doing so.
+<p>Every anchor—excluding the root anchor—as well as its attached element (if any) physically 
+reside on some specific host in the circuit cluster. (The <code>Anchor</code> and element objects in a
+Go client application are merely references to the underlying anchor and element structures.)
 
-<h3>Connecting to a specific server</h3>
+<p>The following illustration demonstrates how the hierarchy structure implies the physical
+location of anchors and elements.
 
-<p>If you want to connect 
-the client to a specific circuit server with a known circuit address, then use
-<pre>
-Dial(addr string, authkey []byte) *Client
-</pre>
-<p>Argument <code>addr</code> specifies the circuit server address (a string of the form <code>circuit://…</code>),
-	whereas <code>authkey</code> should equal the authentication key for this cluster, or <code>nil</code> if
-	the cluster does not use encryption and authentication.
+{{.FigResidence}}
 
-<p><code>Dial</code> blocks until the connection is established and on success returns a client
-object, which implements the <code>Anchor</code> interface and represents the root of the 
-anchor hierarchy.
 
-<p>If <code>Dial</code> is to fail, it will report an error by panicing.
+<h2>Panics and errors</h2>
 
-<h3>Connecting by discovering a server</h3>
-
-<p>Alternatively, if the circuit cluster supports (multicast-based) discovery, 
-you could use <code>DialDiscover</code> to first discover a random
-circuit server from the cluster and then connect to it:
-<pre>
-DialDiscover(multicast string, authkey []byte) *Client
-</pre>
-
-<p>The argument <code>multicast</code> must equal the multicast discovery address for the
-circuit cluster.
-
-<h2>Physical placement of anchors and panics</h2>
-
-<p>
         `

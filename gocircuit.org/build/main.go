@@ -25,6 +25,7 @@ func main() {
 	Build("element-channel.html", man.RenderElementChannelPage())
 
 	Build("api.html", api.RenderMainPage())
+	Build("api-connect.html", api.RenderConnectPage())
 	Build("api-anchor.html", api.RenderAnchorPage())
 	Build("api-process.html", api.RenderProcessPage())
 
