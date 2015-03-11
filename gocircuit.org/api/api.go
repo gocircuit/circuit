@@ -62,6 +62,24 @@ location of anchors and elements.
 
 {{.FigResidence}}
 
+<p>The root anchor (which you obtain from <code>Dial</code> or <code>DialDiscover</code>)
+is special. It symbolically represents your client's connection to the circuit cluster. As such,
+the root anchor resides only in your client's runtime—i.e. it is not persistent.
+No elements can be attached to the root anchor.
+
+<p>The children of the root anchor are always, by definition, server anchors.
+Server anchors correspond to currently live hosts (aka servers) in your circuit cluster.
+Server anchors are created and removed by the circuit system, as hosts join or leave
+the circuit cluster. 
+
+<p>Server anchors physically reside on their respective host and they have an
+attached <code>Server</code> element that allows you to query various
+runtime parameters of the host. <code>Server</code> elements are permanently
+attached to their anchors.
+
+<p>All anchors descendant to server anchors, and their attached elements, are created 
+by the user. All such user anchors as well as the elements that might be attached to them 
+reside—by definition—on the host of the server anchor that they descend from.
 
 <h2>Panics and errors</h2>
 
