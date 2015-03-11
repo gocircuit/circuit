@@ -8,50 +8,47 @@ func RenderProcessPage() string {
 	figs := A{
 		"FigMkProc": RenderFigurePngSvg("Process elements execute OS processes on behalf of the user.", "mkproc", "600px"),
 	}
-	return RenderHtml("Circuit API: Circuit process element", Render(processBody, figs))
+	return RenderHtml("Using processes", Render(processBody, figs))
 }
 
 const processBody = `
 
-<h2>Using the Go API to control processes</h2>
+<h2>Using processes</h2>
 
-<p>To create and manipulate process elements, one needs to import the circuit's Go client API:
-
-<pre>
-	import "github.com/gocircuit/circuit/client"
-</pre>
-
-<p>Let <code>cli</code>, a variable of type <code>*client.Client</code>, be an already established
-connection to the circuit cluster. (<a href="api-client.html">How to connect a Go client to a circuit cluster.</a>)
+<p>You can start an OS process on any host in your cluster by creating a
+new <em>process element</em> at an anchor of your choosing that is a descendant of the
+host's server anchor. The created process element becomes your interface to the
+underlying OS process. 
 
 <h3>Creating a process</h3>
 
-<p>Suppose we already know that there are two servers in the circuit:
-
+<p>Suppose the variable <code>anchor</code> holds an <code>Anchor</code> object,
+corresponding a path in the anchor hierarchy, which has no element attached to it.
+For instance, you could have obtained the <code>anchor</code> from the root anchor
+using something like this:
 <pre>
-	# circuit ls /
-	/X88550014d4c82e4d
-	/X938fe923bcdef2390
+	anchor := root.Walk([]string{"Xe2ac4c8c83976ce6", "job", "demo"})
+</pre>
+<p>This anchor corresponds to the path <code>/Xe2ac4c8c83976ce6/job/demo</code>. 
+(See more on <a href="api-anchor.html">navigating anchors here</a>.)
+
+<p>To create a new process element, use the anchor's <code>MakeProc</code> method:
+<pre>
+	MakeProc(cmd Cmd) (Proc, error)
 </pre>
 
-<p>We would like to start a new process on the first server under the virtual path 
-<code>/X88550014d4c82e4d/jobs/scrapy</code>. First, we need to obtain the
-anchor for this virtual path:
+<p><code>MakeProc</code> will start a new process on the host <code>/Xe2ac4c8c83976ce6</code>,
+as specified by the command parameter <code>cmd</code>. If successful, it will create a 
+corresponding process element and attach it to the anchor. <code>MakeProc</code> returns the 
+newly created process element (of type <code>Proc</code>) as well as an 
+<a href="api.html#errors">application error</a>; or it panics if a 
+<a href="api.html#errors">system error</a> occurs.
 
-<pre>
-	a := cli.Walk([]string{"X88550014d4c82e4d", "jobs", "ls"})
-</pre>
+<p>
 
-<p>The invocation of <code>Walk</code> always succeeds, as virtual paths are created
-as needed (or otherwise they already exist as a circuit element is occupying them). The
-invocation may only fail in panic, which is an indicator that this circuit server being
-accessed, in this case <code>X88550014d4c82e4d</code>, has died or otherwise dropped
-out of the cluster.
+{{.FigMkProc}}
 
-<p>Each anchor (virtual path) can have at most one circuit element (i.e. process, container, etc.)
-attached to it. An anchor's <code>MakeProc</code> method will create a new
-process element and attach it to the anchor:
-
+<h4>Example</h4>
 <pre>
 	proc, err := a.MakeProc(
 		cli.Cmd{
@@ -67,5 +64,13 @@ process element and attach it to the anchor:
 <p>The returned error is non-nil if an element is already attached to the anchor <code>a</code> (i.e. to the path
 <code>/X88550014d4c82e4d/jobs/ls</code> in our example).
 Otherwise, 
+
+<h3>Controlling the standard file descriptors of a process</h3>
+
+<h3>Sending signals and killing processes</h3>
+
+<h3>Querying the status of a process asynchronously</h3>
+
+<h3>Waiting until a process exits</h3>
 
         `

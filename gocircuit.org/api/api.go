@@ -81,7 +81,7 @@ attached to their anchors.
 by the user. All such user anchors as well as the elements that might be attached to them 
 reside—by definition—on the host of the server anchor that they descend from.
 
-<h2>Panics and errors</h2>
+<h2 id="errors">Panics and errors</h2>
 
 <p>All programmatic manipulation of a circuit client involves calling methods
 of <code>Anchor</code> or element objects. As we discussed, all anchors
