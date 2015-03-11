@@ -98,7 +98,9 @@ of the respective method.
 <p>Independently of application errors, every invokation of an anchor or
 element method may fail if the underlying object is physically unreachable.
 Anchors residing on a dead host are unreachable and so are their elements,
-for example. Such errors are treated in a separate category of system errors.
+for example. Such errors are treated in a separate category of system errors
+and they are reported as panics. In particular, if a host is unreachable, 
+all anchors descendant to and including its server anchor will cause panics when used.
 
 <p>By design, any anchor or element method invokation will result in
 a panic, if a system error occurs. We uniformly report system errors as 
@@ -119,6 +121,14 @@ again, follow on method calls will succeed.
 
 <h3>Connection panics</h3>
 
-<p>
+<p>Panics in any method invocation can also be caused if the client's connection
+to a circuit server is lost. This type of panic is permanent, as the circuit client
+does not attempt automatic reconnection to the circuit cluster.
+
+<p>There is a way to distinguish between host-only panics and permanent client
+connection panics. After catching a panic anywhere, the user application can
+simply call the root anchor's <code>View</code> method (which lists the contents of
+the anchor). If this call also results in a panic, this is an indication that the client
+connection has been lost altogether. 
 
         `
