@@ -6,7 +6,8 @@ import (
 
 func RenderIndexPage() string {
 	figs := A{
-		"FigFacade": RenderFigurePngSvg("Circuit API view into a cluster.", "facade", "700px"),
+		"FigFacade": RenderFigurePngSvg(
+			"Circuit API provides a dynamic third-person view of a compute cluster.", "facade", "700px"),
 	}
 	return RenderHtml(
 		"Circuit: Self-managed infrastructure, programmatic monitoring and orchestration",

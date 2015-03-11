@@ -83,4 +83,42 @@ reside—by definition—on the host of the server anchor that they descend from
 
 <h2>Panics and errors</h2>
 
+<p>All programmatic manipulation of a circuit client involves calling methods
+of <code>Anchor</code> or element objects. As we discussed, all anchors
+and elements have an implied physical place of residence (on one of the cluster hosts).
+
+<p>In general, any method invokation might result in one of two types of errors:
+<em>application errors</em> and <em>system errors</em>.
+
+<p>Application errors are things like trying to create an element on anchor that
+already has one, or trying to start a process using a missing binary, for instance.
+Such errors will be returned in the form of Go <code>error</code> return values
+of the respective method.
+
+<p>Independently of application errors, every invokation of an anchor or
+element method may fail if the underlying object is physically unreachable.
+Anchors residing on a dead host are unreachable and so are their elements,
+for example. Such errors are treated in a separate category of system errors.
+
+<p>By design, any anchor or element method invokation will result in
+a panic, if a system error occurs. We uniformly report system errors as 
+panics in order to separate them semantically from application errors.
+But also because they have asynchronous nature and because they usually
+result in a very different way of being handled by the application programmer.
+
+<p>That said, such panic conditions are not critical. These panics merely
+indicate that the host where an anchor or element physically resides is currently
+unreachable. The underlying host can be unreachable either if dead or as the
+result of a complete network partition (partial partitions do not affect the system).
+
+<p>An anchor or element object that produces a panic remains in a valid
+state after the panic and it can be re-used. If the underlying resource is still
+unreachable, another panic will be produced. But if the system has
+recovered from a network partition and the underlying resource is reachable
+again, follow on method calls will succeed.
+
+<h3>Connection panics</h3>
+
+<p>
+
         `
