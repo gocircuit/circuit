@@ -18,6 +18,17 @@ const indexBody = `
 
 {{.FigFacade}}
 
+<p>The circuit is a minimal distributed operating system that enables programmatic, reactive control
+over hosts, processes and connections within a compute cluster.
+
+<p>The circuit is unique in one respect: Once a circuit cluster is formed, the circuit system itself cannot 
+fail—only individual hosts can. In contrast, comparable systems 
+(like 
+<a href="https://coreos.com/">CoreOS</a>, 
+<a href="https://www.consul.io/">Consul</a> and 
+<a href="http://mesosphere.com/">Mesosphere</a>)
+can fail if the hardware hosting the system's own software fail. 
+
 <h2>Sources</h2>
 
 <p>Find the source repository for <a href="https://github.com/gocircuit/circuit">Circuit on GitHub</a>. 

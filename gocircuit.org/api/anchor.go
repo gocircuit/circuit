@@ -9,7 +9,7 @@ func RenderAnchorPage() string {
 		"FigHierarchy": RenderFigurePngSvg(
 			"Virtual anchor hierarchy and its mapping to Go <code>Anchor</code> objects.", "hierarchy", "600px"),
 		"FigResidence": RenderFigurePngSvg(
-			"Except for the root, every anchor physically resides on some circuit host.", "residence", "600px"),
+			"Except for the root, every anchor physically resides on some circuit host.", "residence", "630px"),
 	}
 	return RenderHtml("Navigating and using the anchor hierarchy", Render(anchorBody, figs))
 }
@@ -68,6 +68,29 @@ a critical panic and one can safely recover from it and continue.
 <h3>Manipulating elements</h3>
 
 <p>
+<pre>
+	MakeChan(n int) (Chan, error)
+	MakeProc(cmd Cmd) (Proc, error)
+	MakeDocker(run cdocker.Run) (cdocker.Container, error)
+	MakeNameserver(addr string) (Nameserver, error)
+	MakeOnJoin() (Subscription, error)
+	MakeOnLeave() (Subscription, error)
+</pre>
+
+<p>
+<pre>
+	Get() interface{}
+	Scrub()
+</pre>
+
+<h3>Auxiliary methods</h3>
+
+<p>
+<pre>
+	Addr() string
+	ServerID() string
+	Path() string
+</pre>
 
 <h3>Anchor residence and panics</h3>
 
