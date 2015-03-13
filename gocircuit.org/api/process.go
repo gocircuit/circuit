@@ -71,6 +71,18 @@ explicitly (rather than automatically) is a way of explicit accounting on the us
 this regime is particularly well suited for applications that control circuit processes 
 programmatically (as opposed to manually).
 
+<p>Regardless of the setting of the <code>Scrub</code> parameter, the user can
+use the <code>Scrub</code> method to discard the process element at any point:
+<pre>
+	Scrub()
+</pre>
+
+<p>A call to <code>Scrub</code> will detach the process element from its anchor
+and discard it, thereby freeing the anchor to attach other elements. 
+If the underlying OS process is still running, ‘scrubbing’ will not
+terminate the process. (If OS process termination is desired, the user
+must explicitly send a kill signal to the process, using a <code>Signal</code>
+which is described later.)
 
 <h4>Example</h4>
 <p>For instance, the following code executes the GNU list command:
@@ -185,9 +197,17 @@ process and, in the event that the process has exited, an exit error value or <c
 
 <h3>Waiting until a process exits</h3>
 
-<p>
+<p>Finally, you can call <code>Wait</code> asynchronously to block until the process ends:
 <pre>
 	Wait() (ProcStat, error)
 </pre>
+
+<p>If you call <code>Wait</code> before the process has exited, the invocation will block
+until exit occurs. Otherwise, it will return immediately. In both cases, a process status 
+structure (described earlier) is returned, which captures the exit state (successful or not) of the
+underlying OS process.
+
+<p><code>Wait</code> can return an application error only in the event that it is interrupted
+by a concurring call to <code>Scrub</code>.
 
         `
