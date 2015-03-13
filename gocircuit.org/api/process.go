@@ -73,6 +73,7 @@ programmatically (as opposed to manually).
 
 
 <h4>Example</h4>
+<p>For instance, the following code executes the GNU list command:
 <pre>
 	proc, err := a.MakeProc(
 		cli.Cmd{
@@ -85,18 +86,108 @@ programmatically (as opposed to manually).
 	)
 </pre>
 
-<p>The returned error is non-nil if an element is already attached to the anchor <code>a</code> (i.e. to the path
-<code>/X88550014d4c82e4d/jobs/ls</code> in our example).
-Otherwise, 
+<p>The following picture tries to illustrate the relationship between the
+process element and the underlying OS process itself.
 
 {{.FigMkProc}}
 
 <h3>Controlling the standard file descriptors of a process</h3>
 
+<p>After its invocation, <code>MakeProc</code> returns immediately,
+while the underlying OS process is executing on the host machine.
+
+<p>After a successful execution the user is obligated, by the POSIX 
+standard, to take care of the standard input, output and error
+streams of the underlying process. (For instance, if the standard
+	input is not written to or closed, or if the output is not
+	read from, some programs will pause in waiting.)
+
+<p>The standard streams of the executed process can be retrieved
+with the following methods of the process element:
+<pre>
+	Stdin() io.WriteCloser
+	Stdout() io.ReadCloser
+	Stderr() io.ReadCloser
+</pre>
+
+<p>It is allowed to close the standard output and error at any point
+into the stream. This will result in discarding all remaining data
+in the stream, without blocking the underlying process.
+
+<p>Eventually, the user is responsible for closing all standard streams
+otherwise the underlying process will block and not exit.
+
 <h3>Sending signals and killing processes</h3>
+
+<p>You can send a POSIX signal to the underlying process
+at any point (asynchronously) using:
+<pre>
+	Signal(sig string) error
+</pre>
+
+<p>The <code>sig</code> string must be one of the following recognized
+signal names:
+	<code>ABRT</code>,
+	<code>ALRM</code>,
+	<code>BUS</code>,
+	<code>CHLD</code>,
+	<code>CONT</code>,
+	<code>FPE</code>,
+	<code>HUP</code>,
+	<code>ILL</code>,
+	<code>INT</code>,
+	<code>IO</code>,
+	<code>IOT</code>,
+	<code>KILL</code>,
+	<code>PIPE</code>,
+	<code>PROF</code>,
+	<code>QUIT</code>,
+	<code>SEGV</code>,
+	<code>STOP</code>,
+	<code>SYS</code>,
+	<code>TERM</code>,
+	<code>TRAP</code>,
+	<code>TSTP</code>,
+	<code>TTIN</code>,
+	<code>TTOU</code>,
+	<code>URG</code>,
+	<code>USR1</code>,
+	<code>USR2</code>,
+	<code>VTALRM</code>,
+	<code>WINCH</code>,
+	<code>XCPU</code>,
+	<code>XFSZ</code>.
 
 <h3>Querying the status of a process asynchronously</h3>
 
+<p>You can query the status of a process asynchronously, using:
+<pre>
+	Peek() ProcStat
+</pre>
+
+<p>The returned structure includes the command that started the process, a phase string describing the state of the
+process and, in the event that the process has exited, an exit error value or <code>nil</code> on successful exit.
+<pre>
+	type ProcStat struct {
+		Cmd Cmd
+		Exit error
+		Phase string
+	}
+</pre>
+
+<p>The phase string takes on one of the following values:
+<code>running</code>, 
+<code>exited</code>,
+<code>stopped</code>, 
+<code>signaled</code>,
+ <code>continued</code>.
+
+
 <h3>Waiting until a process exits</h3>
+
+<p>
+<pre>
+	Wait() (ProcStat, error)
+</pre>
 
         `
