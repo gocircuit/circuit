@@ -60,7 +60,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="api-anchor.html">Navigating and using the anchor hierarchy</a></li>
 <li><a href="api-process.html">Using processes</a></li>
 <li>Using containers</li>
-<li>Using subscription</li>
+<li>Using subscriptions</li>
 <li>Using name servers</li>
 <li>Using channels</li>
 </ul>
