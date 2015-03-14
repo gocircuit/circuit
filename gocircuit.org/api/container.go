@@ -77,17 +77,21 @@ exactly captures all the container status variables that are available through t
 command.
 
 <h4>Example</h4>
-<p>For instance, the following code executes the GNU list command inside a Docker container:
+<p>The following snippet shows an example of creating a Docker container with an Ubuntu image,
+which runs the <code>ls</code> command inside, while also specifying some resource limits and 
+mapping some file system volumes:
 <pre>
-	proc, err := a.MakeProc(
-		cli.Cmd{
-			Env: []string{"TERM=xterm"},
+	proc, err := anchor.MakeDocker(
+		docker.Run{
+			Image: "ubuntu",
+			Memory: 1000000000,
+			CpuShares: 3,
+			Volume: []string{"/webapp", "/src/webapp:/opt/webapp:ro"},
 			Dir: "/",
 			Path: "/bin/ls",
-			Args: []string{"-l", "/"},
+			Args: []string{"/"},
 			Scrub: true,
-		},
-	)
+		})
 </pre>
 
 {{.FigMkDkr}}
