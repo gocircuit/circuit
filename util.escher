@@ -1,0 +1,11 @@
+
+// ForkTemplate
+ForkTemplate {
+	fork Fork
+	fork:Template = :Template
+	fork:Data = :Data
+
+	t text.Template
+	t:In = fork:
+	t:Out = :
+}

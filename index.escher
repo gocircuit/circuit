@@ -1,0 +1,36 @@
+
+BuildIndexPage {
+        wf io.util.WriteFile
+        wf:Content = IndexPage
+        wf:Name = "index.html"
+        : = wf:Ready
+}
+
+IndexPage {
+        h Html
+        h: = :
+        h:Title = "Circuit Home Page"
+        h:Body = `
+<h1>Circuit</h1>
+
+<p>Find the source repository for <a href="https://github.com/gocircuit/circuit">Circuit on GitHub</a>. 
+Follow us on Twitter <a href="https://twitter.com/gocircuit">@gocircuit</a>.
+
+<p><center>
+<figure class="shadowless">
+	<img src="img/header.png" width="400px" alt="" />
+	<div>
+	<em></em>
+	</div>
+</figure>
+</center></p>
+
+<h2>Handbook</h2>
+
+<ul>
+<li><a href="intro.html">Introduction</a></li>
+<li><a href="integration.html">Integration</a></li>
+</ul>
+
+        `
+}
