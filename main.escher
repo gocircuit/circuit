@@ -1,7 +1,0 @@
-main {
-        x Fork
-        x: = os.Exit
-
-        x:_1 = BuildIndexPage
-        //x:_2 = BuildIntegrationPage
-}
