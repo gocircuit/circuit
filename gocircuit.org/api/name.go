@@ -50,6 +50,14 @@ name server element is attached to.
 
 <h3>Manipulating records</h3>
 
+<p>Name servers maintain a set of unique <em>names</em>, together with a set of <em>records</em>
+associated with each name.
+
+<p>New records are added using the <code>Set</code> method. The argument of <code>Set</code> is
+a DNS resource record in standard DNS notation. The syntax of these records are described in more detail
+in the documentation of <a href="http://github.com/miekg/dns">github.com/miekg/dns</a>
+as well as this <a href="http://miek.nl/posts/2014/Aug/16/go-dns-package/">related blog article</a>.
+
 <p>??
 <pre>
 	if err := ns.Set("miek.nl. 3600 IN MX 10 mx.miek.nl."); err != nil {
