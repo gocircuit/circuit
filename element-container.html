@@ -1,0 +1,78 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Circuit container element</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+
+<h2>Example: Make a docker container</h2>
+
+<p>Much like for the case of OS processes, the circuit can create, manage and synchronize 
+<a href="http://www.docker.com">Docker</a> containers,
+and attach the corresponding <em>docker elements</em> to a path in the anchor file system.
+
+<p>To allow creation of docker elements, any individual server must be started 
+with the <code>-docker</code> switch. For instance:
+
+<pre>
+	circuit start -if eth0 -discover 228.8.8.8:7711 -docker
+</pre>
+
+<p>To create and execute a new docker container, using the tool:
+
+<pre>
+	circuit mkdkr /X88550014d4c82e4d/docky << EOF
+	{
+		"Image": "ubuntu",
+		"Memory": 1000000000,
+		"CpuShares": 3,
+		"Lxc": ["lxc.cgroup.cpuset.cpus = 0,1"],
+		"Volume": ["/webapp", "/src/webapp:/opt/webapp:ro"],
+		"Dir": "/",
+		"Entry": "",
+		"Env": ["PATH=/usr/bin"],
+		"Path": "/bin/ls",
+		"Args": ["/"],
+	}
+	EOF
+</pre>
+
+<p>Most of these fields can be omitted analogously to their command-line option counterparts 
+of the <code>docker</code> command-line tool.
+
+
+	<p><center>
+	<figure class="shadowless">
+		
+		<object data="img/mkdkr.svg" type="image/svg+xml" width="600px">
+		<img src="img/mkdkr.png" alt="" />
+		</object>
+		<div><em>Docker elements are similar to processes.</em></div>
+	</figure>
+	</center></p>
+	
+
+<p>The remaining docker element commands are identical to those for processes:
+<code>stdin</code>, <code>stdout</code>, <code>stderr</code>, <code>peek</code> and 
+<code>wait</code>. In one exception, <code>peek</code> will return
+a detailed description of the container, derived from <code>docker inspect</code>. 
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

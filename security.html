@@ -1,0 +1,65 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Security and networking</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+
+<h2>Security</h2>
+
+<p>By default, circuit servers and clients communicate over plaintext TCP.
+A HMAC-based symmetric authentication, followed by an asymmetric
+RC4 stream cipher is supported.
+
+<p>To enable encryption, use the <code>-hmac</code> command-line option to point
+the circuit executable to a file containing the private key for your circuit.
+For instance:
+
+<pre>
+	circuit start -a 10.0.0.1 -hmac .hmac
+</pre>
+
+<p>Or, if you are invoking the tool:
+
+<pre>
+	circuit ls -hmac .hmac /...
+</pre>
+
+<p>Alternatively, you can set the environment <code>CIRCUIT_HMAC</code> to
+point to the private key file.
+
+<p>To generate a new private key for your circuit, use the command
+
+<pre>
+	circuit keygen
+</pre>
+
+<h2>Networking</h2>
+
+<p>From a networking and protocol standpoint, circuit servers and
+clients are peers: All communications (server-server and server-client)
+use a common RPC framework which often entails a server
+being able to reverse-dial into a client.
+
+<p>For this reason, circuit clients (the circuit tool or your apps) CANNOT
+be behind a firewall with respect to the servers they are dialing into.
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

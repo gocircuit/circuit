@@ -1,0 +1,65 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Connecting to a circuit cluster</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+
+<h1>Connecting to a circuit cluster</h1>
+
+<p>To use the Go client API to the circuit, start by importing the client package:
+<pre>
+	import "github.com/gocircuit/circuit/client"
+</pre>
+
+<p>The first step of every circuit client application is connecting to a circuit cluster.
+There are two alternative methods for doing so.
+
+<h3>Connecting to a specific server</h3>
+
+<p>If you want to connect 
+the client to a specific circuit server with a known circuit address, then use
+<pre>
+Dial(addr string, authkey []byte) *Client
+</pre>
+<p>Argument <code>addr</code> specifies the circuit server address (a string of the form <code>circuit://…</code>),
+	whereas <code>authkey</code> should equal the authentication key for this cluster, or <code>nil</code> if
+	the cluster does not use encryption and authentication.
+
+<p><code>Dial</code> blocks until the connection is established and on success returns a client
+object, which implements the <code>Anchor</code> interface and represents the root of the 
+anchor hierarchy.
+
+<p>If <code>Dial</code> is to fail, it will report an error by panicing.
+
+<h3>Connecting by discovering a server</h3>
+
+<p>Alternatively, if the circuit cluster supports (multicast-based) discovery, 
+you could use <code>DialDiscover</code> to first discover a random
+circuit server from the cluster and then connect to it:
+<pre>
+DialDiscover(multicast string, authkey []byte) *Client
+</pre>
+
+<p>The argument <code>multicast</code> must equal the multicast discovery address for the
+circuit cluster.
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

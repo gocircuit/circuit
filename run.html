@@ -1,0 +1,91 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Running Circuit servers</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+
+<h1>Running Circuit servers</h1>
+
+<p>Circuit servers can be started asynchronously (and in any order) 
+using the command
+
+<pre>
+	circuit start -if eth0 -discover 228.8.8.8:7711
+</pre>
+
+<p>The same command is used for all instances. The <code>-if</code> option specifies the
+desired network interface to bind to, while the <code>-discover</code> command 
+specifies a desired IP address of a UDP multicast channel to be used for automatic
+server-server discover.
+
+The <code>-discover</code> option can be omitted by setting the environment variable
+<code>CIRCUIT_DISCOVER</code> to equal the desired multicast address.
+
+<h2>Alternative advanced server startup</h2>
+
+<p>To run the circuit server on the first machine, pick a public IP address and port for it to
+listen on, and start it like so
+
+<pre>
+	circuit start -a 10.0.0.1:11022
+</pre>
+
+<p>The circuit server will print its own circuit URL on its standard output.
+It should look like this:
+
+<pre>
+	circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d
+</pre>
+
+<p>Copy it. We will need it to tell the next circuit server to “join” this one
+in a network, i.e. circuit.
+
+<p>Log onto another machine and similarly start a circuit server there, as well.
+This time, use the <code>-j</code> option to tell the new server to join the first one:
+
+<pre>
+	circuit start -a 10.0.0.2:11088 -j circuit://10.0.0.1:11022/78517/Q56e7a2a0d47a7b5d
+</pre>
+
+<p>You now have two mutually-aware circuit servers, running on two different
+hosts in your cluster. 
+
+
+	<p><center>
+	<figure class="shadowless">
+		
+		<object data="img/servers.svg" type="image/svg+xml" width="400px">
+		<img src="img/servers.png" alt="" />
+		</object>
+		<div><em>A circuit system of two hosts (i.e. two circuit servers).</em></div>
+	</figure>
+	</center></p>
+	
+
+<p>You can join any number of additional hosts to the circuit environment in a
+similar fashion, even billions.  The circuit uses a modern 
+<a href="http://en.wikipedia.org/wiki/Expander_graph">expander graph</a>-based algorithm for
+presence awareness and ordered communication, which is genuinely distributed;
+It uses communication and connectivity sparingly, hardly leaving a footprint
+when idle.
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

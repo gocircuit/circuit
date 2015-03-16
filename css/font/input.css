@@ -1,0 +1,13 @@
+@font-face {
+font-family: "input-mono-narrow";
+src: url('input/Input_Fonts/InputMono/InputMonoNarrow/InputMonoNarrow-Thin.ttf') format('truetype');
+font-style: normal;
+font-weight: 100;
+}
+
+@font-face {
+font-family: "input-mono-narrow";
+src: url('input/Input_Fonts/InputMono/InputMonoNarrow/InputMonoNarrow-Light.ttf') format('truetype');
+font-style: normal;
+font-weight: 200;
+}

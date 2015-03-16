@@ -1,0 +1,84 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Step 0: Install app software on host images</title>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+<h1>Step 0: Install app software on host images</h1>
+
+<p>Assuming an Ubuntu base image. Install Vim and node.js first.
+
+<pre>
+	# apt-get update
+	# apt-get install vim
+</pre>
+
+<h2>Install MySQL server</h2>
+
+<p>The installation will prompt you for a root user password — let's use <code>charlie</code>:
+
+<pre>
+	# apt-get install mysql-server
+</pre>
+
+<p>Start the server, so we can create a tutorial user and database:
+
+<pre>
+	# /etc/init.d/mysql start
+</pre>
+
+<p>Connect to the MySQL server as the administrator, using the password <code>charlie</code>:
+
+<pre>
+	# mysql -p
+</pre>
+
+<p>Create a user and a database, both named <code>tutorial</code>.
+
+<pre>
+	mysql> CREATE USER tutorial;
+	mysql> CREATE DATABASE tutorial;
+	mysql> GRANT ALL ON tutorial.*  TO tutorial;
+</pre>
+
+<p>Create table <code>Messages</code> for the tutorial application, after logging in as the <code>tutorial</code> user:
+
+<pre>
+	# mysql -u tutorial
+	mysql> CREATE TABLE NameValue (name VARCHAR(100), value TEXT, PRIMARY KEY (name));
+</pre>
+
+<h2>Install node.js and a simple app that uses MySQL</h2>
+
+<p>Install node.js:
+
+<pre>
+	# apt-get install nodejs
+	# apt-get install npm
+</pre>
+
+<p>Install dependencies:
+
+<pre>
+	# npm install
+</pre>
+
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

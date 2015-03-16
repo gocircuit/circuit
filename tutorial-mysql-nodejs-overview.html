@@ -1,0 +1,68 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Starting a MySQL and node.js stack using a circuit app</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+<h1>Overview</h1>
+
+<p>
+In this tutorial we are going to build an example cloud-based key/value store, based MySQL and Node.js, 
+using the circuit and Amazon EC2 as a host provider.
+
+
+	<p><center>
+	<figure class="shadowless">
+		
+		<object data="img/tutorial/mysql-nodejs.svg" type="image/svg+xml" width="600px">
+		<img src="img/tutorial/mysql-nodejs.png" alt="" />
+		</object>
+		<div><em>Bubbles represent processes. The MySQL daemon and the left circuit are
+			running on Host 1, for instance. MySQL and Node.js communicate via
+			a TCP link and so do the two circuit processes. The circuit application 
+			process can run anywhere: inside or outside of the cluster.</em></div>
+	</figure>
+	</center></p>
+	
+
+<p>We are going to build and deploy the application step-by-step and from scratch. The high-level process
+is as follows:
+
+<ul>
+<li>First, prepare an Ubuntu host image with all software that we might need 
+(such as circuit, MySQL, Node.js, etc.).
+<li>Second, launch multiple host instances based on the prepared image and
+link them into a single circuit cluster.
+<li>Third, implement a circuit app in the Go language, which orchestrates
+the execution of the cloud-based key/value store, by assembling its components.
+<li>Finally, launch the key/value store by connecting into the circuit cluster
+and running the circuit app.
+</ul>
+
+<p>Steps 1 and 2 constitute the startup procedure for your circuit cluster.
+Whereas steps 3 and 4 demonstrate the execution of a circuit application on the cluster.
+Once the cluster is running, it can be reused for multiple executions and terminations
+of circuit applications.
+
+<p>To follow through this tutorial, you will need an <a href="http://aws.amazon.com/ec2/">Amazon EC2</a>
+account to provision virtual host instances.
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

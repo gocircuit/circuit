@@ -1,0 +1,85 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Circuit process element</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+
+<h2>Example: Make a process</h2>
+
+<p>Here are a few examples. To run a new process on some chosen
+cluster machine, first see what machines are available:
+
+<pre>
+	circuit ls /...
+	/X88550014d4c82e4d
+	/X938fe923bcdef2390
+</pre>
+
+<p>Run a new <code>ls</code> process:
+
+<pre>
+	circuit mkproc /X88550014d4c82e4d/pippi << EOF
+	{
+		"Path": "/bin/ls", 
+		"Args":["/"]
+	}
+	EOF
+</pre>
+
+
+	<p><center>
+	<figure class="shadowless">
+		
+		<object data="img/mkproc.svg" type="image/svg+xml" width="600px">
+		<img src="img/mkproc.png" alt="" />
+		</object>
+		<div><em>Process elements execute OS processes on behalf of the user.</em></div>
+	</figure>
+	</center></p>
+	
+
+<p>See what happened:
+
+<pre>
+	circuit peek /X88550014d4c82e4d/pippi
+</pre>
+
+<p>Close the standard input to indicate no intention to write to it:
+
+<pre>
+	cat /dev/null | circuit stdin /X88550014d4c82e4d/pippi
+</pre>
+
+<p>Read the output (note that the output won't show until you close 
+the standard input first, as shown above):
+
+<pre>
+	circuit stdout /X88550014d4c82e4d/pippi
+</pre>
+
+<p>Remove the process element from the anchor hierarchy
+
+<pre>
+	circuit scrub /X88550014d4c82e4d/pippi
+</pre>
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>

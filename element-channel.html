@@ -1,0 +1,100 @@
+<!doctype html><html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+		<title>Circuit channel element</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+	
+	<div class="header">
+	<a href="http://gocircuit.org">Circuit</a> Self-managed infrastructure, programmatic monitoring and orchestration
+	</div>
+	<div class="page">
+	
+
+<h2>Example: Create a channel</h2>
+
+<p>Again, take a look at what servers are available:
+
+<pre>
+	circuit ls /...
+	/X88550014d4c82e4d
+	/X938fe923bcdef2390
+</pre>
+
+<p>Pick one. Say <code>X88550014d4c82e4d</code>. Now, 
+let's create a channel on <code>X88550014d4c82e4d</code>:
+
+<pre>
+	circuit mkchan /X88550014d4c82e4d/this/is/charlie 3
+</pre>
+
+<p>The last argument of this line is the channel buffer capacity,
+analogously to the way channels are created in Go.
+
+
+	<p><center>
+	<figure class="shadowless">
+		
+		<object data="img/mkchan.svg" type="image/svg+xml" width="600px">
+		<img src="img/mkchan.png" alt="" />
+		</object>
+		<div><em>Channel elements reside in the memory of a circuit server.</em></div>
+	</figure>
+	</center></p>
+	
+
+<p>Verify the channel was created:
+
+<pre>
+	circuit peek /X88550014d4c82e4d/this/is/charlie
+</pre>
+
+<p>This should print out something like this:
+
+<pre>
+	{
+			"Cap": 3,
+			"Closed": false,
+			"Aborted": false,
+			"NumSend": 0,
+			"NumRecv": 0
+	}
+</pre>
+
+<p>Sending a message to the channel is accomplished with the command
+
+<pre>
+	circuit send /X88550014d4c82e4d/this/is/charlie < some_file
+</pre>
+
+<p>The contents of the message is read out from the standard input of the
+command above. This command will block until a receiver is available,
+unless there is free space in the channel buffer for a message.
+
+<p>When the command unblocks, it will send any data to the receiver.
+If there is no receiver, but there is a space in the message buffer,
+the command will also unblock and consume its standard input (saving
+it for an eventual receiver) but only up to 32K bytes.
+
+<p>Receiving is accomplished with the command
+
+<pre>
+	circuit recv /X88550014d4c82e4d/this/is/charlie
+</pre>
+
+<p>The received message will be produced on the standard output of 
+the command above.
+
+        
+	</div>
+	
+	<div class="footer">
+	The <a href="http://escher.io">Escher</a> and <a href="http://gocircuit.org">Circuit</a> projects are
+	partially supported by the 
+	<a href="http://www.darpa.mil/Our_Work/I2O/Programs/XDATA.aspx">DARPA XData Initiative</a>.<br>
+	Sponsors and partners are welcome and appreciated. Contact <a href="mailto:p@gocircuit.org">Petar Maymounkov</a> for details.
+	</div>
+	</body>
+	</html>
