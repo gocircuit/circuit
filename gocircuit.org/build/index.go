@@ -7,7 +7,7 @@ import (
 func RenderIndexPage() string {
 	figs := A{
 		"FigFacade": RenderFigurePngSvg(
-			"Circuit API provides a dynamic third-person view of a compute cluster.", "facade", "700px"),
+			"Circuit API provides a dynamic hierarchical view of a compute cluster.", "view", "550px"),
 	}
 	return RenderHtml(
 		"Circuit: Self-managed infrastructure, programmatic monitoring and orchestration",
@@ -17,10 +17,10 @@ func RenderIndexPage() string {
 
 const indexBody = `
 
-{{.FigFacade}}
-
 <p>The circuit is a minimal distributed operating system that enables programmatic, reactive control
 over hosts, processes and connections within a compute cluster.
+
+{{.FigFacade}}
 
 <p>The circuit is unique in one respect: Once a circuit cluster is formed, the circuit system itself cannot 
 fail—only individual hosts can. In contrast, comparable systems 
@@ -62,7 +62,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="api-container.html">Using containers</a></li>
 <li><a href="api-subscription.html">Using subscriptions</a></li>
 <li><a href="api-name.html">Using name servers</a></li>
-<li>Using servers</li>
+<li><a href="api-server.html">Using servers</a></li>
 <li>Using channels</li>
 </ul>
 </li>

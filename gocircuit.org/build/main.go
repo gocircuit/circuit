@@ -31,6 +31,7 @@ func main() {
 	Build("api-container.html", api.RenderContainerPage())
 	Build("api-subscription.html", api.RenderSubscriptionPage())
 	Build("api-name.html", api.RenderNamePage())
+	Build("api-server.html", api.RenderServerPage())
 
 	Build("tutorial-mysql-nodejs-overview.html", mysql_nodejs.RenderOverview())
 	Build("tutorial-mysql-nodejs-image.html", mysql_nodejs.RenderImage())
