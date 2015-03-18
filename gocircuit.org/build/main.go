@@ -22,6 +22,7 @@ func main() {
 	Build("element-container.html", man.RenderElementContainerPage())
 	Build("element-subscription.html", man.RenderElementSubscriptionPage())
 	Build("element-dns.html", man.RenderElementDnsPage())
+	Build("element-server.html", man.RenderElementServerPage())
 	Build("element-channel.html", man.RenderElementChannelPage())
 
 	Build("api.html", api.RenderMainPage())

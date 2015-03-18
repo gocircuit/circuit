@@ -47,11 +47,12 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="metaphor.html">Programming metaphor</a></li>
 <li><a href="cmd.html">Command-line client</a>
 <ul>
-<li><a href="element-process.html">Process</a></li>
-<li><a href="element-container.html">Container</a></li>
-<li><a href="element-subscription.html">Subscription</a></li>
-<li><a href="element-dns.html">Name server</a></li>
-<li><a href="element-channel.html">Channel</a></li>
+<li><a href="element-process.html">Using processes</a></li>
+<li><a href="element-container.html">Using containers</a></li>
+<li><a href="element-subscription.html">Using subscriptions</a></li>
+<li><a href="element-dns.html">Using name servers</a></li>
+<li><a href="element-server.html">Using servers</a></li>
+<li><a href="element-channel.html">Using channel</a></li>
 </ul>
 
 <li><a href="api.html">Go client</a>
