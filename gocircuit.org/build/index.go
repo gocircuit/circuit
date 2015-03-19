@@ -32,6 +32,9 @@ can fail if the hardware hosting the system's own software fails.
 
 <h2>Sources</h2>
 
+<p><a href="https://drone.io/github.com/gocircuit/circuit/latest"><img src="https://drone.io/github.com/gocircuit/circuit/status.png" /></a>&nbsp;
+<a href="https://godoc.org/github.com/gocircuit/circuit/client"><img src="https://godoc.org/github.com/gocircuit/circuit/client?status.png" /></a>
+
 <p>Find the source repository for <a href="https://github.com/gocircuit/circuit">Circuit on GitHub</a>. 
 Follow us on Twitter <a href="https://twitter.com/gocircuit">@gocircuit</a>.
 
