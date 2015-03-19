@@ -1,12 +1,12 @@
 PROJECTS
 ========
 
-* document join
-* amz scripts for connecting the cluster
-
-* tutorial doc
-* element go api doc
-
+tut2: implementing a ordered broadcast service, using circuit 
+broadcasting mechanism
+	circuit mktopic /X123/topic
+	circuit mklisten /X789/listen /X123/topic
+	circuit send /X123/topic
+	circuit recv /X789/listen
 
 test coverage
 job scheduler ala mesos

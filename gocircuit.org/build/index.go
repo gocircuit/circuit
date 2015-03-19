@@ -64,7 +64,7 @@ the Circuit visit <a href="https://groups.google.com/forum/#!forum/gocircuit-use
 <li><a href="api-subscription.html">Using subscriptions</a></li>
 <li><a href="api-name.html">Using name servers</a></li>
 <li><a href="api-server.html">Using servers</a></li>
-<li>Using channels</li>
+<li><a href="api-channel.html">Using channels</a></li>
 </ul>
 </li>
 
