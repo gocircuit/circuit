@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"io"
 	"os"
+	"bufio"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
@@ -79,15 +80,28 @@ func runproc(x *cli.Context) {
 	if err != nil {
 		fatalf("mkproc error: %s", err)
 	}
-	// ps := p.Peek()
-	// if ps.Exit != nil {
-	// 	fatalf("%v", ps.Exit)
-	// }
+
 	q := p.Stdin()
 	if err := q.Close(); err != nil {
 		fatalf("error closing stdin: %v", err)
 	}
-	io.Copy(os.Stdout, p.Stdout())
+
+	if x.Bool("anchors") {
+
+		scanner := bufio.NewScanner(p.Stdout())
+        for scanner.Scan() {
+            fmt.Fprintf(os.Stdout, "%s %s\n", a.Path(), scanner.Text())
+        }
+        if err := scanner.Err(); err != nil {
+            fmt.Fprintln(os.Stderr, "error prefixing the data", err)
+        }
+
+	} else {
+		
+		io.Copy(os.Stdout, p.Stdout())
+
+	}
+
 	a.Scrub()
 }
 
