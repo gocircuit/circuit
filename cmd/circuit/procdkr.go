@@ -66,7 +66,6 @@ func runproc(x *cli.Context) {
 	if len(args) != 1 {
 		fatalf("runproc needs an anchor argument")
 	}
-	w, _ := parseGlob(args[0])
 	buf, _ := ioutil.ReadAll(os.Stdin)
 	var cmd client.Cmd
 	if err := json.Unmarshal(buf, &cmd); err != nil {
@@ -75,6 +74,7 @@ func runproc(x *cli.Context) {
 	if x.Bool("scrub") {
 		cmd.Scrub = true
 	}
+	w, _ := parseGlob(args[0] + "/" + cmd.Path)
 	a := c.Walk(w)
 	p, err := a.MakeProc(cmd)
 	if err != nil {
