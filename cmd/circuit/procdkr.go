@@ -8,12 +8,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"io"
+	"io/ioutil"
 	"os"
-	"bufio"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
@@ -89,15 +89,15 @@ func runproc(x *cli.Context) {
 	if x.Bool("anchors") {
 
 		scanner := bufio.NewScanner(p.Stdout())
-        for scanner.Scan() {
-            fmt.Fprintf(os.Stdout, "%s %s\n", a.Path(), scanner.Text())
-        }
-        if err := scanner.Err(); err != nil {
-            fmt.Fprintln(os.Stderr, "error prefixing the data", err)
-        }
+		for scanner.Scan() {
+			fmt.Fprintf(os.Stdout, "%s %s\n", a.Path(), scanner.Text())
+		}
+		if err := scanner.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, "error prefixing the data", err)
+		}
 
 	} else {
-		
+
 		io.Copy(os.Stdout, p.Stdout())
 
 	}
@@ -144,7 +144,9 @@ func sgnl(x *cli.Context) {
 		fatalf("signal needs an anchor and a signal name arguments")
 	}
 	w, _ := parseGlob(args[1])
-	u, ok := c.Walk(w).Get().(interface{Signal(string) error})
+	u, ok := c.Walk(w).Get().(interface {
+		Signal(string) error
+	})
 	if !ok {
 		fatalf("anchor is not a process or a docker container")
 	}
