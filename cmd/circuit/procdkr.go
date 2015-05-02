@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/gocircuit/circuit/client"
@@ -51,6 +52,43 @@ func mkproc(x *cli.Context) {
 	if ps.Exit != nil {
 		fatalf("%v", ps.Exit)
 	}
+}
+
+func runproc(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("runproc needs an anchor argument")
+	}
+	w, _ := parseGlob(args[0])
+	buf, _ := ioutil.ReadAll(os.Stdin)
+	var cmd client.Cmd
+	if err := json.Unmarshal(buf, &cmd); err != nil {
+		fatalf("command json not parsing: %v", err)
+	}
+	if x.Bool("scrub") {
+		cmd.Scrub = true
+	}
+	a := c.Walk(w)
+	p, err := a.MakeProc(cmd)
+	if err != nil {
+		fatalf("mkproc error: %s", err)
+	}
+	// ps := p.Peek()
+	// if ps.Exit != nil {
+	// 	fatalf("%v", ps.Exit)
+	// }
+	q := p.Stdin()
+	if err := q.Close(); err != nil {
+		fatalf("error closing stdin: %v", err)
+	}
+	io.Copy(os.Stdout, p.Stdout())
+	a.Scrub()
 }
 
 func mkdkr(x *cli.Context) {
