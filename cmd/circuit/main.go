@@ -226,8 +226,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{"dial, d", "", "circuit member to dial into"},
 				cli.StringFlag{"discover", "228.8.8.8:8822", "Multicast address for peer server discovery"},
-				cli.BoolFlag{"anchors", "show anchor names prepended to each line of output"},
-				cli.BoolFlag{"scrub", "scrub the process anchor automatically on exit"},
+				cli.BoolFlag{"tag", "tag each output line with the anchor names"},
 				cli.StringFlag{"hmac", "", "File containing HMAC credentials. Use RC4 encryption."},
 			},
 		},
