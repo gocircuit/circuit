@@ -16,10 +16,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/mcqueenorama/circuit/client"
-	"github.com/mcqueenorama/circuit/client/docker"
+	"github.com/gocircuit/circuit/client"
+	"github.com/gocircuit/circuit/client/docker"
 
-	"github.com/mcqueenorama/circuit/github.com/codegangsta/cli"
+	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
 //make this timeout come from the json input payload
