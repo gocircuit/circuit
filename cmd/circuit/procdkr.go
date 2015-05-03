@@ -22,8 +22,9 @@ import (
 	"github.com/mcqueenorama/circuit/github.com/codegangsta/cli"
 )
 
-
+//make this timeout come from the json input payload
 var timeout = time.Duration(33)
+
 // circuit mkproc /X1234/hola/charlie << EOF
 // { … }
 // EOF
@@ -58,11 +59,58 @@ func mkproc(x *cli.Context) {
 	}
 }
 
-func _runproc (c *client.Client, cmd client.Cmd, dir string, tags bool) {
+func runproc(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
 
-	// w, _ := parseGlob(args[0] + "/" + el)
-	w, _ := parseGlob(dir)
-	a := c.Walk(w)
+	if len(args) != 1 && !x.Bool("all") {
+		fatalf("runproc needs an anchor argument or use the --all flag to do the entire circuit")
+	}
+	buf, _ := ioutil.ReadAll(os.Stdin)
+	var cmd client.Cmd
+	if err := json.Unmarshal(buf, &cmd); err != nil {
+		fatalf("command json not parsing: %v", err)
+	}
+	if x.Bool("scrub") {
+		cmd.Scrub = true
+	}
+
+	el := string("")
+	if len(cmd.Name) > 0 {
+		el = cmd.Name
+	} else {
+		el = cmd.Path
+	}
+
+	if x.Bool("all") {
+
+		w, _ := parseGlob("/")
+
+		anchor := c.Walk(w)
+
+		for _, a := range anchor.View() {
+			w2, _ := parseGlob(a.Path() + "/" + el)
+			a2 := c.Walk(w2)
+			_runproc(a2, cmd, x.Bool("tag"))
+		}
+
+	} else {
+
+		w, _ := parseGlob(args[0] + "/" + el)
+		a := c.Walk(w)
+		_runproc(a, cmd, x.Bool("tag"))
+
+	}
+
+}
+
+func _runproc(a client.Anchor, cmd client.Cmd, tags bool) {
+
 	p, err := a.MakeProc(cmd)
 	if err != nil {
 		fatalf("mkproc error: %s", err)
@@ -73,7 +121,6 @@ func _runproc (c *client.Client, cmd client.Cmd, dir string, tags bool) {
 		fatalf("error closing stdin: %v", err)
 	}
 
-	// if x.Bool("tags") {
 	if tags {
 
 		done := make(chan bool)
@@ -97,7 +144,6 @@ func _runproc (c *client.Client, cmd client.Cmd, dir string, tags bool) {
 			if !rv {
 				fmt.Fprintln(os.Stderr, "error prefixing the data")
 			}
-		//make this timeout come from the json input payload
 		case <-time.After(time.Second * timeout):
 			fmt.Fprintln(os.Stderr, "timeout waiting for data")
 		}
@@ -109,37 +155,6 @@ func _runproc (c *client.Client, cmd client.Cmd, dir string, tags bool) {
 	}
 
 	a.Scrub()
-}
-
-func runproc(x *cli.Context) {
-	defer func() {
-		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
-		}
-	}()
-	c := dial(x)
-	args := x.Args()
-	if len(args) != 1 {
-		fatalf("runproc needs an anchor argument")
-	}
-	buf, _ := ioutil.ReadAll(os.Stdin)
-	var cmd client.Cmd
-	if err := json.Unmarshal(buf, &cmd); err != nil {
-		fatalf("command json not parsing: %v", err)
-	}
-	if x.Bool("scrub") {
-		cmd.Scrub = true
-	}
-
-	el := string("")
-	if len(cmd.Name) > 0 {
-		el = cmd.Name
-	} else {
-		el = cmd.Path
-	}
-
-	_runproc(c, cmd, args[0] + "/" + el, x.Bool("tag"))
-
 }
 
 func mkdkr(x *cli.Context) {
