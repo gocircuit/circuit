@@ -16,10 +16,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/gocircuit/circuit/client"
-	"github.com/gocircuit/circuit/client/docker"
+	"github.com/mcqueenorama/circuit/client"
+	"github.com/mcqueenorama/circuit/client/docker"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/mcqueenorama/circuit/github.com/codegangsta/cli"
 )
 
 
@@ -58,34 +58,10 @@ func mkproc(x *cli.Context) {
 	}
 }
 
-func runproc(x *cli.Context) {
-	defer func() {
-		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
-		}
-	}()
-	c := dial(x)
-	args := x.Args()
-	if len(args) != 1 {
-		fatalf("runproc needs an anchor argument")
-	}
-	buf, _ := ioutil.ReadAll(os.Stdin)
-	var cmd client.Cmd
-	if err := json.Unmarshal(buf, &cmd); err != nil {
-		fatalf("command json not parsing: %v", err)
-	}
-	if x.Bool("scrub") {
-		cmd.Scrub = true
-	}
+func _runproc (c *client.Client, cmd client.Cmd, dir string, tags bool) {
 
-	el := string("")
-	if len(cmd.Name) > 0 {
-		el = cmd.Name
-	} else {
-		el = cmd.Path
-	}
-
-	w, _ := parseGlob(args[0] + "/" + el)
+	// w, _ := parseGlob(args[0] + "/" + el)
+	w, _ := parseGlob(dir)
 	a := c.Walk(w)
 	p, err := a.MakeProc(cmd)
 	if err != nil {
@@ -97,7 +73,8 @@ func runproc(x *cli.Context) {
 		fatalf("error closing stdin: %v", err)
 	}
 
-	if x.Bool("anchors") {
+	// if x.Bool("tags") {
+	if tags {
 
 		done := make(chan bool)
 
@@ -132,6 +109,37 @@ func runproc(x *cli.Context) {
 	}
 
 	a.Scrub()
+}
+
+func runproc(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
+	if len(args) != 1 {
+		fatalf("runproc needs an anchor argument")
+	}
+	buf, _ := ioutil.ReadAll(os.Stdin)
+	var cmd client.Cmd
+	if err := json.Unmarshal(buf, &cmd); err != nil {
+		fatalf("command json not parsing: %v", err)
+	}
+	if x.Bool("scrub") {
+		cmd.Scrub = true
+	}
+
+	el := string("")
+	if len(cmd.Name) > 0 {
+		el = cmd.Name
+	} else {
+		el = cmd.Path
+	}
+
+	_runproc(c, cmd, args[0] + "/" + el, x.Bool("tag"))
+
 }
 
 func mkdkr(x *cli.Context) {
