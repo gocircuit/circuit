@@ -74,7 +74,15 @@ func runproc(x *cli.Context) {
 	if x.Bool("scrub") {
 		cmd.Scrub = true
 	}
-	w, _ := parseGlob(args[0] + "/" + cmd.Path)
+
+	el := string("")
+	if len(cmd.Name) > 0 {
+		el = cmd.Name
+	} else {
+		el = cmd.Path
+	}
+
+	w, _ := parseGlob(args[0] + "/" + el)
 	a := c.Walk(w)
 	p, err := a.MakeProc(cmd)
 	if err != nil {

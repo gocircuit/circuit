@@ -45,6 +45,7 @@ type proc struct {
 		sync.Mutex
 		cmd exec.Cmd
 		scrb bool
+		name string
 		abr chan<- struct{}
 		wait chan<- error
 		exit error // exit set by waiter
@@ -66,6 +67,7 @@ func MakeProc(cmd Cmd) Proc {
 	p.cmd.cmd.Dir = cmd.Dir
 	bin := strings.TrimSpace(cmd.Path)
 	p.cmd.cmd.Path = bin
+	p.cmd.name = cmd.Name
 	p.cmd.cmd.Args = append([]string{bin}, cmd.Args...)
 	p.cmd.scrb = cmd.Scrub
 	// exec
@@ -148,6 +150,7 @@ func (p *proc) GetCmd() Cmd {
 		Path: p.cmd.cmd.Path,
 		Args: p.cmd.cmd.Args[1:],
 		Scrub: p.cmd.scrb,
+		Name: p.cmd.name,
 	}
 }
 
@@ -177,6 +180,7 @@ func (p *proc) peek() Stat {
 			Path: p.cmd.cmd.Path,
 			Args: p.cmd.cmd.Args[1:],
 			Scrub: p.cmd.scrb,
+			Name: p.cmd.name,
 		},
 		Exit: p.cmd.exit,
 		Phase: p.phase().String(),

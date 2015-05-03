@@ -32,6 +32,7 @@ type Cmd struct {
 	// If Scrub is set, the process element will automatically be removed from its anchor
 	// when the process exits.
 	Scrub bool
+	Name string
 }
 
 func retypeProcStat(c proc.Cmd) Cmd {
@@ -41,6 +42,7 @@ func retypeProcStat(c proc.Cmd) Cmd {
 		Path: c.Path,
 		Args: c.Args,
 		Scrub: c.Scrub,
+		Name: c.Name,
 	}
 }
 
@@ -51,6 +53,7 @@ func (cmd Cmd) retype() proc.Cmd {
 		Path: cmd.Path,
 		Args: cmd.Args,
 		Scrub: cmd.Scrub,
+		Name: cmd.Name,
 	}
 }
 
