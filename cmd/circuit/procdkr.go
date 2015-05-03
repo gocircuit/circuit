@@ -14,6 +14,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
@@ -21,6 +22,8 @@ import (
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
+
+var timeout = time.Duration(33)
 // circuit mkproc /X1234/hola/charlie << EOF
 // { … }
 // EOF
@@ -96,12 +99,30 @@ func runproc(x *cli.Context) {
 
 	if x.Bool("anchors") {
 
-		scanner := bufio.NewScanner(p.Stdout())
-		for scanner.Scan() {
-			fmt.Fprintf(os.Stdout, "%s %s\n", a.Path(), scanner.Text())
-		}
-		if err := scanner.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, "error prefixing the data", err)
+		done := make(chan bool)
+
+		go func(a string, r io.Reader, w io.Writer, d chan bool) {
+
+			scanner := bufio.NewScanner(r)
+			for scanner.Scan() {
+				fmt.Fprintf(w, "%s %s\n", a, scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				d <- false
+			}
+
+			d <- true
+
+		}(a.Path(), p.Stdout(), os.Stdout, done)
+
+		select {
+		case rv := <-done:
+			if !rv {
+				fmt.Fprintln(os.Stderr, "error prefixing the data")
+			}
+		//make this timeout come from the json input payload
+		case <-time.After(time.Second * timeout):
+			fmt.Fprintln(os.Stderr, "timeout waiting for data")
 		}
 
 	} else {
