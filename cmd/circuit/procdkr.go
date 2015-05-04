@@ -59,6 +59,14 @@ func mkproc(x *cli.Context) {
 	}
 }
 
+func doRun(x *cli.Context, c *client.Client, cmd client.Cmd, path string) {
+
+	w2, _ := parseGlob(path)
+	a2 := c.Walk(w2)
+	_runproc(a2, cmd, x.Bool("tag"))
+
+}
+
 func runproc(x *cli.Context) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -93,17 +101,36 @@ func runproc(x *cli.Context) {
 
 		anchor := c.Walk(w)
 
+		done := make(chan bool, 10)
+		procs := 0
+
 		for _, a := range anchor.View() {
-			w2, _ := parseGlob(a.Path() + "/" + el)
-			a2 := c.Walk(w2)
-			_runproc(a2, cmd, x.Bool("tag"))
+
+			procs++
+
+			go func(x *cli.Context, cmd client.Cmd, a string, done chan bool) {
+
+				doRun(x, c, cmd, a)
+				done <- true
+
+			}(x, cmd, a.Path()+"/"+el, done)
+
+		}
+
+		for ; procs > 0 ; procs--  {
+
+			select {
+			case <-done:
+				continue
+			case <-time.After(time.Second * timeout):
+				fmt.Fprintln(os.Stderr, "timeout waiting for the command")
+			}
+
 		}
 
 	} else {
 
-		w, _ := parseGlob(args[0] + "/" + el)
-		a := c.Walk(w)
-		_runproc(a, cmd, x.Bool("tag"))
+		doRun(x, c, cmd, args[0]+"/"+el)
 
 	}
 
