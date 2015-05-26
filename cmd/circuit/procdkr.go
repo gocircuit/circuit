@@ -14,7 +14,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"time"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
@@ -22,9 +21,6 @@ import (
 
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
-
-//make this timeout come from the json input payload
-var timeout = time.Duration(33)
 
 // circuit mkproc /X1234/hola/charlie << EOF
 // { … }
@@ -60,11 +56,11 @@ func mkproc(x *cli.Context) {
 	}
 }
 
-func doRun(x *cli.Context, c *client.Client, cmd client.Cmd, path string) {
+func doRun(x *cli.Context, c *client.Client, cmd client.Cmd, path string, done chan bool) {
 
 	w2, _ := parseGlob(path)
 	a2 := c.Walk(w2)
-	_runproc(x, c, a2, cmd)
+	_runproc(x, c, a2, cmd, done)
 
 }
 
@@ -89,13 +85,13 @@ func runproc(x *cli.Context) {
 
 	el := "/runproc/" + keygen(x)
 
+	done := make(chan bool, 10)
 	if x.Bool("all") {
 
 		w, _ := parseGlob("/")
 
 		anchor := c.Walk(w)
 
-		done := make(chan bool, 10)
 		procs := 0
 
 		for _, a := range anchor.View() {
@@ -104,10 +100,8 @@ func runproc(x *cli.Context) {
 
 			go func(x *cli.Context, cmd client.Cmd, a string, done chan bool) {
 
-				doRun(x, c, cmd, a)
-				done <- true
+				doRun(x, c, cmd, a, done)
 
-			// }(x, cmd, a.Path()+"/"+cmd.Path, done)
 			}(x, cmd, a.Path()+el, done)
 
 		}
@@ -117,21 +111,19 @@ func runproc(x *cli.Context) {
 			select {
 			case <-done:
 				continue
-			case <-time.After(time.Second * timeout):
-				fmt.Fprintln(os.Stderr, "timeout waiting for the command")
 			}
 
 		}
 
 	} else {
 
-		doRun(x, c, cmd, args[0]+el)
+		doRun(x, c, cmd, args[0]+el, done)
 
 	}
 
 }
 
-func _runproc(x *cli.Context, c *client.Client, a client.Anchor, cmd client.Cmd) {
+func _runproc(x *cli.Context, c *client.Client, a client.Anchor, cmd client.Cmd, done chan bool) {
 
 	p, err := a.MakeProc(cmd)
 	if err != nil {
@@ -157,6 +149,8 @@ func _runproc(x *cli.Context, c *client.Client, a client.Anchor, cmd client.Cmd)
 		io.Copy(os.Stdout, p.Stdout())
 
 	}
+	p.Wait()
+	done <- true
 
 }
 
