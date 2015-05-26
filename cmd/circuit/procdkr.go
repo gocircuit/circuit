@@ -18,6 +18,7 @@ import (
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
+	"github.com/gocircuit/circuit/kit/iomisc"
 
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
@@ -63,7 +64,7 @@ func doRun(x *cli.Context, c *client.Client, cmd client.Cmd, path string) {
 
 	w2, _ := parseGlob(path)
 	a2 := c.Walk(w2)
-	_runproc(a2, cmd, x.Bool("tag"))
+	_runproc(x, c, a2, cmd)
 
 }
 
@@ -130,7 +131,7 @@ func runproc(x *cli.Context) {
 
 }
 
-func _runproc(a client.Anchor, cmd client.Cmd, tags bool) {
+func _runproc(x *cli.Context, c *client.Client, a client.Anchor, cmd client.Cmd) {
 
 	p, err := a.MakeProc(cmd)
 	if err != nil {
@@ -142,31 +143,13 @@ func _runproc(a client.Anchor, cmd client.Cmd, tags bool) {
 		fatalf("error closing stdin: %v", err)
 	}
 
-	if tags {
+	if x.Bool("tag") {
 
-		done := make(chan bool)
+		r := iomisc.PrefixReader(a.Addr() + " ", p.Stdout())
 
-		go func(a string, r io.Reader, w io.Writer, d chan bool) {
-
-			scanner := bufio.NewScanner(r)
-			for scanner.Scan() {
-				fmt.Fprintf(w, "%s %s\n", a, scanner.Text())
-			}
-			if err := scanner.Err(); err != nil {
-				d <- false
-			}
-
-			d <- true
-
-		}(a.Path(), p.Stdout(), os.Stdout, done)
-
-		select {
-		case rv := <-done:
-			if !rv {
-				fmt.Fprintln(os.Stderr, "error prefixing the data")
-			}
-		case <-time.After(time.Second * timeout):
-			fmt.Fprintln(os.Stderr, "timeout waiting for data")
+		scanner := bufio.NewScanner(r)
+		for scanner.Scan() {
+			fmt.Println(scanner.Text())
 		}
 
 	} else {
@@ -175,7 +158,6 @@ func _runproc(a client.Anchor, cmd client.Cmd, tags bool) {
 
 	}
 
-	a.Scrub()
 }
 
 func mkdkr(x *cli.Context) {
