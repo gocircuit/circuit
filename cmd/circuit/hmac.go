@@ -17,7 +17,7 @@ import (
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
 
-func keygen(c *cli.Context) {
+func keygen(c *cli.Context) string {
 	rand.Seed(time.Now().UnixNano())
 	seed := make([]byte, 32)
 	for i, _ := range seed {
@@ -25,5 +25,12 @@ func keygen(c *cli.Context) {
 	}
 	key := sha512.Sum512(seed)
 	text := base64.StdEncoding.EncodeToString(key[:])
-	fmt.Println(text)
+	
+	return text
+}
+
+func keygenPrint(c *cli.Context) {
+
+	fmt.Println(keygen(c))
+
 }

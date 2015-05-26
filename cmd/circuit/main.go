@@ -37,7 +37,7 @@ func main() {
 		{
 			Name:   "keygen",
 			Usage:  "Generate a new random HMAC key",
-			Action: keygen,
+			Action: keygenPrint,
 		},
 		{
 			Name:   "ls",

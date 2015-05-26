@@ -77,23 +77,16 @@ func runproc(x *cli.Context) {
 	args := x.Args()
 
 	if len(args) != 1 && !x.Bool("all") {
-		fatalf("runproc needs an anchor argument or use the --all flag to do the entire circuit")
+		fatalf("runproc needs an anchor argument or use the --all flag to to execute on every host in the circuit")
 	}
 	buf, _ := ioutil.ReadAll(os.Stdin)
 	var cmd client.Cmd
 	if err := json.Unmarshal(buf, &cmd); err != nil {
 		fatalf("command json not parsing: %v", err)
 	}
-	if x.Bool("scrub") {
-		cmd.Scrub = true
-	}
+	cmd.Scrub = true
 
-	el := string("")
-	if len(cmd.Name) > 0 {
-		el = cmd.Name
-	} else {
-		el = cmd.Path
-	}
+	el := "/runproc/" + keygen(x)
 
 	if x.Bool("all") {
 
@@ -113,7 +106,8 @@ func runproc(x *cli.Context) {
 				doRun(x, c, cmd, a)
 				done <- true
 
-			}(x, cmd, a.Path()+"/"+el, done)
+			// }(x, cmd, a.Path()+"/"+cmd.Path, done)
+			}(x, cmd, a.Path()+el, done)
 
 		}
 
@@ -130,7 +124,7 @@ func runproc(x *cli.Context) {
 
 	} else {
 
-		doRun(x, c, cmd, args[0]+"/"+el)
+		doRun(x, c, cmd, args[0]+el)
 
 	}
 

@@ -42,7 +42,6 @@ func retypeProcStat(c proc.Cmd) Cmd {
 		Path: c.Path,
 		Args: c.Args,
 		Scrub: c.Scrub,
-		Name: c.Name,
 	}
 }
 
@@ -53,7 +52,6 @@ func (cmd Cmd) retype() proc.Cmd {
 		Path: cmd.Path,
 		Args: cmd.Args,
 		Scrub: cmd.Scrub,
-		Name: cmd.Name,
 	}
 }
 
