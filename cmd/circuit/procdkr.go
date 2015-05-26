@@ -118,6 +118,7 @@ func runproc(x *cli.Context) {
 	} else {
 
 		doRun(x, c, cmd, args[0]+el, done)
+		<-done
 
 	}
 
@@ -130,23 +131,30 @@ func _runproc(x *cli.Context, c *client.Client, a client.Anchor, cmd client.Cmd,
 		fatalf("mkproc error: %s", err)
 	}
 
-	q := p.Stdin()
-	if err := q.Close(); err != nil {
+	stdin := p.Stdin()
+	if err := stdin.Close(); err != nil {
 		fatalf("error closing stdin: %v", err)
 	}
 
 	if x.Bool("tag") {
 
-		r := iomisc.PrefixReader(a.Addr() + " ", p.Stdout())
+		stdout := iomisc.PrefixReader(a.Addr() + " ", p.Stdout())
+		stderr := iomisc.PrefixReader(a.Addr() + " ", p.Stderr())
 
-		scanner := bufio.NewScanner(r)
-		for scanner.Scan() {
-			fmt.Println(scanner.Text())
+		stdoutScanner := bufio.NewScanner(stdout)
+		for stdoutScanner.Scan() {
+			fmt.Println(stdoutScanner.Text())
+		}
+
+		stderrScanner := bufio.NewScanner(stderr)
+		for stderrScanner.Scan() {
+			fmt.Println(stderrScanner.Text())
 		}
 
 	} else {
 
 		io.Copy(os.Stdout, p.Stdout())
+		io.Copy(os.Stderr, p.Stderr())
 
 	}
 	p.Wait()
