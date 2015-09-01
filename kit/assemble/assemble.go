@@ -17,15 +17,15 @@ import (
 )
 
 type Assembler struct {
-	focus xor.Key
-	addr n.Addr // our circuit address
+	focus     xor.Key
+	addr      n.Addr       // our circuit address
 	multicast *net.UDPAddr // udp multicast address
 }
 
 func NewAssembler(addr n.Addr, multicast *net.UDPAddr) *Assembler {
 	return &Assembler{
-		focus: xor.ChooseKey(),
-		addr: addr,
+		focus:     xor.ChooseKey(),
+		addr:      addr,
 		multicast: multicast,
 	}
 }
@@ -33,7 +33,7 @@ func NewAssembler(addr n.Addr, multicast *net.UDPAddr) *Assembler {
 func (a *Assembler) scatter(origin string) {
 	msg := &TraceMsg{
 		Origin: origin,
-		Addr: a.addr.String(),
+		Addr:   a.addr.String(),
 	}
 	scatter := NewScatter(a.multicast, a.focus, msg.Encode())
 	scatter.Scatter() // send off a sequence of messages announcing our presnence over time
