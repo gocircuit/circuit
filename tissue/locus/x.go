@@ -23,7 +23,7 @@ func (x XLocus) GetPeers() []*Peer {
 	return x.l.GetPeers()
 }
 
-func (x XLocus) Self() *Peer {
+func (x XLocus) Self() interface{} {
 	return x.l.Self()
 }
 
