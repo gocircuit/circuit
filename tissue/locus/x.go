@@ -23,6 +23,10 @@ func (x XLocus) GetPeers() []*Peer {
 	return x.l.GetPeers()
 }
 
+func (x XLocus) Self() *Peer {
+	return x.l.Self()
+}
+
 // YLocus…
 type YLocus struct {
 	X circuit.PermX
@@ -34,4 +38,8 @@ func (y YLocus) GetPeers() map[string]*Peer {
 		r[p.Key()] = p
 	}
 	return r
+}
+
+func (y YLocus) Self() *Peer {
+	return y.X.Call("Self")[0].(*Peer)
 }

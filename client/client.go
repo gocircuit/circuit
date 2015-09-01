@@ -14,22 +14,23 @@ import (
 	"errors"
 	"math/rand"
 	"net"
-	"time"
 	"sync"
+	"time"
 
+	"github.com/gocircuit/circuit/anchor"
+	"github.com/gocircuit/circuit/client/docker"
+	"github.com/gocircuit/circuit/kit/assemble"
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
 	"github.com/gocircuit/circuit/sys/lang"
 	_ "github.com/gocircuit/circuit/sys/tele"
-	"github.com/gocircuit/circuit/anchor"
 	"github.com/gocircuit/circuit/tissue"
 	"github.com/gocircuit/circuit/tissue/locus"
-	"github.com/gocircuit/circuit/kit/assemble"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
-	"github.com/gocircuit/circuit/client/docker"
 )
 
 var _once sync.Once
+
 func _init(key []byte) {
 	rand.Seed(time.Now().UnixNano())
 	t := n.NewTransport(n.ChooseWorkerID(), &net.TCPAddr{}, key)
@@ -43,7 +44,7 @@ type Client struct {
 }
 
 // Dial establishes a connection to a circuit server specified by a circuit address.
-// Circuit addresses are printed to standard output when a server is started with the 
+// Circuit addresses are printed to standard output when a server is started with the
 // "circuit start …" command.
 //
 // If authkey is non-nil it is used as a private key and all communications are
@@ -122,9 +123,9 @@ func (c *Client) newTerminal(xterm circuit.X, xkin tissue.KinAvatar) terminal {
 	}
 }
 
-// ServerID is an Anchor interface method, not applicable to the root-level anchor.
+// ServerID returns the server ID of the circuit server that this client is connected to.
 func (c *Client) ServerID() string {
-	return ""
+	return c.y.Self().Key()
 }
 
 // MakeChan is an Anchor interface method, not applicable to the root-level anchor.

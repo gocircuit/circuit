@@ -58,6 +58,10 @@ func (locus *Locus) GetPeers() []*Peer {
 	return s
 }
 
+func (locus *Locus) Self() *Peer {
+	return locus.Peer
+}
+
 // peerSubscription
 type peerSubscription struct {
 	pubsub.Consumer
