@@ -9,8 +9,6 @@
 package io
 
 import (
-	"fmt"
-	"os"
 	"io"
 	"runtime"
 	"time"
@@ -39,13 +37,6 @@ type YReader struct {
 }
 
 func (y YReader) Read(p []byte) (n int, err error) {
-	defer func() {
-	// 	println(fmt.Sprintf("yread n=%d err=%v r=%v", n, err, recover()))
-		if r := recover(); r != nil {
-			println(fmt.Sprintf("r=%v", r))
-			os.Exit(1)
-		}
-	}()
 	r := y.Call("Read", len(p))
 	q, err := unpackBytes(r[0]), errors.Unpack(r[1])
 	if len(q) > len(p) {

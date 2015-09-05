@@ -54,7 +54,7 @@ func (r *Runtime) importRewrite(src, dst reflect.Value, exporter n.Addr, ig *imp
 		// For each imported handle, wait until it is not needed any more,
 		// and notify the exporter.
 		imph.ScrubWith(func() {
-			//log.Printf("ptr scrubbing %s", imph.Type.Name())
+			// log.Printf("ptr scrubbing %s", imph.Type.Name())
 			r.imp.Remove(imph.ID)
 
 			conn, err := r.t.Dial(exporter)

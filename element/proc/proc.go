@@ -8,9 +8,9 @@
 package proc
 
 import (
+	"errors"
 	"fmt"
 	"io"
-	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -39,13 +39,13 @@ type proc struct {
 	stdin  io.WriteCloser
 	stdout io.ReadCloser
 	stderr io.ReadCloser
-	wait <-chan error
-	abr <-chan struct{}
-	cmd struct {
+	wait   <-chan error
+	abr    <-chan struct{}
+	cmd    struct {
 		sync.Mutex
-		cmd exec.Cmd
+		cmd  exec.Cmd
 		scrb bool
-		abr chan<- struct{}
+		abr  chan<- struct{}
 		wait chan<- error
 		exit error // exit set by waiter
 	}
@@ -144,9 +144,9 @@ func (p *proc) GetCmd() Cmd {
 	p.cmd.Lock()
 	defer p.cmd.Unlock()
 	return Cmd{
-		Env:  p.cmd.cmd.Env,
-		Path: p.cmd.cmd.Path,
-		Args: p.cmd.cmd.Args[1:],
+		Env:   p.cmd.cmd.Env,
+		Path:  p.cmd.cmd.Path,
+		Args:  p.cmd.cmd.Args[1:],
 		Scrub: p.cmd.scrb,
 	}
 }
@@ -173,12 +173,12 @@ func (p *proc) Peek() Stat {
 func (p *proc) peek() Stat {
 	return Stat{
 		Cmd: Cmd{
-			Env: p.cmd.cmd.Env,
-			Path: p.cmd.cmd.Path,
-			Args: p.cmd.cmd.Args[1:],
+			Env:   p.cmd.cmd.Env,
+			Path:  p.cmd.cmd.Path,
+			Args:  p.cmd.cmd.Args[1:],
 			Scrub: p.cmd.scrb,
 		},
-		Exit: p.cmd.exit,
+		Exit:  p.cmd.exit,
 		Phase: p.phase().String(),
 	}
 }

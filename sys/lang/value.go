@@ -26,7 +26,7 @@ func (u *_ptr) Call(proc string, in ...interface{}) []interface{} {
 	// log.Printf("calling %s.%s on %s", u.imph.Type.Name(), proc, u.imph.Exporter.String())
 	defer func() {
 		if r := recover(); r != nil {
-			log.Printf("call panic: %v", r)
+			// log.Printf("call panic: %v", r)
 			panic(r)
 		}
 	}()
@@ -118,8 +118,8 @@ func (r *Runtime) serveCall(req *callMsg, conn n.Conn) {
 	}
 	expReply, ptrPtr := r.exportValues(reply, conn.Addr())
 	if err = conn.Write(&returnMsg{Out: expReply}); err != nil {
-		// Gob encoding errors will often be the cause of this
-		log.Printf("write error (%s)", err)
+		// This error occurs when a connection is lost unexpectedly.
+		// log.Printf("write error (%s)", err)
 	}
 	r.readGotPtrPtr(ptrPtr, conn)
 }
