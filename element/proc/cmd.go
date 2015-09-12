@@ -13,11 +13,11 @@ import (
 
 // Cmd …
 type Cmd struct {
-	Env  []string `json:"env"`
-	Dir string `json:"dir"`
-	Path string   `json:"path"`
-	Args []string `json:"args"`
-	Scrub bool `json:"scrub"`
+	Env   []string `json:"env"`
+	Dir   string   `json:"dir"`
+	Path  string   `json:"path"`
+	Args  []string `json:"args"`
+	Scrub bool     `json:"scrub"`
 }
 
 func ParseCmd(src string) (*Cmd, error) {
@@ -28,7 +28,7 @@ func ParseCmd(src string) (*Cmd, error) {
 	return x, nil
 }
 
-func (x *Cmd) String() string {
+func (x Cmd) String() string {
 	b, err := json.MarshalIndent(x, "", "\t")
 	if err != nil {
 		panic(0)

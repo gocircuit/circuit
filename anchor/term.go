@@ -13,10 +13,10 @@ import (
 	"log"
 
 	ds "github.com/gocircuit/circuit/client/docker"
-	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/element/docker"
 	"github.com/gocircuit/circuit/element/dns"
+	"github.com/gocircuit/circuit/element/docker"
 	"github.com/gocircuit/circuit/element/proc"
+	srv "github.com/gocircuit/circuit/element/server"
 	"github.com/gocircuit/circuit/element/valve"
 	"github.com/gocircuit/circuit/kit/pubsub"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -28,18 +28,18 @@ type Element interface {
 }
 
 const (
-	Server = "server"
-	Chan = "chan"
-	Proc = "proc"
-	Docker = "docker"
+	Server     = "server"
+	Chan       = "chan"
+	Proc       = "proc"
+	Docker     = "docker"
 	Nameserver = "dns"
-	OnJoin = "@join"
-	OnLeave = "@leave"
+	OnJoin     = "@join"
+	OnLeave    = "@leave"
 )
 
 // Terminal presents a facade to *Anchor with added element manipulation methods
 type Terminal struct {
-	genus Genus
+	genus  Genus
 	anchor *Anchor
 }
 
@@ -51,7 +51,7 @@ type Genus interface {
 // NewTerm create the root node of a new anchor file system.
 func NewTerm(name string, genus Genus) (*Terminal, circuit.PermX) {
 	t := &Terminal{
-		genus: genus,
+		genus:  genus,
 		anchor: newAnchor(nil, name).use(),
 	}
 	return t, circuit.PermRef(XTerminal{t})
@@ -63,7 +63,7 @@ func (t *Terminal) carrier() *Anchor {
 
 func (t *Terminal) Walk(walk []string) *Terminal {
 	return &Terminal{
-		genus: t.genus,
+		genus:  t.genus,
 		anchor: t.carrier().Walk(walk),
 	}
 }
@@ -76,7 +76,7 @@ func (t *Terminal) View() map[string]*Terminal {
 	r := make(map[string]*Terminal)
 	for n, a := range t.carrier().View() {
 		r[n] = &Terminal{
-			genus: t.genus,
+			genus:  t.genus,
 			anchor: a,
 		}
 	}
@@ -106,7 +106,7 @@ func (t *Terminal) Attach(kind string, elm Element) {
 }
 
 func (t *Terminal) Make(kind string, arg interface{}) (elem Element, err error) {
-	log.Printf("Making %s as %s with %v", t.carrier().Path(), kind, arg)
+	log.Printf("Making %s at %s, using %v", kind, t.carrier().Path(), arg)
 	t.carrier().TxLock()
 	defer t.carrier().TxUnlock()
 	if t.carrier().Get() != nil {
