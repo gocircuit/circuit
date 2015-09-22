@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime/pprof"
-	"syscall"
 	"time"
 )
 
@@ -71,19 +70,4 @@ func InstallKillPanic() {
 			//panic("sigkill")
 		}
 	}()
-}
-
-func SavePanicTrace() {
-	r := recover()
-	if r == nil {
-		return
-	}
-	// Redirect stderr
-	file, err := os.Create("panic")
-	if err != nil {
-		panic("dumper (no file) " + r.(fmt.Stringer).String())
-	}
-	syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd()))
-	// TRY: defer func() { file.Close() }()
-	panic("dumper " + r.(string))
 }

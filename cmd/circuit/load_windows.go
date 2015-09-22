@@ -1,4 +1,4 @@
-// +build !windows
+// +build windows
 // Copyright 2013 The Go Circuit Project
 // Use of this source code is governed by the license for
 // The Go Circuit Project, found in the LICENSE file.
@@ -14,13 +14,11 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"time"
 
 	_ "github.com/gocircuit/circuit/kit/debug/kill"
-	"github.com/gocircuit/circuit/kit/lockfile"
 	"github.com/gocircuit/circuit/sys/lang"
 	_ "github.com/gocircuit/circuit/sys/tele"
 	"github.com/gocircuit/circuit/use/circuit"
@@ -45,13 +43,6 @@ func load(addr *net.TCPAddr, vardir string, key []byte) n.Addr {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		log.Fatalf("mkdir %s (%s)", dir, err)
 	}
-
-	// Create a lock file in the chroot directory so its not managed by two circuit instances at the same time
-	lockname := path.Join(dir, ".lock")
-	if _, err := lockfile.Create(lockname); err != nil {
-		log.Fatalf("obtain lock (%s)\n", err)
-	}
-	log.Printf("Created and locked %s", lockname)
 
 	// Initialize networking
 	if len(key) > 0 {
