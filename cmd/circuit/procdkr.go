@@ -8,13 +8,16 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
+	"github.com/gocircuit/circuit/kit/iomisc"
 
 	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
 )
@@ -51,6 +54,112 @@ func mkproc(x *cli.Context) {
 	if ps.Exit != nil {
 		fatalf("%v", ps.Exit)
 	}
+}
+
+func doRun(x *cli.Context, c *client.Client, cmd client.Cmd, path string, done chan bool) {
+
+	w2, _ := parseGlob(path)
+	a2 := c.Walk(w2)
+	_runproc(x, c, a2, cmd, done)
+
+}
+
+func runproc(x *cli.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+		}
+	}()
+	c := dial(x)
+	args := x.Args()
+
+	if len(args) != 1 && !x.Bool("all") {
+		fatalf("runproc needs an anchor argument or use the --all flag to to execute on every host in the circuit")
+	}
+	buf, _ := ioutil.ReadAll(os.Stdin)
+	var cmd client.Cmd
+	if err := json.Unmarshal(buf, &cmd); err != nil {
+		fatalf("command json not parsing: %v", err)
+	}
+	cmd.Scrub = true
+
+	el := "/runproc/" + keygen(x)
+
+	done := make(chan bool, 10)
+	if x.Bool("all") {
+
+		w, _ := parseGlob("/")
+
+		anchor := c.Walk(w)
+
+		procs := 0
+
+		for _, a := range anchor.View() {
+
+			procs++
+
+			go func(x *cli.Context, cmd client.Cmd, a string, done chan bool) {
+
+				doRun(x, c, cmd, a, done)
+
+			}(x, cmd, a.Path()+el, done)
+
+		}
+
+		for ; procs > 0 ; procs--  {
+
+			select {
+			case <-done:
+				continue
+			}
+
+		}
+
+	} else {
+
+		doRun(x, c, cmd, args[0]+el, done)
+		<-done
+
+	}
+
+}
+
+func _runproc(x *cli.Context, c *client.Client, a client.Anchor, cmd client.Cmd, done chan bool) {
+
+	p, err := a.MakeProc(cmd)
+	if err != nil {
+		fatalf("mkproc error: %s", err)
+	}
+
+	stdin := p.Stdin()
+	if err := stdin.Close(); err != nil {
+		fatalf("error closing stdin: %v", err)
+	}
+
+	if x.Bool("tag") {
+
+		stdout := iomisc.PrefixReader(a.Addr() + " ", p.Stdout())
+		stderr := iomisc.PrefixReader(a.Addr() + " ", p.Stderr())
+
+		stdoutScanner := bufio.NewScanner(stdout)
+		for stdoutScanner.Scan() {
+			fmt.Println(stdoutScanner.Text())
+		}
+
+		stderrScanner := bufio.NewScanner(stderr)
+		for stderrScanner.Scan() {
+			fmt.Println(stderrScanner.Text())
+		}
+
+	} else {
+
+		io.Copy(os.Stdout, p.Stdout())
+		io.Copy(os.Stderr, p.Stderr())
+
+	}
+	p.Wait()
+	done <- true
+
 }
 
 func mkdkr(x *cli.Context) {
@@ -92,7 +201,9 @@ func sgnl(x *cli.Context) {
 		fatalf("signal needs an anchor and a signal name arguments")
 	}
 	w, _ := parseGlob(args[1])
-	u, ok := c.Walk(w).Get().(interface{Signal(string) error})
+	u, ok := c.Walk(w).Get().(interface {
+		Signal(string) error
+	})
 	if !ok {
 		fatalf("anchor is not a process or a docker container")
 	}
