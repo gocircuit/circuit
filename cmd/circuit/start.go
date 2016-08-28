@@ -22,7 +22,7 @@ import (
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func server(c *cli.Context) {
@@ -30,9 +30,9 @@ func server(c *cli.Context) {
 	var err error
 
 	if c.Bool("docker") {
-		cmd, err := docker.Init()
-		if err != nil {
-			log.Fatalf("cannot use docker: %v", err)
+		cmd, e := docker.Init()
+		if e != nil {
+			log.Fatalf("cannot use docker: %v", e)
 		}
 		log.Printf("Enabling docker elements, using %s", cmd)
 	}
@@ -136,6 +136,7 @@ func parseAddr(c *cli.Context) *net.TCPAddr {
 	panic(0)
 }
 
+// LocusName ???
 const LocusName = "locus"
 
 func dontPanic(call func(), ifPanic string) {

@@ -11,7 +11,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func stdin(x *cli.Context) {

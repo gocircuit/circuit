@@ -15,7 +15,7 @@ import (
 
 	"github.com/gocircuit/circuit/client"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 // circuit mkchan /X1234/hola/charlie 0

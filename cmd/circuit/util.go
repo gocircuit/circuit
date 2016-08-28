@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/gocircuit/circuit/client"
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func fatalf(format string, arg ...interface{}) {

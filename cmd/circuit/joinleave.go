@@ -8,7 +8,7 @@
 package main
 
 import (
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 // circuit mk@join /X1234/hola/listy

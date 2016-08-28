@@ -13,7 +13,7 @@ import (
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func waitall(x *cli.Context) {
