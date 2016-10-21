@@ -7,9 +7,3 @@ nix:
 
 clean:
 	rm $(GOPATH)/bin/circuit
-
-testnn: nix
-	circuit start --discover 'ipc:///tmp/test.ipc' --beacon
-
-testudp: nix
-	circuit start
