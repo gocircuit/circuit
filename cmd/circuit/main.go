@@ -9,6 +9,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/urfave/cli"
@@ -282,5 +283,9 @@ func main() {
 			},
 		},
 	}
-	app.Run(os.Args)
+
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+	os.Exit(0)
 }

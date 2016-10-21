@@ -21,18 +21,18 @@ import (
 	"github.com/gocircuit/circuit/tissue/locus"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
+	"github.com/pkg/errors"
 
 	"github.com/urfave/cli"
 )
 
-func server(c *cli.Context) {
+func server(c *cli.Context) (err error) {
 	println("CIRCUIT 2015 gocircuit.org")
-	var err error
 
 	if c.Bool("docker") {
 		cmd, e := docker.Init()
 		if e != nil {
-			log.Fatalf("cannot use docker: %v", e)
+			return errors.Wrapf(e, "cannot use docker: %v", e)
 		}
 		log.Printf("Enabling docker elements, using %s", cmd)
 	}
@@ -41,7 +41,7 @@ func server(c *cli.Context) {
 	var join n.Addr            // join address of another circuit server
 	if c.IsSet("join") {
 		if join, err = n.ParseAddr(c.String("join")); err != nil {
-			log.Fatalf("join address does not parse (%s)", err)
+			return errors.Wrapf(err, "join address does not parse (%s)", err)
 		}
 	}
 	var multicast = parseDiscover(c)
@@ -79,6 +79,7 @@ func server(c *cli.Context) {
 	circuit.Listen(LocusName, xlocus)
 
 	<-(chan int)(nil)
+	return nil
 }
 
 func parseDiscover(c *cli.Context) *net.UDPAddr {
