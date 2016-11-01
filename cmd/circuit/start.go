@@ -83,13 +83,8 @@ func server(c *cli.Context) (err error) {
 }
 
 func parseDiscover(c *cli.Context) *net.UDPAddr {
-	var src string
-	switch {
-	case c.String("discover") != "":
-		src = c.String("discover")
-	case os.Getenv("CIRCUIT_DISCOVER") != "":
-		src = os.Getenv("CIRCUIT_DISCOVER")
-	default:
+	src := c.String("discover")
+	if src == "" {
 		return nil
 	}
 	multicast, err := net.ResolveUDPAddr("udp", src)

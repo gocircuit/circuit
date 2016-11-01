@@ -31,8 +31,8 @@ func main() {
 				cli.StringFlag{Name: "if", Value: "", Usage: "Bind any available port on the specified interface."},
 				cli.StringFlag{Name: "var", Value: "", Usage: "Lock and log directory for the circuit server."},
 				cli.StringFlag{Name: "join, j", Value: "", Usage: "Join a circuit through a current member by address."},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File with HMAC credentials for HMAC/RC4 transport security."},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File with HMAC credentials for HMAC/RC4 transport security.", EnvVar: "CIRCUIT_HMAC"},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
 				cli.BoolFlag{Name: "docker", Usage: "Enable docker elements; docker command must be executable"},
 			},
 		},
@@ -47,10 +47,10 @@ func main() {
 			Action: ls,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
 				cli.BoolFlag{Name: "long, l", Usage: "show detailed anchor information"},
 				cli.BoolFlag{Name: "depth, de", Usage: "traverse anchors in depth-first order (leaves first)"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// subscription-specific
@@ -60,8 +60,8 @@ func main() {
 			Action: mkonjoin,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -70,8 +70,8 @@ func main() {
 			Action: mkonleave,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// server-specific
@@ -81,8 +81,8 @@ func main() {
 			Action: stack,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -91,8 +91,8 @@ func main() {
 			Action: join,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -101,8 +101,8 @@ func main() {
 			Action: stack,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// channel-specific
@@ -112,8 +112,8 @@ func main() {
 			Action: mkchan,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -122,8 +122,8 @@ func main() {
 			Action: send,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -132,8 +132,8 @@ func main() {
 			Action: recv,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -142,8 +142,8 @@ func main() {
 			Action: clos,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// common
@@ -153,8 +153,8 @@ func main() {
 			Action: scrb,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -163,8 +163,8 @@ func main() {
 			Action: peek,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// nameserver
@@ -174,8 +174,8 @@ func main() {
 			Action: mkdns,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -184,8 +184,8 @@ func main() {
 			Action: nset,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -194,8 +194,8 @@ func main() {
 			Action: nunset,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// proc/dkr-specific
@@ -205,9 +205,9 @@ func main() {
 			Action: mkdkr,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
 				cli.BoolFlag{Name: "scrub", Usage: "scrub the process anchor automatically on exit"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -216,9 +216,9 @@ func main() {
 			Action: mkproc,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
 				cli.BoolFlag{Name: "scrub", Usage: "scrub the process anchor automatically on exit"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -227,8 +227,8 @@ func main() {
 			Action: sgnl,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -237,8 +237,8 @@ func main() {
 			Action: wait,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -247,8 +247,8 @@ func main() {
 			Action: waitall,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		// stdin, stdout, stderr
@@ -258,8 +258,8 @@ func main() {
 			Action: stdin,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -268,8 +268,8 @@ func main() {
 			Action: stdout,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 		{
@@ -278,8 +278,8 @@ func main() {
 			Action: stderr,
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "dial, d", Value: "", Usage: "circuit member to dial into"},
-				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery"},
-				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption."},
+				cli.StringFlag{Name: "discover", Value: "228.8.8.8:8822", Usage: "Multicast address for peer server discovery", EnvVar: "CIRCUIT_DISCOVER"},
+				cli.StringFlag{Name: "hmac", Value: "", Usage: "File containing HMAC credentials. Use RC4 encryption.", EnvVar: "CIRCUIT_HMAC"},
 			},
 		},
 	}
