@@ -21,18 +21,18 @@ import (
 	"github.com/gocircuit/circuit/tissue/locus"
 	"github.com/gocircuit/circuit/use/circuit"
 	"github.com/gocircuit/circuit/use/n"
+	"github.com/pkg/errors"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
-func server(c *cli.Context) {
+func server(c *cli.Context) (err error) {
 	println("CIRCUIT 2015 gocircuit.org")
-	var err error
 
 	if c.Bool("docker") {
-		cmd, err := docker.Init()
-		if err != nil {
-			log.Fatalf("cannot use docker: %v", err)
+		cmd, e := docker.Init()
+		if e != nil {
+			return errors.Wrapf(e, "cannot use docker: %v", e)
 		}
 		log.Printf("Enabling docker elements, using %s", cmd)
 	}
@@ -41,7 +41,7 @@ func server(c *cli.Context) {
 	var join n.Addr            // join address of another circuit server
 	if c.IsSet("join") {
 		if join, err = n.ParseAddr(c.String("join")); err != nil {
-			log.Fatalf("join address does not parse (%s)", err)
+			return errors.Wrapf(err, "join address does not parse (%s)", err)
 		}
 	}
 	var multicast = parseDiscover(c)
@@ -79,16 +79,12 @@ func server(c *cli.Context) {
 	circuit.Listen(LocusName, xlocus)
 
 	<-(chan int)(nil)
+	return nil
 }
 
 func parseDiscover(c *cli.Context) *net.UDPAddr {
-	var src string
-	switch {
-	case c.String("discover") != "":
-		src = c.String("discover")
-	case os.Getenv("CIRCUIT_DISCOVER") != "":
-		src = os.Getenv("CIRCUIT_DISCOVER")
-	default:
+	src := c.String("discover")
+	if src == "" {
 		return nil
 	}
 	multicast, err := net.ResolveUDPAddr("udp", src)
@@ -136,6 +132,7 @@ func parseAddr(c *cli.Context) *net.TCPAddr {
 	panic(0)
 }
 
+// LocusName ???
 const LocusName = "locus"
 
 func dontPanic(call func(), ifPanic string) {

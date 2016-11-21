@@ -9,19 +9,22 @@ package main
 
 import (
 	"bufio"
+	"log"
 	"os"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/pkg/errors"
+	"github.com/urfave/cli"
 )
 
-func waitall(x *cli.Context) {
+func waitall(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error: %v", r)
+			err = errors.Wrapf(r.(error), "error: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	s := bufio.NewScanner(os.Stdin)
 	var t []string
@@ -32,17 +35,17 @@ func waitall(x *cli.Context) {
 		t = append(t, src)
 		go func() { // wait on w
 			w, _ := parseGlob(src)
-			var err error
+			var e error
 			switch u := c.Walk(w).Get().(type) {
 			case client.Proc:
-				_, err = u.Wait()
+				_, e = u.Wait()
 			case docker.Container:
-				_, err = u.Wait()
+				_, e = u.Wait()
 			default:
 				println("anchor", w, " is not a process or a docker container")
 			}
-			if err != nil {
-				fatalf("wait error: %v", err)
+			if e != nil {
+				log.Fatal(errors.Errorf("wait error: %v", e))
 			}
 			ch <- i
 		}()
@@ -50,4 +53,5 @@ func waitall(x *cli.Context) {
 	for _ = range t {
 		<-ch
 	}
+	return
 }

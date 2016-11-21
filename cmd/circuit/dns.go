@@ -9,71 +9,78 @@ package main
 
 import (
 	"github.com/gocircuit/circuit/client"
+	"github.com/pkg/errors"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
-func mkdns(x *cli.Context) {
+func mkdns(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	args := x.Args()
 	if len(args) < 1 {
-		fatalf("mkdns needs an anchor and an optional address arguments")
+		return errors.New("mkdns needs an anchor and an optional address arguments")
 	}
 	var addr string
 	if len(args) == 2 {
 		addr = args[1]
 	}
 	w, _ := parseGlob(args[0])
-	_, err := c.Walk(w).MakeNameserver(addr)
-	if err != nil {
-		fatalf("mkdns error: %s", err)
+
+	if _, err = c.Walk(w).MakeNameserver(addr); err != nil {
+		return errors.Wrapf(err, "mkdns error: %s", err)
 	}
+	return
 }
 
-func nset(x *cli.Context) {
+func nset(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 2 {
-		fatalf("set needs an anchor and a resource record arguments")
+		return errors.New("set needs an anchor and a resource record arguments")
 	}
 	w, _ := parseGlob(args[0])
 	switch u := c.Walk(w).Get().(type) {
 	case client.Nameserver:
 		err := u.Set(args[1])
 		if err != nil {
-			fatalf("set resoure record error: %v", err)
+			return errors.Wrapf(err, "set resoure record error: %v", err)
 		}
 	default:
-		fatalf("not a nameserver element")
+		return errors.New("not a nameserver element")
 	}
+	return
 }
 
-func nunset(x *cli.Context) {
+func nunset(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 2 {
-		fatalf("unset needs an anchor and a resource name arguments")
+		return errors.New("unset needs an anchor and a resource name arguments")
 	}
 	w, _ := parseGlob(args[0])
 	switch u := c.Walk(w).Get().(type) {
 	case client.Nameserver:
 		u.Unset(args[1])
 	default:
-		fatalf("not a nameserver element")
+		return errors.New("not a nameserver element")
 	}
+	return
 }

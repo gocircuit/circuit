@@ -13,37 +13,40 @@ import (
 	"os"
 
 	"github.com/gocircuit/circuit/client"
+	"github.com/pkg/errors"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
-func recv(x *cli.Context) {
+func recv(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
-		fatalf("recv needs one anchor argument")
+		return errors.New("recv needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
 	switch u := c.Walk(w).Get().(type) {
 	case client.Chan:
 		msgr, err := u.Recv()
 		if err != nil {
-			fatalf("recv error: %v", err)
+			return errors.Wrapf(err, "recv error: %v", err)
 		}
 		io.Copy(os.Stdout, msgr)
 	case client.Subscription:
 		v, ok := u.Consume()
 		if !ok {
-			fatalf("eof")
+			return errors.New("eof")
 		}
 		fmt.Println(v)
 		os.Stdout.Sync()
 	default:
-		fatalf("not a channel or subscription")
+		return errors.New("not a channel or subscription")
 	}
+	return
 }

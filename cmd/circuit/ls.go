@@ -15,15 +15,16 @@ import (
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/pkg/errors"
+	"github.com/urfave/cli"
 )
 
 // circuit ls /Q123/apps/charlie
 // circuit ls /...
-func ls(x *cli.Context) {
+func ls(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
 	c := dial(x)
@@ -34,6 +35,7 @@ func ls(x *cli.Context) {
 	}
 	w, ellipses := parseGlob(args[0])
 	list(0, "/", c.Walk(w), ellipses, x.Bool("long"), x.Bool("depth"))
+	return
 }
 
 func list(level int, prefix string, anchor client.Anchor, recurse, long, depth bool) {
@@ -71,7 +73,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 	sort.Sort(c)
 	for _, e := range c {
 		if recurse && depth {
-			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
+			list(level+1, prefix+e.n+"/", e.a, true, long, depth)
 		}
 		if long {
 			fmt.Printf("%-15s %s%s\n", e.k, prefix, e.n)
@@ -79,7 +81,7 @@ func list(level int, prefix string, anchor client.Anchor, recurse, long, depth b
 			fmt.Printf("%s%s\n", prefix, e.n)
 		}
 		if recurse && !depth {
-			list(level + 1, prefix + e.n + "/", e.a, true, long, depth)
+			list(level+1, prefix+e.n+"/", e.a, true, long, depth)
 		}
 	}
 }
@@ -114,7 +116,7 @@ func parseGlob(pattern string) (walk []string, ellipses bool) {
 	if len(walk) == 0 {
 		return
 	}
-	if walk[len(walk) - 1] == "..." {
+	if walk[len(walk)-1] == "..." {
 		walk = walk[:len(walk)-1]
 		ellipses = true
 	}

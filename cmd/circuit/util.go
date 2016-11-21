@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/gocircuit/circuit/client"
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func fatalf(format string, arg ...interface{}) {
@@ -25,14 +25,10 @@ func fatalf(format string, arg ...interface{}) {
 
 func readkey(x *cli.Context) (key []byte) {
 	var hmac string
-	switch {
-	case x.IsSet("hmac"):
-		hmac = x.String("hmac")
-	case os.Getenv("CIRCUIT_HMAC") != "":
-		hmac = os.Getenv("CIRCUIT_HMAC")
-	default:
+	if hmac = x.String("hmac"); x.IsSet("hmac") == false {
 		return nil
 	}
+
 	b64, err := ioutil.ReadFile(hmac)
 	if err != nil {
 		fatalf("problem reading private key file (%s): %v", hmac, err)
@@ -72,14 +68,6 @@ func dial(x *cli.Context) *client.Client {
 			}
 		}()
 		return client.Dial(strings.TrimSpace(string(buf)), readkey(x))
-
-	case os.Getenv("CIRCUIT_DISCOVER") != "":
-		defer func() {
-			if r := recover(); r != nil {
-				fatalf("multicast address is unresponsive or authentication failed")
-			}
-		}()
-		return client.DialDiscover(os.Getenv("CIRCUIT_DISCOVER"), readkey(x))
 	}
 	fatalf("no dial or discovery addresses available; use -dial or -discover")
 	panic(0)

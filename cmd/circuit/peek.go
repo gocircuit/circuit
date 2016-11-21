@@ -8,26 +8,28 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"github.com/gocircuit/circuit/client"
 	"github.com/gocircuit/circuit/client/docker"
+	"github.com/pkg/errors"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 // circuit peek /X1234/hola/charlie
-func peek(x *cli.Context) {
+func peek(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
-		fatalf("peek needs one anchor argument")
+		return errors.New("peek needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
 	switch t := c.Walk(w).Get().(type) {
@@ -46,7 +48,7 @@ func peek(x *cli.Context) {
 	case docker.Container:
 		stat, err := t.Peek()
 		if err != nil {
-			fatalf("%v", err)
+			return errors.Wrapf(err, "%v", err)
 		}
 		buf, _ := json.MarshalIndent(stat, "", "\t")
 		fmt.Println(string(buf))
@@ -57,21 +59,24 @@ func peek(x *cli.Context) {
 		buf, _ := json.MarshalIndent(nil, "", "\t")
 		fmt.Println(string(buf))
 	default:
-		fatalf("unknown element")
+		return errors.New("unknown element")
 	}
+	return
 }
 
-func scrb(x *cli.Context) {
+func scrb(x *cli.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			fatalf("error, likely due to missing server or misspelled anchor: %v", r)
+			err = errors.Wrapf(r.(error), "error, likely due to missing server or misspelled anchor: %v", r)
 		}
 	}()
+
 	c := dial(x)
 	args := x.Args()
 	if len(args) != 1 {
-		fatalf("scrub needs one anchor argument")
+		return errors.New("scrub needs one anchor argument")
 	}
 	w, _ := parseGlob(args[0])
 	c.Walk(w).Scrub()
+	return
 }

@@ -14,16 +14,17 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/gocircuit/circuit/github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
-func keygen(c *cli.Context) {
+func keygen(c *cli.Context) (err error) {
 	rand.Seed(time.Now().UnixNano())
 	seed := make([]byte, 32)
-	for i, _ := range seed {
+	for i := range seed {
 		seed[i] = byte(rand.Int31())
 	}
 	key := sha512.Sum512(seed)
 	text := base64.StdEncoding.EncodeToString(key[:])
 	fmt.Println(text)
+	return
 }
