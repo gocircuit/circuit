@@ -2,6 +2,9 @@ language: go
 
 go_import_path: github.com/gocircuit/circuit
 
+before_install:
+- go get -v github.com/pkg/errors github.com/urfave/cli
+
 go: 
 - tip
 
