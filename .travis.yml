@@ -1,4 +1,7 @@
 language: go
 
+go_import_path: github.com/gocircuit/circuit
+
 go: 
-    - tip
+- tip
+
