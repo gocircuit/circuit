@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/gocircuit/circuit.svg?branch=master)](https://travis-ci.org/gocircuit/circuit)
 [![GoDoc](https://godoc.org/github.com/gocircuit/circuit?status.png)](https://godoc.org/github.com/gocircuit/circuit)
 
-![Engineering role separation.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/3.png)
+![Engineering role separation.](img/3.png)
 
 **The CIRCUIT is a new way of thinking. It is deceptively similar to existing software,
 while being quite different.**
@@ -16,7 +16,7 @@ Circuit was designed to enable clear, accountable and safe interface between the
 roles in a technology enterprise, ultimately increasing productivity. Engineering role separation
 in a typical circuit-based architecture is illustrated above.
 
-![A circuit-managed cloud.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/header.png)
+![A circuit-managed cloud.](img/header.png)
 
 Users of circuit are
 
@@ -155,7 +155,7 @@ This time, use the `-j` option to tell the new server to join the first one:
 You now have two mutually-aware circuit servers, running on two different
 hosts in your cluster. 
 
-![A circuit system of two hosts.](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/servers.png)
+![A circuit system of two hosts.](img/servers.png)
 
 You can join any number of additional hosts to the circuit environment in a
 similar fashion, even billions.  The circuit uses a modern [expander
@@ -213,7 +213,7 @@ Clients (the tool or your own) _dial into_ a circuit server in order to
 interact with the entire system. All servers are equal citizens in every respect and,
 in particular, any one can be used as a choice for dial-in.
 
-![Circuit client connected to a server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/client.png)
+![Circuit client connected to a server](img/client.png)
 
 The tool (described in more detail later) is essentially a set of commands that
 allow you to traverse the global hierarchical namespace of circuit elements,
@@ -231,7 +231,7 @@ So, you might get something like this in response
 
 The two root-level anchors correspond to the two circuit servers.
 
-![Circuit servers correspond to root-level anchors](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/serveranchor.png)
+![Circuit servers correspond to root-level anchors](img/serveranchor.png)
 
 ### Pointing the tool to your circuit cluster ###
 
@@ -287,7 +287,7 @@ Run a new `ls` process:
 	}
 	EOF
 
-![Process elements execute OS processes on behalf of the user](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/mkproc.png)
+![Process elements execute OS processes on behalf of the user](img/mkproc.png)
 
 See what happened:
 
@@ -335,7 +335,7 @@ To create and execute a new docker container, using the tool:
 Most of these fields can be omitted analogously to their command-line option counterparts 
 of the `docker` command-line tool.
 
-![Docker elements are like processes](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/mkdkr.png)
+![Docker elements are like processes](img/mkdkr.png)
 
 The remaining docker element commands are identical to those for processes:
 `stdin`, `stdout`, `stderr`, `peek` and `wait`. In one exception, `peek` will return
@@ -357,7 +357,7 @@ let's create a channel on `X88550014d4c82e4d`:
 The last argument of this line is the channel buffer capacity,
 analogously to the way channels are created in Go.
 
-![Channel elements reside in the memory of a circuit server](https://raw.githubusercontent.com/gocircuit/circuit/master/misc/img/mkchan.png)
+![Channel elements reside in the memory of a circuit server](img/mkchan.png)
 
 Verify the channel was created:
 
