@@ -12,7 +12,6 @@ package debug
 import (
 	"fmt"
 	"os"
-	"syscall"
 )
 
 func SavePanicTrace() {
@@ -25,7 +24,7 @@ func SavePanicTrace() {
 	if err != nil {
 		panic("dumper (no file) " + r.(fmt.Stringer).String())
 	}
-	syscall.Dup3(int(file.Fd()), int(os.Stderr.Fd()), 0)
+	Dup2(int(file.Fd()), int(os.Stderr.Fd()))
 	// TRY: defer func() { file.Close() }()
 	panic("dumper " + r.(string))
 }
