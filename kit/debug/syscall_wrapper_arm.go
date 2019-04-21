@@ -1,4 +1,6 @@
-// +build !windows,arm
+// +build !windows
+// +build arm arm64
+
 // Copyright 2019 Tumblr, Inc.
 // Use of this source code is governed by the license for
 // The Go Circuit Project, found in the LICENSE file.
