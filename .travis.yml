@@ -1,10 +1,21 @@
 language: go
+sudo: false
 
+# Allow use in forks
 go_import_path: github.com/gocircuit/circuit
 
-before_install:
-- go get -v github.com/pkg/errors github.com/urfave/cli
+matrix:
+  include:
+    - go: 1.12.x
+      os: linux
+    - go: 1.11.x
+      os: osx
+    - name: Cross-Compile for windows (from Linux)
+      go: 1.11.x
+      os: linux
+      env: GOOS=windows GOARCH=amd64 CGO_ENABLED=0
 
-go: 
-- tip
+install:
+- go get -v github.com/pkg/errors
+- go get -v github.com/urfave/cli
 
