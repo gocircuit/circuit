@@ -15,8 +15,8 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/errors"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/errors"
 )
 
 func New() *Acid {

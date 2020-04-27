@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gocircuit/circuit/tissue"
-	"github.com/gocircuit/circuit/kit/lang"
-	"github.com/gocircuit/circuit/kit/pubsub"
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/tissue"
+	"github.com/hoijui/circuit/kit/lang"
+	"github.com/hoijui/circuit/kit/pubsub"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 // Tube is a folk data structure that maintains a key-value set sorted by key.

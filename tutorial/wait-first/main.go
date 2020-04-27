@@ -12,7 +12,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/client"
 )
 
 const n = 5

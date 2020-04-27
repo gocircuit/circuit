@@ -15,8 +15,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/gocircuit/circuit/kit/tele/codec"
-	"github.com/gocircuit/circuit/kit/tele/trace"
+	"github.com/hoijui/circuit/kit/tele/codec"
+	"github.com/hoijui/circuit/kit/tele/trace"
 )
 
 // CodecTransport is a codec.Carrier over TCP.

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"testing"
 
-	ds "github.com/gocircuit/circuit/client/docker"
+	ds "github.com/hoijui/circuit/client/docker"
 )
 
 func TestDocker(t *testing.T) {

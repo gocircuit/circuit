@@ -13,7 +13,7 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/gocircuit/circuit/use/errors"
+	"github.com/hoijui/circuit/use/errors"
 )
 
 var ErrParse = errors.NewError("parse")

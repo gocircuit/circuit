@@ -19,12 +19,12 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/gocircuit/circuit/kit/debug/kill"
-	"github.com/gocircuit/circuit/kit/lockfile"
-	"github.com/gocircuit/circuit/sys/lang"
-	_ "github.com/gocircuit/circuit/sys/tele"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	_ "github.com/hoijui/circuit/kit/debug/kill"
+	"github.com/hoijui/circuit/kit/lockfile"
+	"github.com/hoijui/circuit/sys/lang"
+	_ "github.com/hoijui/circuit/sys/tele"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 )
 
 func load(addr *net.TCPAddr, vardir string, key []byte) n.Addr {

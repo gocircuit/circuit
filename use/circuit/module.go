@@ -9,10 +9,10 @@
 package circuit
 
 import (
-	"github.com/gocircuit/circuit/kit/module"
-	"github.com/gocircuit/circuit/sys/lang/types"
-	"github.com/gocircuit/circuit/use/n"
-	"github.com/gocircuit/circuit/use/worker"
+	"github.com/hoijui/circuit/kit/module"
+	"github.com/hoijui/circuit/sys/lang/types"
+	"github.com/hoijui/circuit/use/n"
+	"github.com/hoijui/circuit/use/worker"
 )
 
 var mod = module.Slot{Name: "language"}

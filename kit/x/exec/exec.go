@@ -14,10 +14,10 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/gocircuit/circuit/kit/pty"
-	xyio "github.com/gocircuit/circuit/kit/x/io"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/errors"
+	"github.com/hoijui/circuit/kit/pty"
+	xyio "github.com/hoijui/circuit/kit/x/io"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/errors"
 )
 
 // XCmd exports chroot-ed shells.

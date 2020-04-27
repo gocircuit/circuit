@@ -9,8 +9,8 @@
 package worker
 
 import (
-	"github.com/gocircuit/circuit/kit/module"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/kit/module"
+	"github.com/hoijui/circuit/use/n"
 )
 
 // Host is a location where a new worker can be executed.

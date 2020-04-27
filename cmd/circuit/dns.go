@@ -8,7 +8,7 @@
 package main
 
 import (
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/client"
 	"github.com/pkg/errors"
 
 	"github.com/urfave/cli"

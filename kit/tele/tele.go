@@ -8,11 +8,11 @@
 package tele
 
 import (
-	"github.com/gocircuit/circuit/kit/tele/blend"
-	"github.com/gocircuit/circuit/kit/tele/codec"
-	"github.com/gocircuit/circuit/kit/tele/hmac"
-	"github.com/gocircuit/circuit/kit/tele/tcp"
-	"github.com/gocircuit/circuit/kit/tele/trace"
+	"github.com/hoijui/circuit/kit/tele/blend"
+	"github.com/hoijui/circuit/kit/tele/codec"
+	"github.com/hoijui/circuit/kit/tele/hmac"
+	"github.com/hoijui/circuit/kit/tele/tcp"
+	"github.com/hoijui/circuit/kit/tele/trace"
 )
 
 func NewStructOverTCP() *blend.Transport {

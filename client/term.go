@@ -10,16 +10,16 @@ package client
 import (
 	// "fmt"
 
-	"github.com/gocircuit/circuit/anchor"
-	"github.com/gocircuit/circuit/element/dns"
-	"github.com/gocircuit/circuit/element/proc"
-	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/element/valve"
-	"github.com/gocircuit/circuit/kit/pubsub"
-	"github.com/gocircuit/circuit/tissue"
+	"github.com/hoijui/circuit/anchor"
+	"github.com/hoijui/circuit/element/dns"
+	"github.com/hoijui/circuit/element/proc"
+	srv "github.com/hoijui/circuit/element/server"
+	"github.com/hoijui/circuit/element/valve"
+	"github.com/hoijui/circuit/kit/pubsub"
+	"github.com/hoijui/circuit/tissue"
 
-	cdocker "github.com/gocircuit/circuit/client/docker"
-	edocker "github.com/gocircuit/circuit/element/docker"
+	cdocker "github.com/hoijui/circuit/client/docker"
+	edocker "github.com/hoijui/circuit/element/docker"
 )
 
 // An Anchor represents a location in the global anchor namespace of a circuit

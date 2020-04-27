@@ -8,7 +8,7 @@
 package client
 
 import (
-	"github.com/gocircuit/circuit/element/dns"
+	"github.com/hoijui/circuit/element/dns"
 )
 
 // NameserverStat encloses process state information.

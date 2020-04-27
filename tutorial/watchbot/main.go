@@ -31,7 +31,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/client"
 )
 
 // pickServer returns the root anchor of a randomly-chosen circuit server in the cluster.

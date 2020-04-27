@@ -10,7 +10,7 @@ package tissue
 import (
 	"sync"
 
-	"github.com/gocircuit/circuit/kit/lang"
+	"github.com/hoijui/circuit/kit/lang"
 )
 
 // Neighborhood is a set of perm cross-interfaces.

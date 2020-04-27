@@ -14,7 +14,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/gocircuit/circuit/kit/xor"
+	"github.com/hoijui/circuit/kit/xor"
 )
 
 type Gather struct {

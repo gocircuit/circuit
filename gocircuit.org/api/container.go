@@ -1,7 +1,7 @@
 package api
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderContainerPage() string {
@@ -18,7 +18,7 @@ const containerBody = `
 <p>The container-related types and structures of the circuit API are
 in a dedicated package:
 <pre>
-	import "github.com/gocircuit/circuit/client/docker"
+	import "github.com/hoijui/circuit/client/docker"
 </pre>
 
 <p>Container element manipulations and semantics are exactly analogous to 

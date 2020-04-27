@@ -15,12 +15,12 @@ import (
 	"os"
 	"path"
 
-	"github.com/gocircuit/circuit/element/docker"
-	"github.com/gocircuit/circuit/kit/assemble"
-	"github.com/gocircuit/circuit/tissue"
-	"github.com/gocircuit/circuit/tissue/locus"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/element/docker"
+	"github.com/hoijui/circuit/kit/assemble"
+	"github.com/hoijui/circuit/tissue"
+	"github.com/hoijui/circuit/tissue/locus"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 	"github.com/pkg/errors"
 
 	"github.com/urfave/cli"

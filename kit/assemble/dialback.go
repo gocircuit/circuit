@@ -10,8 +10,8 @@ package assemble
 import (
 	"sync"
 
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 )
 
 type DialBack struct {

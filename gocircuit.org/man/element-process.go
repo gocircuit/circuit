@@ -1,7 +1,7 @@
 package man
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderElementProcessPage() string {
@@ -16,7 +16,7 @@ func RenderElementProcessPage() string {
 // <p>To create and manipulate process elements, one needs to import the circuit's Go client API:
 
 // <pre>
-// 	import "github.com/gocircuit/circuit/client"
+// 	import "github.com/hoijui/circuit/client"
 // </pre>
 
 // <p>Let <code>client</code>, of type <code>*client.Client</code>, be an already established

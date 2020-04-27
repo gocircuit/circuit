@@ -1,7 +1,7 @@
 package mysql_nodejs
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderRun() string {
@@ -16,7 +16,7 @@ Log into any one of the EC2 instances that are part of your circuit cluster.
 
 <p>First, build and install the circuit app, which can be found within the circuit repo:
 <pre>
-	$ go install github.com/gocircuit/circuit/tutorial/nodejs-using-mysql/start-app
+	$ go install github.com/hoijui/circuit/tutorial/nodejs-using-mysql/start-app
 </pre>
 
 <p>This will place the resulting executable in <code>$GOPATH/bin</code>.

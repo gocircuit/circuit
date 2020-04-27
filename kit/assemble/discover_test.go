@@ -12,7 +12,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/gocircuit/circuit/kit/xor"
+	"github.com/hoijui/circuit/kit/xor"
 )
 
 // func TestAssembler(t *testing.T) {

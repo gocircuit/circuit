@@ -8,8 +8,8 @@
 package lang
 
 import (
-	"github.com/gocircuit/circuit/sys/lang/types"
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/sys/lang/types"
+	"github.com/hoijui/circuit/use/circuit"
 	"fmt"
 	"runtime"
 	"strconv"

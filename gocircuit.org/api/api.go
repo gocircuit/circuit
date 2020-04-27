@@ -1,7 +1,7 @@
 package api
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderMainPage() string {
@@ -22,7 +22,7 @@ const mainBody = `
 
 <p>To use the Go client API to the circuit, start by importing the client package:
 <pre>
-	import "github.com/gocircuit/circuit/client"
+	import "github.com/hoijui/circuit/client"
 </pre>
 
 <h2>System abstraction</h2>

@@ -10,7 +10,7 @@ package client
 import (
 	"io"
 
-	"github.com/gocircuit/circuit/element/valve"
+	"github.com/hoijui/circuit/element/valve"
 )
 
 // Chan provides access to a circuit channel element.

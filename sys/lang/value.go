@@ -11,7 +11,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/use/n"
 )
 
 func (r *Runtime) serveDropPtr(q *dropPtrMsg, conn n.Conn) {

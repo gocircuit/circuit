@@ -10,8 +10,8 @@ package tissue
 import (
 	"fmt"
 
-	"github.com/gocircuit/circuit/kit/lang"
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/kit/lang"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 func init() {

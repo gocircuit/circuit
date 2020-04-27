@@ -14,10 +14,10 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/gocircuit/circuit/kit/interruptible"
-	"github.com/gocircuit/circuit/tissue"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/kit/interruptible"
+	"github.com/hoijui/circuit/tissue"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 )
 
 type Server interface {

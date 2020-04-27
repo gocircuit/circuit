@@ -1,7 +1,7 @@
 package mysql_nodejs
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderApp() string {
@@ -18,7 +18,7 @@ the cluster.
 
 <p>The source of the finished app is located in:
 <pre>
-	$GOPATH/github.com/gocircuit/circuit/tutorial/nodejs-using-mysql/start-app/main.go
+	$GOPATH/github.com/hoijui/circuit/tutorial/nodejs-using-mysql/start-app/main.go
 </pre>
 
 <h2>First strokes</h2>
@@ -32,7 +32,7 @@ package main
 
 import (
 	"flag"
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/client"
 )
 
 var flagAddr = flag.String("addr", "", "circuit server address (looks like circuit://...)")
@@ -48,7 +48,7 @@ func main() {
 }
 </pre>
 
-<p>Notable here is the import of the circuit client package <code>"github.com/gocircuit/circuit/client"</code>
+<p>Notable here is the import of the circuit client package <code>"github.com/hoijui/circuit/client"</code>
 and the definition of function <code>fatalf()</code>, which we'll use to report terminal errors.
 
 

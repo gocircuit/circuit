@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/use/n"
 )
 
 type importGroup struct {

@@ -10,7 +10,7 @@ package lang
 import (
 	"fmt"
 	"testing"
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 func TestExportImport(t *testing.T) {

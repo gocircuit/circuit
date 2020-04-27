@@ -14,7 +14,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/use/n"
 )
 
 func NewBytesConn(addr string) n.Conn {

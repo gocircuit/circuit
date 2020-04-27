@@ -13,7 +13,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/gocircuit/circuit/kit/xor"
+	"github.com/hoijui/circuit/kit/xor"
 )
 
 type Scatter struct {

@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/client"
 	"github.com/urfave/cli"
 )
 

@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gocircuit/circuit/use/errors"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/use/errors"
+	"github.com/hoijui/circuit/use/n"
 )
 
 // Addr maintains a single unique instance for each addr.

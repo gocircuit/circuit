@@ -12,14 +12,14 @@ import (
 	"io"
 	"log"
 
-	ds "github.com/gocircuit/circuit/client/docker"
-	"github.com/gocircuit/circuit/element/dns"
-	"github.com/gocircuit/circuit/element/docker"
-	"github.com/gocircuit/circuit/element/proc"
-	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/element/valve"
-	"github.com/gocircuit/circuit/kit/pubsub"
-	"github.com/gocircuit/circuit/use/circuit"
+	ds "github.com/hoijui/circuit/client/docker"
+	"github.com/hoijui/circuit/element/dns"
+	"github.com/hoijui/circuit/element/docker"
+	"github.com/hoijui/circuit/element/proc"
+	srv "github.com/hoijui/circuit/element/server"
+	"github.com/hoijui/circuit/element/valve"
+	"github.com/hoijui/circuit/kit/pubsub"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 type Element interface {

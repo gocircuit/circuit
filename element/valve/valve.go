@@ -12,7 +12,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 type Valve interface {

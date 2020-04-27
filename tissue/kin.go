@@ -13,9 +13,9 @@ import (
 	"sync"
 	//"runtime/debug"
 
-	"github.com/gocircuit/circuit/kit/lang"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/kit/lang"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 )
 
 // Kin is a service that maintains connectivity to a small set of 'neighbor' circuits.

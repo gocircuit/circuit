@@ -11,7 +11,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/gocircuit/circuit/kit/interruptible"
+	"github.com/hoijui/circuit/kit/interruptible"
 )
 
 // Send …

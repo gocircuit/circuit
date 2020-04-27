@@ -12,9 +12,9 @@ import (
 	"net"
 	"os"
 
-	"github.com/gocircuit/circuit/kit/tele"
-	"github.com/gocircuit/circuit/kit/tele/blend"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/kit/tele"
+	"github.com/hoijui/circuit/kit/tele/blend"
+	"github.com/hoijui/circuit/use/n"
 )
 
 func init() {

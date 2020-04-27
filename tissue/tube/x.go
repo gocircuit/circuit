@@ -10,8 +10,8 @@ package tube
 import (
 	"time"
 
-	"github.com/gocircuit/circuit/tissue"
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/tissue"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 // XTube is the interface to a tube, given to the tube's upstream (cross-circiuit) peering tubes.

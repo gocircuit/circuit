@@ -13,8 +13,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gocircuit/circuit/kit/tele/codec"
-	"github.com/gocircuit/circuit/kit/tele/trace"
+	"github.com/hoijui/circuit/kit/tele/codec"
+	"github.com/hoijui/circuit/kit/tele/trace"
 )
 
 // AcceptSession

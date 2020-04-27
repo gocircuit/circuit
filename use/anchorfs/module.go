@@ -8,7 +8,7 @@
 package anchorfs
 
 import (
-	"github.com/gocircuit/circuit/kit/module"
+	"github.com/hoijui/circuit/kit/module"
 )
 
 var mod = module.Slot{Name: "anchor file system"}

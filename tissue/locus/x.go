@@ -8,7 +8,7 @@
 package locus
 
 import (
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 func init() {

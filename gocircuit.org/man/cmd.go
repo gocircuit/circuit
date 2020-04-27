@@ -1,7 +1,7 @@
 package man
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderCommandPage() string {
@@ -18,7 +18,7 @@ const commandBody = `
 
 <p>Once the circuit servers are started, you can create, observe and control
 circuit elements (i) interactively—using the circuit binary which doubles as a command-line client—as
-well as (ii) programmatically—using the circuit Go client package <code>github.com/gocircuit/circuit/client</code>.
+well as (ii) programmatically—using the circuit Go client package <code>github.com/hoijui/circuit/client</code>.
 In fact, the circuit command-line tool is simply a front-end for the Go client library.
 
 <p>Clients (the tool or your own) <em>dial into</em> a circuit server in order to

@@ -9,7 +9,7 @@ package posix
 
 import (
 	"bytes"
-	"github.com/gocircuit/circuit/kit/iomisc"
+	"github.com/hoijui/circuit/kit/iomisc"
 	"io"
 	"os"
 	"os/exec"

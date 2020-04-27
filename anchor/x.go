@@ -10,14 +10,14 @@ package anchor
 import (
 	"errors"
 
-	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/element/proc"
-	"github.com/gocircuit/circuit/element/docker"
-	"github.com/gocircuit/circuit/element/valve"
-	"github.com/gocircuit/circuit/element/dns"
-	"github.com/gocircuit/circuit/kit/pubsub"
-	"github.com/gocircuit/circuit/use/circuit"
-	xerrors "github.com/gocircuit/circuit/use/errors"
+	srv "github.com/hoijui/circuit/element/server"
+	"github.com/hoijui/circuit/element/proc"
+	"github.com/hoijui/circuit/element/docker"
+	"github.com/hoijui/circuit/element/valve"
+	"github.com/hoijui/circuit/element/dns"
+	"github.com/hoijui/circuit/kit/pubsub"
+	"github.com/hoijui/circuit/use/circuit"
+	xerrors "github.com/hoijui/circuit/use/errors"
 )
 
 func init() {

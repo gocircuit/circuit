@@ -11,9 +11,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/gocircuit/circuit/kit/xor"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/kit/xor"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 )
 
 type Assembler struct {

@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gocircuit/circuit/kit/xor"
+	"github.com/hoijui/circuit/kit/xor"
 )
 
 type Lens struct {

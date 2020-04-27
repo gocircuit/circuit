@@ -11,11 +11,11 @@ import (
 	"log"
 	"sync"
 
-	"github.com/gocircuit/circuit/sys/acid"
-	"github.com/gocircuit/circuit/sys/lang/prof"
-	"github.com/gocircuit/circuit/sys/lang/types"
-	"github.com/gocircuit/circuit/use/circuit"
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/sys/acid"
+	"github.com/hoijui/circuit/sys/lang/prof"
+	"github.com/hoijui/circuit/sys/lang/types"
+	"github.com/hoijui/circuit/use/circuit"
+	"github.com/hoijui/circuit/use/n"
 )
 
 // Runtime represents that state of the circuit program at the present moment.

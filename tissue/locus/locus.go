@@ -12,12 +12,12 @@ import (
 	"path"
 	"time"
 
-	"github.com/gocircuit/circuit/anchor"
-	srv "github.com/gocircuit/circuit/element/server"
-	"github.com/gocircuit/circuit/kit/pubsub"
-	"github.com/gocircuit/circuit/tissue"
-	"github.com/gocircuit/circuit/tissue/tube"
-	"github.com/gocircuit/circuit/use/circuit"
+	"github.com/hoijui/circuit/anchor"
+	srv "github.com/hoijui/circuit/element/server"
+	"github.com/hoijui/circuit/kit/pubsub"
+	"github.com/hoijui/circuit/tissue"
+	"github.com/hoijui/circuit/tissue/tube"
+	"github.com/hoijui/circuit/use/circuit"
 )
 
 // Locus is a device that listens to the join/leave events reported by the tissue social
