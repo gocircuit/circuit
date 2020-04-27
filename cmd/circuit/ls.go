@@ -29,11 +29,11 @@ func ls(x *cli.Context) (err error) {
 	}()
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		println("ls needs a glob argument")
 		os.Exit(1)
 	}
-	w, ellipses := parseGlob(args[0])
+	w, ellipses := parseGlob(args.Get(0))
 	list(0, "/", c.Walk(w), ellipses, x.Bool("long"), x.Bool("depth"))
 	return
 }

@@ -27,10 +27,10 @@ func recv(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("recv needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch u := c.Walk(w).Get().(type) {
 	case client.Chan:
 		msgr, err := u.Recv()

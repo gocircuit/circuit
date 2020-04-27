@@ -22,10 +22,10 @@ func mkonjoin(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("mk@join needs an anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	if _, err = c.Walk(w).MakeOnJoin(); err != nil {
 		return errors.Wrapf(err, "mk@join error: %s", err)
 	}
@@ -42,10 +42,10 @@ func mkonleave(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("mk@leave needs an anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	if _, err = c.Walk(w).MakeOnLeave(); err != nil {
 		return errors.Wrapf(err, "mk@leave error: %s", err)
 	}

@@ -29,12 +29,12 @@ func mkchan(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 2 {
+	if x.NArg() != 2 {
 		return errors.New("mkchan needs an anchor and a capacity arguments")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	a := c.Walk(w)
-	n, err := strconv.Atoi(args[1])
+	n, err := strconv.Atoi(args.Get(1))
 	if err != nil || n < 0 {
 		return errors.New("second argument to mkchan must be a non-negative integral capacity")
 	}
@@ -53,10 +53,10 @@ func send(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("send needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	u, ok := c.Walk(w).Get().(client.Chan)
 	if !ok {
 		return errors.New("not a channel")
@@ -74,10 +74,10 @@ func send(x *cli.Context) (err error) {
 func clos(x *cli.Context) (err error) {
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("close needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	u, ok := c.Walk(w).Get().(client.Chan)
 	if !ok {
 		return errors.New("not a channel")

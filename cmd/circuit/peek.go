@@ -28,10 +28,10 @@ func peek(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("peek needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch t := c.Walk(w).Get().(type) {
 	case client.Server:
 		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
@@ -73,10 +73,10 @@ func scrb(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("scrub needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	c.Walk(w).Scrub()
 	return
 }
