@@ -267,7 +267,7 @@ A list of available tool commands is shown on the help screen
 	circuit help
 
 A more detailed explanation of their meaning and function can be found
-in the documentation of the client package, `github.com/gocircuit/client`.
+in the documentation of the client package, `github.com/gocircuit/circuit/client`.
 
 ### Example: Make a process ###
 
