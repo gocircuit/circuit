@@ -9,7 +9,7 @@ package main
 
 import (
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // circuit mk@join /X1234/hola/listy

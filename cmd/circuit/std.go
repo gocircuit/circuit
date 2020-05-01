@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func stdin(x *cli.Context) (err error) {

@@ -23,7 +23,7 @@ import (
 	"github.com/hoijui/circuit/use/n"
 	"github.com/pkg/errors"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func server(c *cli.Context) (err error) {

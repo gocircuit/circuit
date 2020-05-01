@@ -11,7 +11,7 @@ import (
 	"github.com/hoijui/circuit/client"
 	"github.com/pkg/errors"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func mkdns(x *cli.Context) (err error) {

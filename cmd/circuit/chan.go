@@ -16,7 +16,7 @@ import (
 	"github.com/hoijui/circuit/client"
 	"github.com/pkg/errors"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // circuit mkchan /X1234/hola/charlie 0

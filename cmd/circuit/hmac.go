@@ -14,7 +14,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func keygen(c *cli.Context) (err error) {

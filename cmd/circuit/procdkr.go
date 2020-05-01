@@ -17,7 +17,7 @@ import (
 	"github.com/hoijui/circuit/client/docker"
 	"github.com/pkg/errors"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // circuit mkproc /X1234/hola/charlie << EOF
