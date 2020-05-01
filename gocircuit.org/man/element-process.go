@@ -16,7 +16,7 @@ func RenderElementProcessPage() string {
 // <p>To create and manipulate process elements, one needs to import the circuit's Go client API:
 
 // <pre>
-// 	import "github.com/hoijui/circuit/client"
+// 	import "github.com/hoijui/circuit/pkg/client"
 // </pre>
 
 // <p>Let <code>client</code>, of type <code>*client.Client</code>, be an already established

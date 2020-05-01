@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hoijui/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 var flagAddr = flag.String("addr", "", "circuit server address, looks like circuit://...")

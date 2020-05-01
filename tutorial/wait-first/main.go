@@ -12,7 +12,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/hoijui/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 const n = 5

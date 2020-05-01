@@ -18,7 +18,7 @@ const containerBody = `
 <p>The container-related types and structures of the circuit API are
 in a dedicated package:
 <pre>
-	import "github.com/hoijui/circuit/client/docker"
+	import "github.com/hoijui/circuit/pkg/client/docker"
 </pre>
 
 <p>Container element manipulations and semantics are exactly analogous to 

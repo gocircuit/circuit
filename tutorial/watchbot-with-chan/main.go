@@ -34,7 +34,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hoijui/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 // pickServer returns the root anchor of a randomly-chosen circuit server in the cluster.

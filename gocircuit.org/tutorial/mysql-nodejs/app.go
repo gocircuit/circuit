@@ -32,7 +32,7 @@ package main
 
 import (
 	"flag"
-	"github.com/hoijui/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 var flagAddr = flag.String("addr", "", "circuit server address (looks like circuit://...)")
@@ -48,7 +48,7 @@ func main() {
 }
 </pre>
 
-<p>Notable here is the import of the circuit client package <code>"github.com/hoijui/circuit/client"</code>
+<p>Notable here is the import of the circuit client package <code>"github.com/hoijui/circuit/pkg/client"</code>
 and the definition of function <code>fatalf()</code>, which we'll use to report terminal errors.
 
 

@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hoijui/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 	"github.com/urfave/cli/v2"
 )
 

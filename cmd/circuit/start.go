@@ -15,12 +15,12 @@ import (
 	"os"
 	"path"
 
-	"github.com/hoijui/circuit/element/docker"
-	"github.com/hoijui/circuit/kit/assemble"
-	"github.com/hoijui/circuit/tissue"
-	"github.com/hoijui/circuit/tissue/locus"
-	"github.com/hoijui/circuit/use/circuit"
-	"github.com/hoijui/circuit/use/n"
+	"github.com/hoijui/circuit/pkg/element/docker"
+	"github.com/hoijui/circuit/pkg/kit/assemble"
+	"github.com/hoijui/circuit/pkg/tissue"
+	"github.com/hoijui/circuit/pkg/tissue/locus"
+	"github.com/hoijui/circuit/pkg/use/circuit"
+	"github.com/hoijui/circuit/pkg/use/n"
 	"github.com/pkg/errors"
 
 	"github.com/urfave/cli/v2"

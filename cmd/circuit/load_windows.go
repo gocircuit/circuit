@@ -18,11 +18,11 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/hoijui/circuit/kit/debug/kill"
-	"github.com/hoijui/circuit/sys/lang"
-	_ "github.com/hoijui/circuit/sys/tele"
-	"github.com/hoijui/circuit/use/circuit"
-	"github.com/hoijui/circuit/use/n"
+	_ "github.com/hoijui/circuit/pkg/kit/debug/kill"
+	"github.com/hoijui/circuit/pkg/sys/lang"
+	_ "github.com/hoijui/circuit/pkg/sys/tele"
+	"github.com/hoijui/circuit/pkg/use/circuit"
+	"github.com/hoijui/circuit/pkg/use/n"
 )
 
 func load(addr *net.TCPAddr, vardir string, key []byte) n.Addr {

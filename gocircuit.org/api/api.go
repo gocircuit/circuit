@@ -22,7 +22,7 @@ const mainBody = `
 
 <p>To use the Go client API to the circuit, start by importing the client package:
 <pre>
-	import "github.com/hoijui/circuit/client"
+	import "github.com/hoijui/circuit/pkg/client"
 </pre>
 
 <h2>System abstraction</h2>

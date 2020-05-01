@@ -8,13 +8,13 @@
 package main
 
 import (
-	"github.com/hoijui/circuit/use/n"
+	"github.com/hoijui/circuit/pkg/use/n"
 	"github.com/pkg/errors"
 	// "bytes"
 	"io"
 	"os"
 
-	"github.com/hoijui/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 
 	"github.com/urfave/cli/v2"
 )

@@ -11,8 +11,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hoijui/circuit/client"
-	"github.com/hoijui/circuit/client/docker"
+	"github.com/hoijui/circuit/pkg/client"
+	"github.com/hoijui/circuit/pkg/client/docker"
 	"github.com/pkg/errors"
 
 	"github.com/urfave/cli/v2"
