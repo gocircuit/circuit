@@ -45,6 +45,10 @@ can fail if the hardware hosting the system's own software fails.
 	href="https://godoc.org/github.com/hoijui/circuit/pkg/client">
 	<img src="https://godoc.org/github.com/hoijui/circuit/pkg/client?status.png" /></a>
 	&nbsp;
+<a alt="go.dev Docs (will soon supersee GoDoc)"
+	href="https://goreportcard.com/report/github.com/hoijui/circuit">
+	<img src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white" /></a>
+	&nbsp;
 <a alt="Go Report Card"
 	href="https://goreportcard.com/report/github.com/hoijui/circuit">
 	<img src="https://goreportcard.com/badge/github.com/hoijui/circuit" /></a>
