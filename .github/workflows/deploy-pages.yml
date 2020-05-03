@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
     paths:
-    - 'src/handbook/**'
+    - 'gocircuit.org/**'
 
 jobs:
 
