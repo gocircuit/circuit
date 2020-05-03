@@ -30,9 +30,6 @@ jobs:
     - name: Create the bin directory (will ocntain the built binaries)
       run: mkdir -p bin
 
-    - name: Build from Go sources
-      run: go build -v -o bin/circuit "$MAIN_SRC_DIR"
-
     - name: Install the main executable into PATH
       run: go install -v "$MAIN_SRC_DIR"
 
