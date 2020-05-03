@@ -120,16 +120,16 @@ func TestDomainNameAndTXTEscapes(t *testing.T) {
 		if _, err := PackRR(rr2, repacked, 0, nil, false); err != nil {
 			t.Logf("error packing parsed RR: %v", err)
 			t.Logf(" original Bytes: %v\n", rrbytes)
-			t.Logf("unpacked Struct: %V\n", rr1)
-			t.Logf("  parsed Struct: %V\n", rr2)
+			t.Logf("unpacked Struct: %#v\n", rr1)
+			t.Logf("  parsed Struct: %#v\n", rr2)
 			t.Fail()
 		}
 		if !bytes.Equal(repacked, rrbytes) {
 			t.Log("packed bytes don't match original bytes")
 			t.Logf(" original bytes: %v", rrbytes)
 			t.Logf("   packed bytes: %v", repacked)
-			t.Logf("unpacked struct: %V", rr1)
-			t.Logf("  parsed struct: %V", rr2)
+			t.Logf("unpacked struct: %#v", rr1)
+			t.Logf("  parsed struct: %#v", rr2)
 			t.Fail()
 		}
 	}
@@ -273,14 +273,14 @@ func TestTXTRRQuick(t *testing.T) {
 		buf := make([]byte, len(rrbytes)*3)
 		off, err := PackRR(rr, buf, 0, nil, false)
 		if err != nil {
-			t.Logf("pack Error: %s\nRR: %V", err.Error(), rr)
+			t.Logf("pack Error: %s\nRR: %#v", err.Error(), rr)
 			return false
 		}
 		buf = buf[:off]
 		if !bytes.Equal(buf, rrbytes) {
 			t.Logf("packed bytes don't match original bytes")
 			t.Logf("src bytes: %v", rrbytes)
-			t.Logf("   struct: %V", rr)
+			t.Logf("   struct: %#v", rr)
 			t.Logf("oUt bytes: %v", buf)
 			return false
 		}
@@ -292,7 +292,7 @@ func TestTXTRRQuick(t *testing.T) {
 		rr2, err := NewRR(rrString)
 		if err != nil {
 			t.Logf("error parsing own output: %s", err.Error())
-			t.Logf("struct: %V", rr)
+			t.Logf("struct: %#v", rr)
 			t.Logf("string: %v", rrString)
 			return false
 		}
@@ -307,18 +307,18 @@ func TestTXTRRQuick(t *testing.T) {
 		off, err = PackRR(rr2, buf, 0, nil, false)
 		if err != nil {
 			t.Logf("error packing parsed rr: %s", err.Error())
-			t.Logf("unpacked Struct: %V", rr)
+			t.Logf("unpacked Struct: %#v", rr)
 			t.Logf("         string: %v", rrString)
-			t.Logf("  parsed Struct: %V", rr2)
+			t.Logf("  parsed Struct: %#v", rr2)
 			return false
 		}
 		buf = buf[:off]
 		if !bytes.Equal(buf, rrbytes) {
 			t.Logf("parsed packed bytes don't match original bytes")
 			t.Logf("   source bytes: %v", rrbytes)
-			t.Logf("unpacked struct: %V", rr)
+			t.Logf("unpacked struct: %#v", rr)
 			t.Logf("         string: %v", rrString)
-			t.Logf("  parsed struct: %V", rr2)
+			t.Logf("  parsed struct: %#v", rr2)
 			t.Logf(" repacked bytes: %v", buf)
 			return false
 		}
@@ -683,17 +683,17 @@ b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
 		t.Fatalf("failed to unpack msg: %s", err)
 	}
 	if len(msg.Answer) != 2 {
-		t.Fatalf("2 answers expected: %V", msg)
+		t.Fatalf("2 answers expected: %#v", msg)
 	}
 	for i, rr := range msg.Answer {
 		rr := rr.(*HIP)
 		t.Logf("RR: %s", rr)
 		if l := len(rr.RendezvousServers); l != 2 {
-			t.Fatalf("2 servers expected, only %d in record %d:\n%V", l, i, msg)
+			t.Fatalf("2 servers expected, only %d in record %d:\n%#v", l, i, msg)
 		}
 		for j, s := range []string{"rvs1.example.com.", "rvs2.example.com."} {
 			if rr.RendezvousServers[j] != s {
-				t.Fatalf("expected server %d of record %d to be %s:\n%V", j, i, s, msg)
+				t.Fatalf("expected server %d of record %d to be %s:\n%#v", j, i, s, msg)
 			}
 		}
 	}

@@ -21,7 +21,7 @@ func TestLossyRing(t *testing.T) {
 		t.Fatalf("x")
 	}
 	if r.Len() != 2 {
-		t.Fatalf("len", r.Len())
+		t.Fatal("len", r.Len())
 	}
 	if !r.Send(3) {
 		t.Fatalf("x")

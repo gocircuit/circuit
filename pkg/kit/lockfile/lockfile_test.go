@@ -19,7 +19,7 @@ func TestLockFile(t *testing.T) {
 	}
 
 	if _, err := Create(name); err == nil {
-		t.Errorf("re-create lock should not succceed", err)
+		t.Error("re-create lock should not succceed", err)
 	}
 
 	if err = lock.Release(); err != nil {

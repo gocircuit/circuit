@@ -30,13 +30,14 @@ func (id Key) Bit(k int) int {
 
 // String returns a textual representation of the id
 func (id Key) String() string {
-	return fmt.Sprintf("%016x", id)
+	return strconv.FormatUint(uint64(id), 16)
 }
 
 // String returns a textual representation of the id, truncated to the k MSBs.
 func (id Key) ShortString(k uint) string {
 	shift := uint(8*unsafe.Sizeof(id)) - k
-	return fmt.Sprintf("%0"+strconv.Itoa(int(k))+"b", ((id << shift) >> shift))
+	return fmt.Sprintf("%0"+strconv.Itoa(int(k))+"b",
+		strconv.FormatUint(uint64((id<<shift)>>shift), 16))
 }
 
 // Point is any type that has an XOR-space Key
