@@ -12,10 +12,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/gocircuit/circuit/client"
-	"github.com/gocircuit/circuit/client/docker"
+	"github.com/hoijui/circuit/pkg/client"
+	"github.com/hoijui/circuit/pkg/client/docker"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func waitall(x *cli.Context) (err error) {
@@ -50,7 +50,7 @@ func waitall(x *cli.Context) (err error) {
 			ch <- i
 		}()
 	}
-	for _ = range t {
+	for range t {
 		<-ch
 	}
 	return

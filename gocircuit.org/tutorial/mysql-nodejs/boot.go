@@ -1,7 +1,7 @@
 package mysql_nodejs
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderBoot() string {
@@ -64,7 +64,7 @@ Respectively, we redirect it to a host-local log file named <code>/var/circuit/l
 locate in the source repo at
 
 <pre>
-	$GOPATH/src/github.com/gocircuit/circuit/tutorial/ec2/start-first-server.sh
+	$GOPATH/src/github.com/hoijui/circuit/tutorial/ec2/start-first-server.sh
 </pre>
 
 <p>Note that we are starting the circuit server as a singleton server, without

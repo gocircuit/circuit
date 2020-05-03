@@ -8,10 +8,10 @@
 package main
 
 import (
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 	"github.com/pkg/errors"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func mkdns(x *cli.Context) (err error) {
@@ -23,14 +23,14 @@ func mkdns(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) < 1 {
+	if x.NArg() < 1 {
 		return errors.New("mkdns needs an anchor and an optional address arguments")
 	}
 	var addr string
-	if len(args) == 2 {
-		addr = args[1]
+	if x.NArg() == 2 {
+		addr = args.Get(1)
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 
 	if _, err = c.Walk(w).MakeNameserver(addr); err != nil {
 		return errors.Wrapf(err, "mkdns error: %s", err)
@@ -47,13 +47,13 @@ func nset(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 2 {
+	if x.NArg() != 2 {
 		return errors.New("set needs an anchor and a resource record arguments")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch u := c.Walk(w).Get().(type) {
 	case client.Nameserver:
-		err := u.Set(args[1])
+		err := u.Set(args.Get(1))
 		if err != nil {
 			return errors.Wrapf(err, "set resoure record error: %v", err)
 		}
@@ -72,13 +72,13 @@ func nunset(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 2 {
+	if x.NArg() != 2 {
 		return errors.New("unset needs an anchor and a resource name arguments")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch u := c.Walk(w).Get().(type) {
 	case client.Nameserver:
-		u.Unset(args[1])
+		u.Unset(args.Get(1))
 	default:
 		return errors.New("not a nameserver element")
 	}

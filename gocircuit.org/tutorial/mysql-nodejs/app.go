@@ -1,7 +1,7 @@
 package mysql_nodejs
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderApp() string {
@@ -18,7 +18,7 @@ the cluster.
 
 <p>The source of the finished app is located in:
 <pre>
-	$GOPATH/github.com/gocircuit/circuit/tutorial/nodejs-using-mysql/start-app/main.go
+	$GOPATH/github.com/hoijui/circuit/tutorial/nodejs-using-mysql/start-app/main.go
 </pre>
 
 <h2>First strokes</h2>
@@ -32,7 +32,7 @@ package main
 
 import (
 	"flag"
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 var flagAddr = flag.String("addr", "", "circuit server address (looks like circuit://...)")
@@ -48,7 +48,7 @@ func main() {
 }
 </pre>
 
-<p>Notable here is the import of the circuit client package <code>"github.com/gocircuit/circuit/client"</code>
+<p>Notable here is the import of the circuit client package <code>"github.com/hoijui/circuit/pkg/client"</code>
 and the definition of function <code>fatalf()</code>, which we'll use to report terminal errors.
 
 
@@ -371,7 +371,7 @@ returns its server address and port number as a result.
 	func startMysql(host client.Anchor) (ip, port string)
 </pre>
 
-<p>We are first going to describe the “manual” processs of starting a fresh
+<p>We are first going to describe the “manual” processes of starting a fresh
 MySQL server, assuming we have a shell session at the host.
 
 <p>Then we are going to show how this manual process can be codified
@@ -379,7 +379,7 @@ into a Go subroutine that performs its steps directly from the client applicatio
 
 <h3>Manually starting MySQL at the host</h3>
 
-<p>Let's asume you are at the shell of the host machine. The following
+<p>Let's assume you are at the shell of the host machine. The following
 steps describe the way to start the MySQL server with a new database.
 
 <p>Obtain the private IP address of this host:

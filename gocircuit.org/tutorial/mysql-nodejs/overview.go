@@ -1,7 +1,7 @@
 package mysql_nodejs
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderOverview() string {

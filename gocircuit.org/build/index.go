@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderIndexPage() string {
@@ -32,10 +32,28 @@ can fail if the hardware hosting the system's own software fails.
 
 <h2>Sources</h2>
 
-<p><a href="https://drone.io/github.com/gocircuit/circuit/latest"><img src="https://drone.io/github.com/gocircuit/circuit/status.png" /></a>&nbsp;
-<a href="https://godoc.org/github.com/gocircuit/circuit/client"><img src="https://godoc.org/github.com/gocircuit/circuit/client?status.png" /></a>
+<p>
+<a alt="Build Status"
+	href="https://github.com/hoijui/circuit/actions?query=workflow%3A%22Build+%26+Test%22">
+	<img src="https://github.com/hoijui/circuit/workflows/Build%20&%20Test/badge.svg" /></a>
+	&nbsp;
+<a alt="Homepage Build Status"
+	href="https://github.com/hoijui/circuit/actions?query=workflow%3A%22Deploy+Pages%22">
+	<img src="https://github.com/hoijui/circuit/workflows/Deploy%20Pages/badge.svg" /></a>
+	&nbsp;
+<a alt="GoDoc"
+	href="https://godoc.org/github.com/hoijui/circuit/pkg/client">
+	<img src="https://godoc.org/github.com/hoijui/circuit/pkg/client?status.png" /></a>
+	&nbsp;
+<a alt="go.dev Docs (will soon supersee GoDoc)"
+	href="https://goreportcard.com/report/github.com/hoijui/circuit">
+	<img src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white" /></a>
+	&nbsp;
+<a alt="Go Report Card"
+	href="https://goreportcard.com/report/github.com/hoijui/circuit">
+	<img src="https://goreportcard.com/badge/github.com/hoijui/circuit" /></a>
 
-<p>Find the source repository for <a href="https://github.com/gocircuit/circuit">Circuit on GitHub</a>. 
+<p>Find the source repository for <a href="https://github.com/hoijui/circuit">Circuit on GitHub</a>. 
 Follow us on Twitter <a href="https://twitter.com/gocircuit">@gocircuit</a>.
 
 <p>Submit <a href="">issues</a> to our GitHub repo. For discussions about using and developing

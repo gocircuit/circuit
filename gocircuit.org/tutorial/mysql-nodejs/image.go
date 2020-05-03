@@ -1,7 +1,7 @@
 package mysql_nodejs
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderImage() string {
@@ -50,7 +50,7 @@ that points the Go compiler to a source tree.
 <p>Fetch and build the circuit, then place the circuit executable in the system path:
 
 <pre>
-	# go get github.com/gocircuit/circuit/cmd/circuit
+	# go get github.com/hoijui/circuit/cmd/circuit
 	# cp $GOPATH/bin/circuit /usr/local/bin
 </pre>
 
@@ -101,7 +101,7 @@ and place it nearby for convenience:
 
 <pre>
 	# cd $HOME
-	# cp -R $GOPATH/src/github.com/gocircuit/circuit/tutorial/nodejs-using-mysql/nodejs-app .
+	# cp -R $GOPATH/src/github.com/hoijui/circuit/tutorial/nodejs-using-mysql/nodejs-app .
 </pre>
 
 <p>And prepare the Node.js app for execution by fetching its Node.js package dependencies:

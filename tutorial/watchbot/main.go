@@ -18,7 +18,7 @@
 	on a random machine in the circuit cluster. Then it installs itself on a machine different
 	from that of the payload process, and proceeds to watch the payload until it dies.
 
-	When the payload dies, the nucleus executes a new payload instance on another 
+	When the payload dies, the nucleus executes a new payload instance on another
 	randomly chosen host, and replaces itself with a new nucleus process on yet
 	another new random host. And so on ...
 
@@ -26,12 +26,12 @@
 package main
 
 import (
+	"os"
 	"path"
 	"path/filepath"
-	"os"
 	"time"
 
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 // pickServer returns the root anchor of a randomly-chosen circuit server in the cluster.
@@ -49,9 +49,9 @@ func waitFotPayloadDeath(c *client.Client, payloadAnchor string) (recov interfac
 	// 	recov = recover()
 	// }()
 	t := c.Walk(client.Split(payloadAnchor)) // Access the process anchor of the currently-running payload of the virus.
-	t.Get().(client.Proc).Wait() // Wait until the payload process exits.
-	t.Scrub() // scrub payload anchor from old process element
-	time.Sleep(2*time.Second) // Wait a touch to slow down the spin
+	t.Get().(client.Proc).Wait()             // Wait until the payload process exits.
+	t.Scrub()                                // scrub payload anchor from old process element
+	time.Sleep(2 * time.Second)              // Wait a touch to slow down the spin
 	return
 }
 
@@ -87,7 +87,7 @@ func spawnPayload(c *client.Client) (payloadAnchor string) {
 		Path: "/usr/bin/say", // say is a standard OSX command which speaks, so it's easy to hear the virus in action.
 		Args: []string{"i am a virus"},
 	}
-	a := pickServer(c) // Randomly choose a circuit server to host the virus payload.
+	a := pickServer(c)                                                      // Randomly choose a circuit server to host the virus payload.
 	pservice, err := a.Walk([]string{"virus", "payload"}).MakeProc(service) // Run the payload process
 	if err != nil {
 		println("payload not created:", err.Error())
@@ -108,7 +108,7 @@ func spawnNucleus(c *client.Client, payloadAnchor string) {
 	nucleus := client.Cmd{
 		Path: virus,
 		Args: []string{
-			b.Addr(), // dial-in circuit server address
+			b.Addr(),      // dial-in circuit server address
 			payloadAnchor, // payload anchor
 			nucleusAnchor, // anchor of the spawned nucleus itself
 		},

@@ -12,3 +12,4 @@ test coverage
 job scheduler ala mesos
 add mutex element
 tty element; interactive shell
+use external dependencies instead of local ./github.com/... and ./gocircuit.org/...

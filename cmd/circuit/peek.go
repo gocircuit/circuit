@@ -11,11 +11,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gocircuit/circuit/client"
-	"github.com/gocircuit/circuit/client/docker"
+	"github.com/hoijui/circuit/pkg/client"
+	"github.com/hoijui/circuit/pkg/client/docker"
 	"github.com/pkg/errors"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // circuit peek /X1234/hola/charlie
@@ -28,10 +28,10 @@ func peek(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("peek needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch t := c.Walk(w).Get().(type) {
 	case client.Server:
 		buf, _ := json.MarshalIndent(t.Peek(), "", "\t")
@@ -73,10 +73,10 @@ func scrb(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("scrub needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	c.Walk(w).Scrub()
 	return
 }

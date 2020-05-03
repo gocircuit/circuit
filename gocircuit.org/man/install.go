@@ -1,7 +1,7 @@
 package man
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderInstallPage() string {
@@ -17,7 +17,7 @@ const installBody = `
 you can build and install the circuit binary with one line:
 
 <pre>
-	go get github.com/gocircuit/circuit/cmd/circuit
+	go get github.com/hoijui/circuit/cmd/circuit
 </pre>
 
         `

@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func stdin(x *cli.Context) (err error) {
@@ -24,10 +24,10 @@ func stdin(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("stdin needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	u, ok := c.Walk(w).Get().(interface {
 		Stdin() io.WriteCloser
 	})
@@ -53,10 +53,10 @@ func stdout(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("stdout needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	u, ok := c.Walk(w).Get().(interface {
 		Stdout() io.ReadCloser
 	})
@@ -76,10 +76,10 @@ func stderr(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("stderr needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	u, ok := c.Walk(w).Get().(interface {
 		Stderr() io.ReadCloser
 	})

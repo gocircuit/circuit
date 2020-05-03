@@ -4,9 +4,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/gocircuit/circuit/gocircuit.org/api"
-	"github.com/gocircuit/circuit/gocircuit.org/man"
-	"github.com/gocircuit/circuit/gocircuit.org/tutorial/mysql-nodejs"
+	"github.com/hoijui/circuit/gocircuit.org/api"
+	"github.com/hoijui/circuit/gocircuit.org/man"
+	mysql_nodejs "github.com/hoijui/circuit/gocircuit.org/tutorial/mysql-nodejs"
 )
 
 func main() {

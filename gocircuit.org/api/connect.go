@@ -1,7 +1,7 @@
 package api
 
 import (
-	. "github.com/gocircuit/circuit/gocircuit.org/render"
+	. "github.com/hoijui/circuit/gocircuit.org/render"
 )
 
 func RenderConnectPage() string {
@@ -18,7 +18,7 @@ const connectBody = `
 
 <p>To use the Go client API to the circuit, start by importing the client package:
 <pre>
-	import "github.com/gocircuit/circuit/client"
+	import "github.com/hoijui/circuit/pkg/client"
 </pre>
 
 <p>The first step of every circuit client application is connecting to a circuit cluster.

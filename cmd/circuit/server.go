@@ -8,15 +8,16 @@
 package main
 
 import (
-	"github.com/gocircuit/circuit/use/n"
+	"github.com/hoijui/circuit/pkg/use/n"
 	"github.com/pkg/errors"
+
 	// "bytes"
 	"io"
 	"os"
 
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func stack(x *cli.Context) (err error) {
@@ -28,10 +29,10 @@ func stack(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("recv needs one anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch u := c.Walk(w).Get().(type) {
 	case client.Server:
 		r, err := u.Profile("goroutine")
@@ -54,10 +55,10 @@ func suicide(x *cli.Context) (err error) {
 
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		return errors.New("suicide needs one server anchor argument")
 	}
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	u, ok := c.Walk(w).Get().(client.Server)
 	if !ok {
 		return errors.New("not a server")
@@ -74,18 +75,18 @@ func join(x *cli.Context) (err error) {
 	}()
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 2 {
+	if x.NArg() != 2 {
 		return errors.New("join needs one anchor argument and one circuit address argument")
 	}
 	// Verify the target circuit address is valid
-	if _, err = n.ParseAddr(args[1]); err != nil {
-		return errors.Wrapf(err, "argument %q is not a valid circuit address", args[1])
+	if _, err = n.ParseAddr(args.Get(1)); err != nil {
+		return errors.Wrapf(err, "argument %q is not a valid circuit address", args.Get(1))
 	}
 	//
-	w, _ := parseGlob(args[0])
+	w, _ := parseGlob(args.Get(0))
 	switch u := c.Walk(w).Get().(type) {
 	case client.Server:
-		if err = u.Rejoin(args[1]); err != nil {
+		if err = u.Rejoin(args.Get(1)); err != nil {
 			return errors.Wrapf(err, "error: %v", err)
 		}
 	default:

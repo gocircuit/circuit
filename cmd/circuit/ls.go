@@ -13,10 +13,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/gocircuit/circuit/client"
-	"github.com/gocircuit/circuit/client/docker"
+	"github.com/hoijui/circuit/pkg/client"
+	"github.com/hoijui/circuit/pkg/client/docker"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // circuit ls /Q123/apps/charlie
@@ -29,11 +29,11 @@ func ls(x *cli.Context) (err error) {
 	}()
 	c := dial(x)
 	args := x.Args()
-	if len(args) != 1 {
+	if x.NArg() != 1 {
 		println("ls needs a glob argument")
 		os.Exit(1)
 	}
-	w, ellipses := parseGlob(args[0])
+	w, ellipses := parseGlob(args.Get(0))
 	list(0, "/", c.Walk(w), ellipses, x.Bool("long"), x.Bool("depth"))
 	return
 }

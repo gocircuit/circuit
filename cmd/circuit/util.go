@@ -14,8 +14,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gocircuit/circuit/client"
-	"github.com/urfave/cli"
+	"github.com/hoijui/circuit/pkg/client"
+	"github.com/urfave/cli/v2"
 )
 
 func fatalf(format string, arg ...interface{}) {

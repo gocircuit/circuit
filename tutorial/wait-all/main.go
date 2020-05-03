@@ -12,7 +12,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gocircuit/circuit/client"
+	"github.com/hoijui/circuit/pkg/client"
 )
 
 const n = 5
@@ -26,7 +26,6 @@ func pickServer(c *client.Client) client.Anchor {
 }
 
 func main() {
-
 	// The first argument is the circuit server address that this execution will use.
 	c := client.Dial(os.Args[1], nil)
 
@@ -34,8 +33,8 @@ func main() {
 	ch := make(chan int)
 	for i := 0; i < n; i++ {
 		cmd := client.Cmd{
-			Path: "/bin/sleep", 
-			Args: []string{strconv.Itoa(3+i*3)},
+			Path: "/bin/sleep",
+			Args: []string{strconv.Itoa(3 + i*3)},
 		}
 		i_ := i
 		go func() {

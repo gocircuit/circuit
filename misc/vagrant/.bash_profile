@@ -38,7 +38,7 @@ alias c='cat'
 alias gs=""  # disable gs command
 
 alias c0m="cd ~/0/src/github.com/petar/maymounkov.io"
-alias c0c="cd ~/0/src/github.com/gocircuit/circuit"
+alias c0c="cd ~/0/src/github.com/hoijui/circuit"
 
 # HG aliases
 alias hll='hg log | less'
@@ -90,10 +90,10 @@ export GOROOT=$HOME/go
 export PATH=$PATH:$HOME/0/bin:$GOROOT/bin
 
 # CIRCUIT
-declare -x CIRCUIT=/Users/petar/0/src/github.com/gocircuit/circuit/cmd/circuit/.circuit
-declare -x CIRCUIT_HMAC=/Users/petar/0/src/github.com/gocircuit/circuit/cmd/circuit/.hmac
+declare -x CIRCUIT=/Users/petar/0/src/github.com/hoijui/circuit/cmd/circuit/.circuit
+declare -x CIRCUIT_HMAC=/Users/petar/0/src/github.com/hoijui/circuit/cmd/circuit/.hmac
 
-export VAGRANT_CWD=$GOPATH/src/github.com/gocircuit/circuit/misc/vagrant
+export VAGRANT_CWD=$GOPATH/src/github.com/hoijui/circuit/misc/vagrant
 # export VAGRANT_GO_ORIGIN=$HOME/vagrant/go
 # export VAGRANT_GOCIRCUIT_ORIGIN=$HOME/vagrant/gocircuit
 
