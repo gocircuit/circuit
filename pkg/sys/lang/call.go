@@ -8,8 +8,8 @@
 package lang
 
 import (
-	"github.com/hoijui/circuit/pkg/sys/lang/types"
 	"fmt"
+	"github.com/hoijui/circuit/pkg/sys/lang/types"
 	"reflect"
 	"runtime/debug"
 )

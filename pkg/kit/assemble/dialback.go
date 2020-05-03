@@ -16,7 +16,7 @@ import (
 
 type DialBack struct {
 	once sync.Once
-	ch chan n.Addr
+	ch   chan n.Addr
 }
 
 func NewDialBack() (*DialBack, *XDialBack) {

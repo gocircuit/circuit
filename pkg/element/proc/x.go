@@ -9,7 +9,7 @@ package proc
 
 import (
 	"io"
-	
+
 	xio "github.com/hoijui/circuit/pkg/kit/x/io"
 	"github.com/hoijui/circuit/pkg/use/circuit"
 	"github.com/hoijui/circuit/pkg/use/errors"

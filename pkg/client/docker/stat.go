@@ -14,23 +14,23 @@ import (
 )
 
 type Stat struct {
-	ID string
-	Created time.Time
-	Path string
-	Args []string
-	Config Config
-	State State
-	Image string
+	ID              string
+	Created         time.Time
+	Path            string
+	Args            []string
+	Config          Config
+	State           State
+	Image           string
 	NetworkSettings NetworkSettings
-	ResolvConfPath string
-	HostnamePath string
-	HostsPath string
-	Name string
-	Driver string
-	ExecDriver string
-	Volumes map[string]string
-	VolumesRW map[string]bool
-	HostConfig HostConfig
+	ResolvConfPath  string
+	HostnamePath    string
+	HostsPath       string
+	Name            string
+	Driver          string
+	ExecDriver      string
+	Volumes         map[string]string
+	VolumesRW       map[string]bool
+	HostConfig      HostConfig
 }
 
 func ParseStat(buf []byte) (s *Stat, err error) {
@@ -93,7 +93,7 @@ type State struct {
 	ExitCode   int
 	StartedAt  time.Time
 	FinishedAt time.Time
-	Ghost bool
+	Ghost      bool
 }
 
 type NetworkSettings struct {

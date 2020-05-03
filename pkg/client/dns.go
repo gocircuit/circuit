@@ -29,7 +29,6 @@ func nameserverStat(s dns.Stat) NameserverStat {
 }
 
 type Nameserver interface {
-
 	Set(rr string) error
 
 	Unset(name string)

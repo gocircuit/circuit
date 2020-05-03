@@ -11,14 +11,14 @@ import (
 	"container/list"
 	"runtime"
 	"sync"
-	
+
 	"github.com/hoijui/circuit/pkg/use/circuit"
 )
 
 // PubSub…
 type PubSub struct {
 	name string
-	up struct {
+	up   struct {
 		sync.Mutex
 		src chan<- interface{}
 	}
@@ -26,7 +26,7 @@ type PubSub struct {
 		sum Summarize
 		sync.Mutex
 		member map[int]*queue
-		n int
+		n      int
 	}
 }
 
@@ -70,7 +70,7 @@ func (ps *PubSub) Close() {
 	ps.up.src = nil
 }
 
-// loop churns messages between the publishing entity, using Publish(), 
+// loop churns messages between the publishing entity, using Publish(),
 // and the multiple registered subscriber entities.
 func (ps *PubSub) loop(src <-chan interface{}) {
 	for {
@@ -118,7 +118,7 @@ func (ps *PubSub) Subscribe() *Subscription {
 	return q.use()
 }
 
-// scrub removes a subscription queue from the member table, only if 
+// scrub removes a subscription queue from the member table, only if
 // all Subscription handles referring to it have been collected.
 func (ps *PubSub) scrub(id int) {
 	ps.down.Lock()
@@ -132,13 +132,13 @@ func (ps *PubSub) scrub(id int) {
 
 // queue…
 type queue struct {
-	ps *PubSub
-	id int
+	ps  *PubSub
+	id  int
 	ch1 chan<- interface{} // disribute() => loop()
 	ch2 <-chan interface{} // loop() => consume()
 	sync.Mutex
-	nref int // number of references to this queue
-	pend int // number of buffered messages
+	nref   int  // number of references to this queue
+	pend   int  // number of buffered messages
 	closed bool // true if the source channel has reached EOF
 }
 
@@ -146,9 +146,9 @@ func newQueue(ps *PubSub, id int) *queue {
 	ch1 := make(chan interface{}, 1)
 	ch2 := make(chan interface{}, 1)
 	q := &queue{
-		ps: ps, 
-		id: id, 
-		ch1: ch1, 
+		ps:  ps,
+		id:  id,
+		ch1: ch1,
 		ch2: ch2,
 	}
 	go q.loop(ch1, ch2)
@@ -168,18 +168,18 @@ func (q *queue) setClosed(v bool) {
 }
 
 type Stat struct {
-	Source string
+	Source  string
 	Pending int
-	Closed bool
+	Closed  bool
 }
 
 func (q *queue) Peek() Stat {
 	q.Lock()
 	defer q.Unlock()
 	return Stat{
-		Source: q.ps.Source(),
+		Source:  q.ps.Source(),
 		Pending: q.pend,
-		Closed: q.closed,
+		Closed:  q.closed,
 	}
 }
 
@@ -211,7 +211,7 @@ __preclose:
 				q.addPend(-1)
 			}
 		} else {
-			v, ok := <- ch1
+			v, ok := <-ch1
 			if !ok {
 				q.setClosed(true)
 				break __preclose

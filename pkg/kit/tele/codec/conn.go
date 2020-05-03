@@ -8,13 +8,13 @@
 package codec
 
 import (
-	"net"
 	"io"
+	"net"
 )
 
 type Conn struct {
-	enc   Encoder
-	dec   Decoder
+	enc     Encoder
+	dec     Decoder
 	carrier CarrierConn
 }
 
@@ -23,8 +23,8 @@ func NewConn(carrier CarrierConn, codec Codec) *Conn {
 		panic("nil carrier")
 	}
 	return &Conn{
-		enc:   codec.NewEncoder(),
-		dec:   codec.NewDecoder(),
+		enc:     codec.NewEncoder(),
+		dec:     codec.NewDecoder(),
 		carrier: carrier,
 	}
 }

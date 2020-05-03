@@ -20,8 +20,8 @@ func TestDocker(t *testing.T) {
 	}
 	run := ds.Run{
 		Image: "ubuntu",
-		Path: "/bin/ls",
-		Args: []string{"/"},
+		Path:  "/bin/ls",
+		Args:  []string{"/"},
 	}
 	con, err := MakeContainer(run)
 	if err != nil {

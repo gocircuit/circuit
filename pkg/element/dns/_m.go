@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -18,10 +17,10 @@ func Filter(w ResponseWriter, req *Msg) {
 	m.Answer = make([]RR, 1)
 	m.Answer[0] = &A{
 		Hdr: RR_Header{
-			Name: q, 
+			Name:   q,
 			Rrtype: TypeA,
-			Class: ClassINET, 
-			Ttl: 0,
+			Class:  ClassINET,
+			Ttl:    0,
 		},
 		A: net.IP{127, 0, 0, 1},
 	}
@@ -37,7 +36,7 @@ func RunLocalUDPServer(laddr string) (*Server, string, error) {
 	mux.HandleFunc(".", Filter)
 	server := &Server{
 		PacketConn: pc,
-		Handler: mux,
+		Handler:    mux,
 	}
 	go func() {
 		server.ActivateAndServe()
@@ -60,7 +59,7 @@ func RunLocalTCPServer(laddr string) (*Server, string, error) {
 	mux.HandleFunc(".", Filter)
 	server := &Server{
 		Listener: l,
-		Handler: mux,
+		Handler:  mux,
 	}
 	go func() {
 		server.ActivateAndServe()
@@ -72,5 +71,5 @@ func RunLocalTCPServer(laddr string) (*Server, string, error) {
 func main() {
 	_, addr, err := RunLocalUDPServer("127.0.0.1:61222")
 	fmt.Printf("addr=%v err=%v\n", addr, err)
-	select{}
+	select {}
 }

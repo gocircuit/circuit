@@ -17,21 +17,21 @@ import (
 )
 
 type Scatter struct {
-	addr *net.UDPAddr // udp multicast address
-	key xor.Key
+	addr    *net.UDPAddr // udp multicast address
+	key     xor.Key
 	payload []byte
 }
 
 type Msg struct {
-	Key xor.Key
+	Key     xor.Key
 	Payload []byte
 }
 
 // addr is a udp multicast address.
 func NewScatter(addr *net.UDPAddr, key xor.Key, payload []byte) *Scatter {
 	return &Scatter{
-		addr: addr,
-		key: key,
+		addr:    addr,
+		key:     key,
 		payload: payload,
 	}
 }
@@ -43,7 +43,7 @@ func (s *Scatter) Scatter() {
 	}
 	defer conn.Close()
 	msg := &Msg{
-		Key: s.key,
+		Key:     s.key,
 		Payload: s.payload,
 	}
 	buf, err := json.Marshal(msg)

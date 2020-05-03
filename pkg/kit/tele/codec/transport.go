@@ -49,7 +49,7 @@ func (t *Transport) Dial(addr net.Addr) (*Conn, error) {
 
 func (t *Transport) Listen(addr net.Addr) *Listener {
 	return &Listener{
-		codec:    t.codec,
+		codec:           t.codec,
 		CarrierListener: t.sub.Listen(addr),
 	}
 }

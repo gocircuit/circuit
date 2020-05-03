@@ -18,11 +18,11 @@ import (
 
 // View is a folk data structure that maintains a key-value set sorted by key
 type View struct {
-	arrive   *pubsub.PubSub
-	depart  *pubsub.PubSub
+	arrive *pubsub.PubSub
+	depart *pubsub.PubSub
 	sync.Mutex
-	lkp       map[string]int // record key => record index
-	img      []*Record // Current state of the record space known to us
+	lkp map[string]int // record key => record index
+	img []*Record      // Current state of the record space known to us
 }
 
 // NewView returns a new view object.

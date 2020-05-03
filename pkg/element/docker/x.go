@@ -9,11 +9,11 @@ package docker
 
 import (
 	"io"
-	
+
+	ds "github.com/hoijui/circuit/pkg/client/docker"
 	xio "github.com/hoijui/circuit/pkg/kit/x/io"
 	"github.com/hoijui/circuit/pkg/use/circuit"
 	"github.com/hoijui/circuit/pkg/use/errors"
-	ds "github.com/hoijui/circuit/pkg/client/docker"
 )
 
 func init() {

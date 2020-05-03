@@ -31,7 +31,7 @@ type writer struct {
 		sync.Mutex
 		abort chan<- struct{}
 	}
-	s struct { // Stats 
+	s struct { // Stats
 		sync.Mutex
 		closed bool
 		n      int64

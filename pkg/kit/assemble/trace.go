@@ -13,7 +13,7 @@ import (
 
 type TraceMsg struct {
 	Origin string // "server" or "client"
-	Addr string // address of origin
+	Addr   string // address of origin
 }
 
 func (m *TraceMsg) Encode() []byte {

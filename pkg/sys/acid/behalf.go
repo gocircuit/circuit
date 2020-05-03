@@ -8,8 +8,8 @@
 package acid
 
 import (
-	"github.com/hoijui/circuit/pkg/use/circuit"
 	"fmt"
+	"github.com/hoijui/circuit/pkg/use/circuit"
 	"reflect"
 )
 

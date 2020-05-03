@@ -12,7 +12,7 @@ import (
 )
 
 type Stat struct {
-	Address string `json:"addr"`
+	Address string              `json:"addr"`
 	Records map[string][]string `json:"records"`
 }
 

@@ -25,7 +25,6 @@ func NewStructOverTCP() *blend.Transport {
 	return blend.NewTransport(f.Refine("blend"), x3)
 }
 
-
 func NewStructOverTCPWithHMAC(key []byte) *blend.Transport {
 	f := trace.NewFrame("tele")
 	// Carrier

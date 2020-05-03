@@ -26,8 +26,8 @@ type Nameserver interface {
 type nameserver struct {
 	sync.Mutex
 	server *dns.Server
-	addr net.Addr
-	rr map[string][]dns.RR // name -> rr
+	addr   net.Addr
+	rr     map[string][]dns.RR // name -> rr
 }
 
 func MakeNameserver(addr string) (_ Nameserver, err error) {
@@ -47,7 +47,7 @@ func (ns *nameserver) startUdpServer(addr string) error {
 	}
 	ns.server = &dns.Server{
 		PacketConn: pc,
-		Handler: ns,
+		Handler:    ns,
 	}
 	ns.addr = pc.LocalAddr()
 	go func() {

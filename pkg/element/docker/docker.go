@@ -13,11 +13,11 @@ import (
 	"os/exec"
 	"runtime"
 
+	ds "github.com/hoijui/circuit/pkg/client/docker"
 	"github.com/hoijui/circuit/pkg/element/proc"
 	"github.com/hoijui/circuit/pkg/kit/interruptible"
 	"github.com/hoijui/circuit/pkg/kit/lang"
 	"github.com/hoijui/circuit/pkg/use/circuit"
-	ds "github.com/hoijui/circuit/pkg/client/docker"
 )
 
 type Container interface {
@@ -33,12 +33,12 @@ type Container interface {
 }
 
 type container struct {
-	name string
-	cmd *exec.Cmd
+	name   string
+	cmd    *exec.Cmd
 	stdin  io.WriteCloser
 	stdout io.ReadCloser
 	stderr io.ReadCloser
-	exit <-chan error
+	exit   <-chan error
 }
 
 func MakeContainer(run ds.Run) (_ Container, err error) {
@@ -47,7 +47,7 @@ func MakeContainer(run ds.Run) (_ Container, err error) {
 	}
 	ch := make(chan error, 1)
 	con := &container{
-		name: "via-circuit-"+lang.ChooseReceiverID().String()[1:],
+		name: "via-circuit-" + lang.ChooseReceiverID().String()[1:],
 		exit: ch,
 	}
 	con.cmd = exec.Command(dkr, run.Arg(con.name)...)

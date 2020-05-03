@@ -45,7 +45,7 @@ type Point interface {
 	Key() Key
 }
 
-// Proximity equals the number of contiguous bits, starting from 
+// Proximity equals the number of contiguous bits, starting from
 // the metrically most significant one, that x and y share.
 func Proximity(x, y Point) int {
 	const nbits = 64
@@ -93,7 +93,7 @@ func (m *Metric) Dump() []Point {
 func (m *Metric) Copy() *Metric {
 	m_ := &Metric{
 		Point: m.Point,
-		n:    m.n,
+		n:     m.n,
 	}
 	if m.sub[0] != nil {
 		m_.sub[0] = m.sub[0].Copy()

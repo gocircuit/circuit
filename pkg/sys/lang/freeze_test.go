@@ -9,8 +9,8 @@ package lang
 
 import (
 	"fmt"
-	"testing"
 	"github.com/hoijui/circuit/pkg/use/circuit"
+	"testing"
 )
 
 func TestExportImport(t *testing.T) {

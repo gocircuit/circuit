@@ -19,17 +19,17 @@ func init() {
 
 // Run parameterizes a container execution.
 type Run struct {
-	Image string
-	Memory int64
+	Image     string
+	Memory    int64
 	CpuShares int64
-	Lxc []string
-	Volume []string
-	Dir string
-	Entry string
-	Env []string
-	Path string
-	Args []string
-	Scrub bool
+	Lxc       []string
+	Volume    []string
+	Dir       string
+	Entry     string
+	Env       []string
+	Path      string
+	Args      []string
+	Scrub     bool
 }
 
 func ParseRun(src string) (*Run, error) {

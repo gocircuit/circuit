@@ -14,10 +14,10 @@ import (
 )
 
 type Folk struct {
-	kin *Kin
-	topic string
+	kin          *Kin
+	topic        string
 	neighborhood *Neighborhood
-	ch chan FolkAvatar // Services pending to be opened
+	ch           chan FolkAvatar // Services pending to be opened
 }
 
 func (folk *Folk) Opened() []FolkAvatar {

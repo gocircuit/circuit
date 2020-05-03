@@ -34,8 +34,8 @@ func main() {
 	ch := make(chan int)
 	for i := 0; i < n; i++ {
 		cmd := client.Cmd{
-			Path: "/bin/sleep", 
-			Args: []string{strconv.Itoa(3+i*3)},
+			Path: "/bin/sleep",
+			Args: []string{strconv.Itoa(3 + i*3)},
 		}
 		i_ := i
 		go func() {

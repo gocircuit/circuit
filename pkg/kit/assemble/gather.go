@@ -31,7 +31,7 @@ func NewGather(addr *net.UDPAddr) *Gather {
 		log.Printf("problem listening to udp multicast: %v", err)
 		os.Exit(1)
 	}
-	runtime.SetFinalizer(g, 
+	runtime.SetFinalizer(g,
 		func(g2 *Gather) {
 			g2.conn.Close()
 		},
@@ -39,7 +39,7 @@ func NewGather(addr *net.UDPAddr) *Gather {
 	return g
 }
 
-func (s *Gather) Gather()  (xor.Key, []byte) {
+func (s *Gather) Gather() (xor.Key, []byte) {
 	buf := make([]byte, 7e3)
 	for {
 		n, _, err := s.conn.ReadFromUDP(buf)
@@ -56,13 +56,13 @@ func (s *Gather) Gather()  (xor.Key, []byte) {
 
 type GatherLens struct {
 	gather *Gather
-	lens *Lens
+	lens   *Lens
 }
 
 func NewGatherLens(addr *net.UDPAddr, focus xor.Key, k int) *GatherLens {
 	return &GatherLens{
 		gather: NewGather(addr),
-		lens: NewLens(focus, k),
+		lens:   NewLens(focus, k),
 	}
 }
 
@@ -70,7 +70,7 @@ func (s *GatherLens) String() string {
 	return s.lens.String()
 }
 
-func (s *GatherLens) Gather()  []byte {
+func (s *GatherLens) Gather() []byte {
 	for {
 		key, payload := s.gather.Gather()
 		if s.lens.Remember(key) {

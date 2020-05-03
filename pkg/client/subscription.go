@@ -26,9 +26,9 @@ type SubscriptionStat struct {
 
 func subscriptionStat(s pubsub.Stat) SubscriptionStat {
 	return SubscriptionStat{
-		Source: s.Source,
+		Source:  s.Source,
 		Pending: s.Pending,
-		Closed: s.Closed,
+		Closed:  s.Closed,
 	}
 }
 

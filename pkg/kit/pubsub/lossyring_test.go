@@ -46,7 +46,7 @@ func TestLossyRing(t *testing.T) {
 }
 
 func smrz() []interface{} {
-	return []interface{}{1,2,3}
+	return []interface{}{1, 2, 3}
 }
 
 func TestPubSub(t *testing.T) {

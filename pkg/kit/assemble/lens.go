@@ -16,7 +16,7 @@ import (
 )
 
 type Lens struct {
-	cap int // capacity of proximity buckets
+	cap   int // capacity of proximity buckets
 	focus xor.Key
 	sync.Mutex
 	mem map[int]map[xor.Key]struct{} // proximity => set of keys
@@ -27,9 +27,9 @@ func NewLens(focus xor.Key, k int) *Lens {
 		panic(0)
 	}
 	return &Lens{
-		cap: k,
+		cap:   k,
 		focus: focus,
-		mem: make(map[int]map[xor.Key]struct{}),
+		mem:   make(map[int]map[xor.Key]struct{}),
 	}
 }
 

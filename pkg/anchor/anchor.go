@@ -18,14 +18,14 @@ type Anchor struct {
 }
 
 type anchor struct {
-	walk []string
-	parent *anchor
-	name string
-	lk sync.Mutex
+	walk     []string
+	parent   *anchor
+	name     string
+	lk       sync.Mutex
 	children map[string]*anchor
-	nhandle int
-	value interface{}
-	tx sync.Mutex
+	nhandle  int
+	value    interface{}
+	tx       sync.Mutex
 }
 
 func (a *anchor) TxLock() {
@@ -102,9 +102,9 @@ func newAnchor(parent *anchor, name string) *anchor {
 		w = append(w, name)
 	}
 	return &anchor{
-		walk: w,
-		parent: parent,
-		name: name,
+		walk:     w,
+		parent:   parent,
+		name:     name,
 		children: make(map[string]*anchor),
 	}
 }

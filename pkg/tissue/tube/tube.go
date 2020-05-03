@@ -12,19 +12,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hoijui/circuit/pkg/tissue"
 	"github.com/hoijui/circuit/pkg/kit/lang"
 	"github.com/hoijui/circuit/pkg/kit/pubsub"
+	"github.com/hoijui/circuit/pkg/tissue"
 	"github.com/hoijui/circuit/pkg/use/circuit"
 )
 
 // Tube is a folk data structure that maintains a key-value set sorted by key.
 // …
 type Tube struct {
-	av     tissue.FolkAvatar // Avatar to this tube
-	folk   *tissue.Folk   // Folk interface of this tube to the kin system
+	av   tissue.FolkAvatar // Avatar to this tube
+	folk *tissue.Folk      // Folk interface of this tube to the kin system
 	sync.Mutex
-	view  *View
+	view *View
 }
 
 func init() {
@@ -58,7 +58,6 @@ func (t *Tube) NewDepartures() *pubsub.Subscription {
 	return t.view.NewDepartures()
 }
 
-
 func (t *Tube) superscribe(peer tissue.FolkAvatar) {
 	// log.Printf("tube superscribing %s", peer.ID.String())
 	// defer func() {
@@ -90,9 +89,9 @@ func (t *Tube) Write(key string, rev Rev, value interface{}) (changed bool) {
 	t.Lock()
 	defer t.Unlock()
 	changed = t.view.Update(&Record{
-		Key:        key,
-		Rev:        rev,
-		Value:     value,
+		Key:     key,
+		Rev:     rev,
+		Value:   value,
 		Updated: time.Now(),
 	})
 	if changed {

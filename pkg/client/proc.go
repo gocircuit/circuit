@@ -9,7 +9,7 @@ package client
 
 import (
 	"io"
-	
+
 	"github.com/hoijui/circuit/pkg/element/proc"
 )
 
@@ -36,20 +36,20 @@ type Cmd struct {
 
 func retypeProcStat(c proc.Cmd) Cmd {
 	return Cmd{
-		Env: c.Env,
-		Dir: c.Dir,
-		Path: c.Path,
-		Args: c.Args,
+		Env:   c.Env,
+		Dir:   c.Dir,
+		Path:  c.Path,
+		Args:  c.Args,
 		Scrub: c.Scrub,
 	}
 }
 
 func (cmd Cmd) retype() proc.Cmd {
 	return proc.Cmd{
-		Env: cmd.Env,
-		Dir: cmd.Dir,
-		Path: cmd.Path,
-		Args: cmd.Args,
+		Env:   cmd.Env,
+		Dir:   cmd.Dir,
+		Path:  cmd.Path,
+		Args:  cmd.Args,
 		Scrub: cmd.Scrub,
 	}
 }
@@ -69,18 +69,18 @@ type ProcStat struct {
 }
 
 const (
-	Running = "running"
-	Exited = "exited"
-	Stopped = "stopped"
-	Signaled = "signaled"
+	Running   = "running"
+	Exited    = "exited"
+	Stopped   = "stopped"
+	Signaled  = "signaled"
 	Continued = "continued"
-	Unknown = "unknown"
+	Unknown   = "unknown"
 )
 
 func statstat(s proc.Stat) ProcStat {
 	return ProcStat{
-		Cmd: retypeProcStat(s.Cmd),
-		Exit: s.Exit,
+		Cmd:   retypeProcStat(s.Cmd),
+		Exit:  s.Exit,
 		Phase: s.Phase,
 	}
 }

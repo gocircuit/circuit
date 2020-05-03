@@ -8,9 +8,9 @@
 package lang
 
 import (
+	"fmt"
 	"github.com/hoijui/circuit/pkg/sys/lang/types"
 	"github.com/hoijui/circuit/pkg/use/circuit"
-	"fmt"
 	"runtime"
 	"strconv"
 	"testing"
