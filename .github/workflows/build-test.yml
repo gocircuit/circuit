@@ -43,10 +43,6 @@ jobs:
         go build -v -o bin/tutorial-watchbot           ./tutorial/watchbot/
         go build -v -o bin/tutorial-watchbot-with-chan ./tutorial/watchbot-with-chan/
 
-    - name: Run the Tutorials
-      run: |
-        bin/tutorial-*
-
     - name: Run GoLang-CI Linter
       run: |
         # install it into ./bin/
