@@ -42,7 +42,6 @@ jobs:
         go build -v -o bin/tutorial-wait-first         ./tutorial/wait-first/
         go build -v -o bin/tutorial-watchbot           ./tutorial/watchbot/
         go build -v -o bin/tutorial-watchbot-with-chan ./tutorial/watchbot-with-chan/
-        go build -v -o bin/tutorial-mysql-nodejs       ./gocircuit.org/tutorial/mysql-nodejs/
 
     - name: Run the Tutorials
       run: |
