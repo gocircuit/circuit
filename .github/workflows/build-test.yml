@@ -1,0 +1,58 @@
+name: Build & Test
+
+on: [push, pull_request]
+
+jobs:
+
+  build:
+    name: Build, Test & Run Tutorials
+    env:
+      MAIN_SRC_DIR: ./cmd/circuit/
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13.1
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get Go dependencies
+      run: go get -v -t -d ./...
+
+    - name: Create the bin directory (will ocntain the built binaries)
+      run: mkdir -p bin
+
+    - name: Build from Go sources
+      run: go build -v -o bin/circuit "$MAIN_SRC_DIR"
+
+    - name: Install the main executable into PATH
+      run: go install -v "$MAIN_SRC_DIR"
+
+    - name: Run Go Tests
+      run: go test ./...
+
+    - name: Build the Tutorials
+      run: |
+        go build -v -o bin/tutorial-nodejs-using-mysql ./tutorial/nodejs-using-mysql/start-app/
+        go build -v -o bin/tutorial-wait-all           ./tutorial/wait-all/
+        go build -v -o bin/tutorial-wait-first         ./tutorial/wait-first/
+        go build -v -o bin/tutorial-watchbot           ./tutorial/watchbot/
+        go build -v -o bin/tutorial-watchbot-with-chan ./tutorial/watchbot-with-chan/
+        go build -v -o bin/tutorial-mysql-nodejs       ./gocircuit.org/tutorial/mysql-nodejs/
+
+    - name: Run the Tutorials
+      run: |
+        bin/tutorial-*
+
+    - name: Run GoLang-CI Linter
+      run: |
+        # install it into ./bin/
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.25.1
+        # NOTE the " || true" chould possibly be removed from the below, once we reach 0 warnings
+        # NOTE " --enable-all" chould possibly be added to the below, to get more warnings
+        ./bin/golangci-lint run || true
+
