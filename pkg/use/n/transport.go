@@ -49,7 +49,7 @@ type Conn interface {
 	// example, releasing all values exported to that runtime. Therefore, a
 	// typical Conn implementation might choose to attempt various physical
 	// connectivity recovery methods, before it reports an error on any pending
-	// connection. Such implentation strategies are facilitated by the fact
+	// connection. Such implementation strategies are facilitated by the fact
 	// that the runtime has no semantic limits on the length of blocking waits.
 	// In fact, the runtime has no notion of time altogether.
 

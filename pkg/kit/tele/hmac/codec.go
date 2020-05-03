@@ -22,6 +22,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+
 	//"runtime/debug"
 	"strings"
 
@@ -195,7 +196,7 @@ func (m *authMsg) Read(r *bufio.Reader) (err error) {
 
 func pickHalfKey() []byte {
 	seed := make([]byte, 32)
-	for i, _ := range seed {
+	for i := range seed {
 		seed[i] = byte(rand.Int31())
 	}
 	key := sha512.Sum512(seed)

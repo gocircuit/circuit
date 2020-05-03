@@ -8,8 +8,9 @@
 package n
 
 import (
-	"github.com/hoijui/circuit/pkg/kit/module"
 	"net"
+
+	"github.com/hoijui/circuit/pkg/kit/module"
 )
 
 var mod = module.Slot{Name: "network"}

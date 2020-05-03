@@ -31,7 +31,7 @@ func NewHistogram(min, max float64, n int) *Histogram {
 	if h.width < 0 {
 		panic("negative histogram bin width")
 	}
-	for i, _ := range h.bin {
+	for i := range h.bin {
 		h.bin[i] = &Bin{X: min + float64(i)*h.width}
 	}
 	return h

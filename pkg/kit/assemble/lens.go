@@ -39,7 +39,7 @@ func (f *Lens) String() string {
 	var w bytes.Buffer
 	for i, s := range f.mem {
 		fmt.Fprintf(&w, "%d:", i)
-		for x, _ := range s {
+		for x := range s {
 			fmt.Fprintf(&w, "%d,", uint64(x))
 		}
 		w.WriteString(" ")

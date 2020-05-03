@@ -6,7 +6,7 @@ import (
 
 	"github.com/hoijui/circuit/gocircuit.org/api"
 	"github.com/hoijui/circuit/gocircuit.org/man"
-	"github.com/hoijui/circuit/gocircuit.org/tutorial/mysql-nodejs"
+	mysql_nodejs "github.com/hoijui/circuit/gocircuit.org/tutorial/mysql-nodejs"
 )
 
 func main() {

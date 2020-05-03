@@ -30,7 +30,7 @@ func NewSlidingMoment(resolution int, duration time.Duration) *SlidingMoment {
 // Init initializes the sketch.
 func (x *SlidingMoment) Init(resolution int, duration time.Duration) {
 	slots := make([]Moment, resolution)
-	for i, _ := range slots {
+	for i := range slots {
 		slots[i].Init()
 	}
 	x.slotdur = int64(duration) / int64(resolution)
@@ -95,7 +95,7 @@ func (x *SlidingMoment) TailWeight(tail int) float64 {
 // Weight returns the total weight of all samples across all time slots.
 func (x *SlidingMoment) Weight() float64 {
 	var result float64
-	for i, _ := range x.slots {
+	for i := range x.slots {
 		result += x.slots[i].Weight()
 	}
 	return result
@@ -104,7 +104,7 @@ func (x *SlidingMoment) Weight() float64 {
 // Mass returns the total mass across all time slot sketches.
 func (x *SlidingMoment) Mass() float64 {
 	var result float64
-	for i, _ := range x.slots {
+	for i := range x.slots {
 		result += x.slots[i].Mass()
 	}
 	return result

@@ -9,11 +9,12 @@ package posix
 
 import (
 	"bytes"
-	"github.com/hoijui/circuit/pkg/kit/iomisc"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/hoijui/circuit/pkg/kit/iomisc"
 )
 
 func ForwardCombined(prefix string, stderr, stdout io.Reader) {

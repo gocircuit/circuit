@@ -46,7 +46,6 @@ func ComputeReceiverID(r interface{}) ReceiverID {
 func snapvalue(w io.Writer, v reflect.Value) {
 	var q string
 	switch v.Kind() {
-
 	case reflect.Bool: // Not addressable
 		q = strconv.FormatBool(v.Bool())
 

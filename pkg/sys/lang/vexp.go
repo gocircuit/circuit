@@ -34,7 +34,6 @@ func (r *Runtime) exportValues(values []interface{}, importer n.Addr) ([]interfa
 func (r *Runtime) exportRewrite(src, dst reflect.Value, importer n.Addr, eg *exportGroup) bool {
 	// Serialize cross-runtime pointers
 	switch v := src.Interface().(type) {
-
 	case *_permptr:
 		pm := &permPtrPtrMsg{ID: v.impHandle().ID, TypeID: v.impHandle().Type.ID, Src: v.impHandle().Exporter}
 		dst.Set(reflect.ValueOf(pm))
@@ -85,9 +84,8 @@ func (r *Runtime) exportPtr(v interface{}, importer n.Addr) interface{} {
 		r.live[importer.WorkerID()] = struct{}{}
 
 		// The anonymous function creates a "lifeline" connection to the worker importing v.
-		// When this conncetion is broken, v is released.
+		// When this connections is broken, v is released.
 		go func() {
-
 			// Defer removal of v's handle from the export table to the end of this function
 			defer func() {
 				r.lk.Lock()

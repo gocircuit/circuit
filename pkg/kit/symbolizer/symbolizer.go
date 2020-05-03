@@ -51,7 +51,6 @@ func Symbolize(r io.Reader) (trace *Trace) {
 		text := scanner.Text()
 		//println(fmt.Sprintf("---> %s", text))
 		switch prev {
-
 		case _start:
 			trace.Header = text
 			prev = _header

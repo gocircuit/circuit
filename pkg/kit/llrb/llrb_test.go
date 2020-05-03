@@ -115,7 +115,6 @@ func TestRandomReplace(t *testing.T) {
 	perm = rand.Perm(n)
 	for i := 0; i < n; i++ {
 		if replaced := tree.ReplaceOrInsert(perm[i]); replaced == nil || replaced.(int) != perm[i] {
-
 			t.Errorf("error replacing")
 		}
 	}

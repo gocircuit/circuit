@@ -130,7 +130,7 @@ func (t *TypeChar) New() reflect.Value {
 // MainID returns the ID of the first method in Func.
 // It is useful for types that have exactly one method.
 func (t *TypeChar) MainID() FuncID {
-	for id, _ := range t.Func {
+	for id := range t.Func {
 		return id
 	}
 	panic("no func")
@@ -140,7 +140,7 @@ func (t *TypeChar) MainID() FuncID {
 type FuncID int32
 
 type funcChar struct {
-	// ID is a collision resistent hash of the method's signature, which
+	// ID is a collision resistant hash of the method's signature, which
 	// includes the method name, its arguments and its replies.
 	ID       FuncID
 	Method   reflect.Method

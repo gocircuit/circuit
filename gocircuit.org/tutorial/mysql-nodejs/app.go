@@ -371,7 +371,7 @@ returns its server address and port number as a result.
 	func startMysql(host client.Anchor) (ip, port string)
 </pre>
 
-<p>We are first going to describe the “manual” processs of starting a fresh
+<p>We are first going to describe the “manual” processes of starting a fresh
 MySQL server, assuming we have a shell session at the host.
 
 <p>Then we are going to show how this manual process can be codified
@@ -379,7 +379,7 @@ into a Go subroutine that performs its steps directly from the client applicatio
 
 <h3>Manually starting MySQL at the host</h3>
 
-<p>Let's asume you are at the shell of the host machine. The following
+<p>Let's assume you are at the shell of the host machine. The following
 steps describe the way to start the MySQL server with a new database.
 
 <p>Obtain the private IP address of this host:

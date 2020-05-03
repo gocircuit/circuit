@@ -141,7 +141,6 @@ func getEc2PrivateIP(host client.Anchor) string {
 }
 
 func startMysql(host client.Anchor) (ip, port string) {
-
 	// Retrieve the IP address of this host within the cluster's private network.
 	ip = getEc2PrivateIP(host)
 

@@ -7,8 +7,10 @@
 
 package xor
 
-import "hash/fnv"
-import "math/rand"
+import (
+	"hash/fnv"
+	"math/rand"
+)
 
 func ChooseKey() Key {
 	return Key(rand.Int63())
@@ -51,7 +53,7 @@ func Combine(keys ...Key) Key {
 
 func uint64bytes(u uint64) []byte {
 	q := make([]byte, 8)
-	for i, _ := range q {
+	for i := range q {
 		q[i] = byte(u >> uint64(i) * 8)
 	}
 	return q

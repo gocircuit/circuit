@@ -37,7 +37,6 @@ func rewriteValue(rewrite rewriteFunc, src, dst reflect.Value) (changed bool) {
 	// Recursive step
 	t := src.Type()
 	switch src.Kind() {
-
 	case reflect.Array:
 		if isTerminalKind(t) {
 			return false

@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-
 	app := cli.NewApp()
 	app.Name = "circuit"
 	app.Usage = "Circuit server and client tool"

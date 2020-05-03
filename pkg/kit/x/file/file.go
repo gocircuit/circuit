@@ -29,7 +29,7 @@ func NewFileClient(x circuit.X) *FileClient {
 	return &FileClient{X: x}
 }
 
-// FileClient is a convenience wrapper for using a cross-interface, refering to a FileServer remote object.
+// FileClient is a convenience wrapper for using a cross-interface, referring to a FileServer remote object.
 type FileClient struct {
 	circuit.X
 }

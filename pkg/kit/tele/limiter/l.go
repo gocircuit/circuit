@@ -68,7 +68,7 @@ func (l *Limiter) Throttle(f func()) {
 	}
 }
 
-// Wait blocks until all unclosed invokations to Open have been closed.
+// Wait blocks until all unclosed invocations to Open have been closed.
 func (l *Limiter) Wait() {
 	l.wg.Wait()
 }

@@ -10,6 +10,7 @@ package interruptible
 import (
 	"bytes"
 	"errors"
+
 	// "fmt"
 	"io"
 	"sync"

@@ -32,7 +32,6 @@ func deep(shown shownMap, w *bufio.Writer, v reflect.Value, prefix string) {
 	defer w.Flush()
 
 	switch v.Kind() {
-
 	case reflect.Array, reflect.Slice:
 		w.WriteString(v.Type().String())
 		if v.Len() == 0 {

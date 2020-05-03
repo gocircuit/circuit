@@ -193,7 +193,7 @@ func (imp *impTabl) Dump() string {
 	defer imp.lk.Unlock()
 
 	var w bytes.Buffer
-	for id, _ := range imp.id {
+	for id := range imp.id {
 		w.WriteString(id.String())
 		w.WriteByte('\n')
 	}

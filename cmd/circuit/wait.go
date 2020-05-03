@@ -50,7 +50,7 @@ func waitall(x *cli.Context) (err error) {
 			ch <- i
 		}()
 	}
-	for _ = range t {
+	for range t {
 		<-ch
 	}
 	return

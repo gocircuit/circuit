@@ -105,7 +105,7 @@ func parentRepos(wd string) []string {
 		return nil
 	}
 	p = p[1:]
-	for i, _ := range p {
+	for i := range p {
 		g := path.Join(p[:len(p)-i]...)
 		g = "/" + g
 		if isRepo(g) {

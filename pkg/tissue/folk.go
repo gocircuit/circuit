@@ -29,7 +29,7 @@ func (folk *Folk) Opened() []FolkAvatar {
 	return r
 }
 
-// Replenish blocks and returns the next downstream peer added to the neighborhod set by the kin.
+// Replenish blocks and returns the next downstream peer added to the neighborhood set by the kin.
 func (folk *Folk) Replenish() (peer FolkAvatar) {
 	peer = <-folk.ch
 	folk.neighborhood.Add(Avatar(peer))

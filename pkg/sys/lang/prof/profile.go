@@ -9,9 +9,10 @@
 package prof
 
 import (
-	"github.com/hoijui/circuit/pkg/kit/stat"
 	"sync"
 	"time"
+
+	"github.com/hoijui/circuit/pkg/kit/stat"
 )
 
 // Profile keeps various load-related statistics for a worker

@@ -47,7 +47,7 @@ func InstallCtrlCPanic() {
 		//defer SavePanicTrace()
 		ch := make(chan os.Signal, 1)
 		signal.Notify(ch, os.Interrupt)
-		for _ = range ch {
+		for range ch {
 			panic("ctrlc")
 			prof := pprof.Lookup("goroutine")
 			prof.WriteTo(os.Stderr, 2)
@@ -63,7 +63,7 @@ func InstallKillPanic() {
 		//defer SavePanicTrace()
 		ch := make(chan os.Signal, 1)
 		signal.Notify(ch, os.Kill)
-		for _ = range ch {
+		for range ch {
 			prof := pprof.Lookup("goroutine")
 			prof.WriteTo(os.Stderr, 2)
 			os.Exit(1)

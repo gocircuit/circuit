@@ -27,7 +27,7 @@ func testPipe(r io.ReadCloser, w io.WriteCloser, t *testing.T) {
 	const N = 2200
 	ch := make(chan int)
 	data := make([]byte, N)
-	for i, _ := range data {
+	for i := range data {
 		data[i] = byte(rand.Int())
 	}
 	go func() { // write goroutine
@@ -60,7 +60,7 @@ func testPipe(r io.ReadCloser, w io.WriteCloser, t *testing.T) {
 	}()
 	<-ch
 	<-ch
-	for i, _ := range data {
+	for i := range data {
 		if data[i] != y[i] {
 			t.Fatalf("index %d differs: %v vs %v", i, data[i], y[i])
 		}

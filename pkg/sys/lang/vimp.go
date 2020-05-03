@@ -38,7 +38,6 @@ func (r *Runtime) importValues(values []interface{}, types []reflect.Type, expor
 
 func (r *Runtime) importRewrite(src, dst reflect.Value, exporter n.Addr, ig *importGroup) bool {
 	switch v := src.Interface().(type) {
-
 	case *ptrMsg:
 		if exporter == nil {
 			panic("importing non-perm ptr without exporter")

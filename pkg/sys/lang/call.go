@@ -9,9 +9,10 @@ package lang
 
 import (
 	"fmt"
-	"github.com/hoijui/circuit/pkg/sys/lang/types"
 	"reflect"
 	"runtime/debug"
+
+	"github.com/hoijui/circuit/pkg/sys/lang/types"
 )
 
 // call invokes the method of r encoded by f with respect to t, with arguments a

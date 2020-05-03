@@ -9,8 +9,9 @@ package acid
 
 import (
 	"fmt"
-	"github.com/hoijui/circuit/pkg/use/circuit"
 	"reflect"
+
+	"github.com/hoijui/circuit/pkg/use/circuit"
 )
 
 type Stringer interface {
@@ -18,7 +19,6 @@ type Stringer interface {
 }
 
 func (s *Acid) OnBehalfCallStringer(service, proc string) (r string) {
-
 	// If anything goes wrong, let's not panic the worker
 	defer func() {
 		if p := recover(); p != nil {
