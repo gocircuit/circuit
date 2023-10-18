@@ -6,7 +6,7 @@
 
 ## Running containers
 
-**Note**: Use the `-l` option so that `bash` is in "login shell mode". This will make bash execute `/ect/profile`, where environment variables are exported for convenience.
+**Note**: Use the `-l` option so that `bash` is in "login shell mode". This will make bash execute `/etc/profile`, where environment variables are exported for convenience.
 
 	sudo docker run -i -t circuit-img /bin/bash -l
 
